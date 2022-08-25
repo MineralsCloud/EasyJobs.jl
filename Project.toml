@@ -3,6 +3,11 @@ uuid = "66d786ec-6e9c-4d5d-a8f6-aa4f8d7350fb"
 authors = ["singularitti <singularitti@outlook.com> and contributors"]
 version = "0.1.0"
 
+[deps]
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+ReusePatterns = "a39b5e78-89b5-562b-97d8-70689129df0c"
+UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+
 [compat]
 julia = "1"
 
