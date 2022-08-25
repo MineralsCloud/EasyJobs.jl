@@ -1,8 +1,6 @@
 using Dates: now
 
-using ..Thunks: reify!
-
-import ..SimpleWorkflows: run!
+using .Thunks: reify!
 
 export run!, interrupt!
 
