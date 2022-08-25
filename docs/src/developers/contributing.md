@@ -33,7 +33,7 @@ person to improve it!
 The docs are written in Markdown and are built using
 [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl).
 You can find the source of all the docs
-[here](https://github.com/MineralsCloud/EasyJobs.jl/tree/master/docs).
+[here](https://github.com/MineralsCloud/EasyJobs.jl/tree/main/docs).
 
 If your change is small (like fixing typos, or one or two sentence corrections),
 the easiest way to do this is via GitHub's online editor. (GitHub has
@@ -52,7 +52,7 @@ Another way to contribute to `EasyJobs` is to file
 
 Make sure you read the info in the box where you write the body of the issue
 before posting. You can also find a copy of that info
-[here](https://github.com/MineralsCloud/EasyJobs.jl/blob/master/.github/ISSUE_TEMPLATE/bug_report.md).
+[here](https://github.com/MineralsCloud/EasyJobs.jl/blob/main/.github/ISSUE_TEMPLATE/bug_report.md).
 
 !!! tip
     If you're unsure whether you have a real bug, post on the
@@ -136,7 +136,7 @@ cd ~/.julia/dev/EasyJobs
 
 git remote add GITHUB_ACCOUNT https://github.com/GITHUB_ACCOUNT/EasyJobs.jl.git
 
-git checkout master  # or main
+git checkout main
 
 git pull
 
@@ -240,7 +240,7 @@ next contribution!
 ```shell
 cd ~/.julia/dev/EasyJobs
 
-git checkout master
+git checkout main
 
 git pull
 ```

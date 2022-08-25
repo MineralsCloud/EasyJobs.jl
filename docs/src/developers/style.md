@@ -32,7 +32,7 @@ If not following, your pull requests may not be accepted.
 `EasyJobs` uses [`JuliaFormatter`](https://github.com/domluna/JuliaFormatter.jl) as
 an auto-formatting tool.
 
-We use the options contained in [`.JuliaFormatter.toml`](https://github.com/MineralsCloud/EasyJobs.jl/blob/master/.JuliaFormatter.toml).
+We use the options contained in [`.JuliaFormatter.toml`](https://github.com/MineralsCloud/EasyJobs.jl/blob/main/.JuliaFormatter.toml).
 
 To format your code, `cd` to the `EasyJobs` directory, then run:
 

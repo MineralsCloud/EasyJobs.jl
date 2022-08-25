@@ -14,12 +14,12 @@
 [appveyor-url]: https://ci.appveyor.com/project/singularitti/EasyJobs-jl
 [cirrus-img]: https://api.cirrus-ci.com/github/MineralsCloud/EasyJobs.jl.svg
 [cirrus-url]: https://cirrus-ci.com/github/MineralsCloud/EasyJobs.jl
-[gitlab-img]: https://gitlab.com/singularitti/EasyJobs.jl/badges/master/pipeline.svg
+[gitlab-img]: https://gitlab.com/singularitti/EasyJobs.jl/badges/main/pipeline.svg
 [gitlab-url]: https://gitlab.com/singularitti/EasyJobs.jl/-/pipelines
-[codecov-img]: https://codecov.io/gh/MineralsCloud/EasyJobs.jl/branch/master/graph/badge.svg
+[codecov-img]: https://codecov.io/gh/MineralsCloud/EasyJobs.jl/branch/main/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/MineralsCloud/EasyJobs.jl
 [license-img]: https://img.shields.io/github/license/MineralsCloud/EasyJobs.jl
-[license-url]: https://github.com/MineralsCloud/EasyJobs.jl/blob/master/LICENSE
+[license-url]: https://github.com/MineralsCloud/EasyJobs.jl/blob/main/LICENSE
 [style-img]: https://img.shields.io/badge/code%20style-blue-4495d1.svg
 [style-url]: https://github.com/invenia/BlueStyle
 
