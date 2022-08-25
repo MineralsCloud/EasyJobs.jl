@@ -1,0 +1,3 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+EasyJobs = "66d786ec-6e9c-4d5d-a8f6-aa4f8d7350fb"
