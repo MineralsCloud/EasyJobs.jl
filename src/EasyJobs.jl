@@ -1,5 +1,10 @@
 module EasyJobs
 
-# Write your package code here.
+include("Thunks.jl")
+include("jobs.jl")
+include("run!.jl")
+include("registry.jl")
+include("status.jl")
+include("misc.jl")
 
 end
