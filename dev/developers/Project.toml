@@ -1,0 +1,3 @@
+[deps]
+EasyJobs = "66d786ec-6e9c-4d5d-a8f6-aa4f8d7350fb"
+JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
