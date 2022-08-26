@@ -149,7 +149,7 @@ end
 
 Get the result of a `Thunk`. If `thunk` has not been evaluated, return `nothing`, else return a `Some`-wrapped result.
 """
-getresult(thunk::Think) = thunk.evaluated ? thunk.result : nothing
+getresult(think::Think) = think.evaluated ? think.result : nothing
 
 # See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L6-L11
 function _kill(task)
@@ -172,16 +172,16 @@ function Base.show(io::IO, thunk::Thunk)
     end
 end
 
-function printfunc(io::IO, thunk::Thunk)
-    print(io, thunk.f, '(')
-    args = thunk.args
+function printfunc(io::IO, think::Think)
+    print(io, think.f, '(')
+    args = think.args
     if length(args) > 0
         for v in args[1:(end - 1)]
             print(io, v, ", ")
         end
         print(io, args[end])
     end
-    kwargs = thunk.kwargs
+    kwargs = think.kwargs
     if isempty(kwargs)
         print(io, ')')
     else
