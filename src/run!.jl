@@ -1,6 +1,6 @@
 using Dates: now
 
-using .Thunks: TimeoutException, ErredResult, reify!
+using .Thunks: TimeoutException, ErredResult, reify!, _kill
 
 export run!, interrupt!
 
@@ -89,17 +89,9 @@ function interrupt!(job::Job)
     elseif ispending(job)
         @info "the job $(job.id) has not started!"
     else
-        killtask(JOB_REGISTRY[job])
+        _kill(JOB_REGISTRY[job])
     end
     return job
-end
-
-# See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L6-L11
-function killtask(task)
-    try
-        schedule(task, InterruptException(); error=true)
-    catch
-    end
 end
 
 Base.wait(job::Job) = wait(JOB_REGISTRY[job])
