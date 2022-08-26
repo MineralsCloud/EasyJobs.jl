@@ -11,18 +11,7 @@ Run a `Job` with maximum `n` attempts, with each attempt separated by `δt` seco
 """
 function run!(job::Job; n=1, δt=1)
     @assert isinteger(n) && n >= 1
-    for _ in 1:n
-        if !issucceeded(job)
-            run_inner!(job)
-        end
-        if issucceeded(job)
-            break  # Stop immediately
-        end
-        if !iszero(δt)  # Still unsuccessful
-            sleep(δt)  # `if-else` is faster than `sleep(0)`
-        end
-    end
-    return job
+    return run_repeatedly!(job; n=n, δt=δt)
 end
 function run!(job::SubsequentJob; n=1, δt=1)
     @assert isinteger(n) && n >= 1
@@ -36,6 +25,9 @@ function run!(job::SubsequentJob; n=1, δt=1)
     else  # > 1
         collect(getresult(parent) for parent in parents)
     end
+    return run_repeatedly!(job; n=n, δt=δt)
+end
+function run_repeatedly!(job; n=1, δt=1)
     for _ in 1:n
         if !issucceeded(job)
             run_inner!(job)
