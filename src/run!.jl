@@ -13,7 +13,7 @@ function run!(job::Job; n=1, δt=1)
     @assert isinteger(n) && n >= 1
     return run_repeatedly!(job; n=n, δt=δt)
 end
-function run!(job::SubsequentJob; n=1, δt=1)
+function run!(job::ConsequentJob; n=1, δt=1)
     @assert isinteger(n) && n >= 1
     # Use previous results as arguments
     parents = job.parents
