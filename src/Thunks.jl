@@ -110,6 +110,32 @@ function reify!(thunk::Thunk)
         end
     end
 end
+# See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L18-L45
+function reify!(thunk::TimeLimitedThink)
+    istimedout = Channel{Bool}(1)
+    main = @async begin
+        try
+            thunk.result = Some(thunk.f(thunk.args...; thunk.kwargs...))
+        catch e
+            thunk.erred = true
+            s = stacktrace(catch_backtrace())
+            thunk.result = Some(ErredResult(e, s))
+        finally
+            thunk.evaluated = true
+        end
+        put!(istimedout, false)
+    end
+    timer = @async begin
+        sleep(thunk.timeout)
+        put!(istimedout, true)
+        Base.throwto(main, TimeoutException())
+    end
+    fetch(istimedout)  # You do not know which of `main` and `timer` finishes first, so you need `istimedout`.
+    close(istimedout)
+    _kill(main)  # Kill all `Task`s after done.
+    _kill(timer)
+    return thunk.result
+end
 
 """
     getresult(thunk::Thunk)
@@ -117,6 +143,14 @@ end
 Get the result of a `Thunk`. If `thunk` has not been evaluated, return `nothing`, else return a `Some`-wrapped result.
 """
 getresult(thunk::Think) = thunk.evaluated ? thunk.result : nothing
+
+# See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L6-L11
+function _kill(task)
+    try
+        schedule(task, InterruptException(); error=true)
+    catch
+    end
+end
 
 function Base.show(io::IO, thunk::Thunk)
     if get(io, :compact, false) || get(io, :typeinfo, nothing) == typeof(thunk)
