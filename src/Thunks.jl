@@ -1,8 +1,8 @@
 module Thunks
 
-export Thunk, reify!, getresult
 using Dates: Period, Second
 
+export Thunk, TimeLimitedThink, reify!, getresult
 
 # See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L4
 struct TimeoutException <: Exception end
@@ -116,7 +116,7 @@ end
 
 Get the result of a `Thunk`. If `thunk` has not been evaluated, return `nothing`, else return a `Some`-wrapped result.
 """
-getresult(thunk::Thunk) = thunk.evaluated ? thunk.result : nothing
+getresult(thunk::Think) = thunk.evaluated ? thunk.result : nothing
 
 function Base.show(io::IO, thunk::Thunk)
     if get(io, :compact, false) || get(io, :typeinfo, nothing) == typeof(thunk)
