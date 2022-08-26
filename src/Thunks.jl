@@ -2,7 +2,7 @@ module Thunks
 
 using Dates: Period, Second
 
-export Thunk, TimeLimitedThink, reify!, getresult
+export Thunk, TimeLimitedThunk, reify!, getresult
 
 # See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L4
 struct TimeoutException <: Exception end
@@ -68,19 +68,26 @@ end
 Thunk(f, args...; kwargs...) = Thunk(f, args, NamedTuple(kwargs))
 Thunk(f) = (args...; kwargs...) -> Thunk(f, args, NamedTuple(kwargs))
 
-mutable struct TimeLimitedThink <: Think
+mutable struct TimeLimitedThunk <: Think
+    timeout::Period
     f
     args::Tuple
     kwargs::NamedTuple
     evaluated::Bool
     erred::Bool
     result::Union{Some,Nothing}
-    timeout::Period
-    function TimeLimitedThink(
-        f, args::Tuple, kwargs::NamedTuple=NamedTuple(), timeout=Second(0)
-    )
-        return new(f, args, kwargs, false, false, nothing, timeout)
+    function TimeLimitedThunk(timeout, f, args::Tuple, kwargs::NamedTuple=NamedTuple())
+        return new(timeout, f, args, kwargs, false, false, nothing)
     end
+end
+function TimeLimitedThunk(timeout, f, args...; kwargs...)
+    return TimeLimitedThunk(timeout, f, args, NamedTuple(kwargs))
+end
+function TimeLimitedThunk(timeout, f)
+    return (args...; kwargs...) -> TimeLimitedThunk(timeout, f, args, NamedTuple(kwargs))
+end
+function TimeLimitedThunk(timeout)
+    return (f, args...; kwargs...) -> TimeLimitedThunk(timeout, f, args, NamedTuple(kwargs))
 end
 
 # See https://github.com/tbenst/Thunks.jl/blob/ff2a553/src/core.jl#L113-L123
@@ -95,34 +102,12 @@ and then evaluating the `Thunk`'s function with the evaluated arguments.
 
 See also [`Thunk`](@ref).
 """
-function reify!(thunk::Thunk)
-    if thunk.evaluated
-        return getresult(thunk)
-    else
-        try
-            thunk.result = Some(thunk.f(thunk.args...; thunk.kwargs...))
-        catch e
-            thunk.erred = true
-            s = stacktrace(catch_backtrace())
-            thunk.result = Some(ErredResult(e, s))
-        finally
-            thunk.evaluated = true
-        end
-    end
-end
+reify!(thunk::Thunk) = thunk.evaluated ? getresult(thunk) : reify_core!(thunk)
 # See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L18-L45
-function reify!(thunk::TimeLimitedThink)
+function reify!(thunk::TimeLimitedThunk)
     istimedout = Channel{Bool}(1)
     main = @async begin
-        try
-            thunk.result = Some(thunk.f(thunk.args...; thunk.kwargs...))
-        catch e
-            thunk.erred = true
-            s = stacktrace(catch_backtrace())
-            thunk.result = Some(ErredResult(e, s))
-        finally
-            thunk.evaluated = true
-        end
+        reify_core!(thunk)
         put!(istimedout, false)
     end
     timer = @async begin
@@ -136,13 +121,24 @@ function reify!(thunk::TimeLimitedThink)
     _kill(timer)
     return thunk.result
 end
+function reify_core!(think)
+    try
+        think.result = Some(think.f(think.args...; think.kwargs...))
+    catch e
+        think.erred = true
+        s = stacktrace(catch_backtrace())
+        think.result = Some(ErredResult(e, s))
+    finally
+        think.evaluated = true
+    end
+end
 
 """
     getresult(thunk::Thunk)
 
 Get the result of a `Thunk`. If `thunk` has not been evaluated, return `nothing`, else return a `Some`-wrapped result.
 """
-getresult(thunk::Think) = thunk.evaluated ? thunk.result : nothing
+getresult(think::Think) = think.evaluated ? think.result : nothing
 
 # See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L6-L11
 function _kill(task)
@@ -161,20 +157,43 @@ function Base.show(io::IO, thunk::Thunk)
         printfunc(io, thunk)
         println(io)
         println(io, " evaluated: ", thunk.evaluated)
-        println(io, " result: ", thunk.result)
+        result = thunk.result
+        if result isa ErredResult
+            println(io, " result: ", result.thrown)
+        else
+            println(io, " result: ", result)
+        end
+    end
+end
+function Base.show(io::IO, thunk::TimeLimitedThunk)
+    if get(io, :compact, false) || get(io, :typeinfo, nothing) == typeof(thunk)
+        Base.show_default(IOContext(io, :limit => true), thunk)  # From https://github.com/mauro3/Parameters.jl/blob/ecbf8df/src/Parameters.jl#L556
+    else
+        println(io, summary(thunk))
+        print(io, ' ', "def: ")
+        printfunc(io, thunk)
+        println(io)
+        println(io, " time limit: ", thunk.timeout)
+        println(io, " evaluated: ", thunk.evaluated)
+        result = thunk.result
+        if result isa ErredResult
+            println(io, " result: ", result.thrown)
+        else
+            println(io, " result: ", result)
+        end
     end
 end
 
-function printfunc(io::IO, thunk::Thunk)
-    print(io, thunk.f, '(')
-    args = thunk.args
+function printfunc(io::IO, think::Think)
+    print(io, think.f, '(')
+    args = think.args
     if length(args) > 0
         for v in args[1:(end - 1)]
             print(io, v, ", ")
         end
         print(io, args[end])
     end
-    kwargs = thunk.kwargs
+    kwargs = think.kwargs
     if isempty(kwargs)
         print(io, ')')
     else

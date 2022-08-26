@@ -1,8 +1,7 @@
 using Dates: DateTime, now, format
-using ReusePatterns
 using UUIDs: UUID, uuid1
 
-using .Thunks: Thunk, printfunc
+using .Thunks: Think, printfunc
 
 export SimpleJob
 
@@ -35,7 +34,7 @@ julia> b = Job(Thunk(run, `pwd` & `ls`); user="me", desc="Run some commands");
 """
 mutable struct SimpleJob <: Job
     id::UUID
-    thunk::Thunk
+    thunk::Think
     desc::String
     user::String
     created_time::DateTime
@@ -48,7 +47,7 @@ mutable struct SimpleJob <: Job
     parents::Vector{Job}
     "These jobs runs after the current job."
     children::Vector{Job}
-    function SimpleJob(thunk::Thunk; desc="", user="")
+    function SimpleJob(thunk::Think; desc="", user="")
         return new(
             uuid1(), thunk, desc, user, now(), DateTime(0), DateTime(0), PENDING, 0, [], []
         )
@@ -67,7 +66,7 @@ function SimpleJob(job::SimpleJob)
 end
 mutable struct SubsequentJob <: Job
     id::UUID
-    thunk::Thunk
+    thunk::Think
     desc::String
     user::String
     created_time::DateTime
@@ -80,7 +79,7 @@ mutable struct SubsequentJob <: Job
     parents::Vector{Job}
     "These jobs runs after the current job."
     children::Vector{Job}
-    function SubsequentJob(thunk::Thunk; desc="", user="")
+    function SubsequentJob(thunk::Think; desc="", user="")
         return new(
             uuid1(), thunk, desc, user, now(), DateTime(0), DateTime(0), PENDING, 0, [], []
         )
@@ -88,7 +87,7 @@ mutable struct SubsequentJob <: Job
 end
 mutable struct ConsequentJob <: Job
     id::UUID
-    thunk::Thunk
+    thunk::Think
     desc::String
     user::String
     created_time::DateTime
@@ -101,7 +100,7 @@ mutable struct ConsequentJob <: Job
     parents::Vector{Job}
     "These jobs runs after the current job."
     children::Vector{Job}
-    function ConsequentJob(thunk::Thunk; desc="", user="")
+    function ConsequentJob(thunk::Think; desc="", user="")
         if !isempty(thunk.args)
             @warn "the functional arguments of a `ConsequentJob` are not empty!"
         end
