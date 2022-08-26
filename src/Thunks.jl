@@ -1,12 +1,19 @@
 module Thunks
 
-export Thunk, reify!, getresult
+using Dates: Period, Second
+
+export Thunk, TimeLimitedThink, reify!, getresult
+
+# See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L4
+struct TimeoutException <: Exception end
 
 "Capture errors and stack traces from a running `Thunk`."
 struct ErredResult{T}
     thrown::T
     stacktrace::Base.StackTraces.StackTrace
 end
+
+abstract type Think end
 
 # Idea from https://github.com/tbenst/Thunks.jl/blob/ff2a553/src/core.jl#L11-L20
 """
@@ -47,7 +54,7 @@ julia> e = Thunk(sin, "1");  # Catch errors
 julia> reify!(e);
 ```
 """
-mutable struct Thunk
+mutable struct Thunk <: Think
     f
     args::Tuple
     kwargs::NamedTuple
@@ -60,6 +67,21 @@ mutable struct Thunk
 end
 Thunk(f, args...; kwargs...) = Thunk(f, args, NamedTuple(kwargs))
 Thunk(f) = (args...; kwargs...) -> Thunk(f, args, NamedTuple(kwargs))
+
+mutable struct TimeLimitedThink <: Think
+    f
+    args::Tuple
+    kwargs::NamedTuple
+    evaluated::Bool
+    erred::Bool
+    result::Union{Some,Nothing}
+    timeout::Period
+    function TimeLimitedThink(
+        f, args::Tuple, kwargs::NamedTuple=NamedTuple(), timeout=Second(0)
+    )
+        return new(f, args, kwargs, false, false, nothing, timeout)
+    end
+end
 
 # See https://github.com/tbenst/Thunks.jl/blob/ff2a553/src/core.jl#L113-L123
 """
@@ -88,13 +110,47 @@ function reify!(thunk::Thunk)
         end
     end
 end
+# See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L18-L45
+function reify!(thunk::TimeLimitedThink)
+    istimedout = Channel{Bool}(1)
+    main = @async begin
+        try
+            thunk.result = Some(thunk.f(thunk.args...; thunk.kwargs...))
+        catch e
+            thunk.erred = true
+            s = stacktrace(catch_backtrace())
+            thunk.result = Some(ErredResult(e, s))
+        finally
+            thunk.evaluated = true
+        end
+        put!(istimedout, false)
+    end
+    timer = @async begin
+        sleep(thunk.timeout)
+        put!(istimedout, true)
+        Base.throwto(main, TimeoutException())
+    end
+    fetch(istimedout)  # You do not know which of `main` and `timer` finishes first, so you need `istimedout`.
+    close(istimedout)
+    _kill(main)  # Kill all `Task`s after done.
+    _kill(timer)
+    return thunk.result
+end
 
 """
     getresult(thunk::Thunk)
 
 Get the result of a `Thunk`. If `thunk` has not been evaluated, return `nothing`, else return a `Some`-wrapped result.
 """
-getresult(thunk::Thunk) = thunk.evaluated ? thunk.result : nothing
+getresult(thunk::Think) = thunk.evaluated ? thunk.result : nothing
+
+# See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L6-L11
+function _kill(task)
+    try
+        schedule(task, InterruptException(); error=true)
+    catch
+    end
+end
 
 function Base.show(io::IO, thunk::Thunk)
     if get(io, :compact, false) || get(io, :typeinfo, nothing) == typeof(thunk)
@@ -132,12 +188,14 @@ function printfunc(io::IO, thunk::Thunk)
 end
 
 function Base.show(io::IO, erred::ErredResult)
+    println(io, summary(erred))
     if erred.thrown isa ErrorException
         show(io, erred.thrown)
     else
         showerror(io, erred.thrown)
     end
-    return Base.show_backtrace(io, erred.stacktrace)
+    Base.show_backtrace(io, erred.stacktrace)
+    return nothing
 end
 
 end
