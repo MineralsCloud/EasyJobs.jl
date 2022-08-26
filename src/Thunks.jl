@@ -69,25 +69,26 @@ Thunk(f, args...; kwargs...) = Thunk(f, args, NamedTuple(kwargs))
 Thunk(f) = (args...; kwargs...) -> Thunk(f, args, NamedTuple(kwargs))
 
 mutable struct TimeLimitedThunk <: Think
-    timeout::Period
+    time_limit::Period
     f
     args::Tuple
     kwargs::NamedTuple
     evaluated::Bool
     erred::Bool
     result::Union{Some,Nothing}
-    function TimeLimitedThunk(timeout, f, args::Tuple, kwargs::NamedTuple=NamedTuple())
-        return new(timeout, f, args, kwargs, false, false, nothing)
+    function TimeLimitedThunk(time_limit, f, args::Tuple, kwargs::NamedTuple=NamedTuple())
+        return new(time_limit, f, args, kwargs, false, false, nothing)
     end
 end
-function TimeLimitedThunk(timeout, f, args...; kwargs...)
-    return TimeLimitedThunk(timeout, f, args, NamedTuple(kwargs))
+function TimeLimitedThunk(time_limit, f, args...; kwargs...)
+    return TimeLimitedThunk(time_limit, f, args, NamedTuple(kwargs))
 end
-function TimeLimitedThunk(timeout, f)
-    return (args...; kwargs...) -> TimeLimitedThunk(timeout, f, args, NamedTuple(kwargs))
+function TimeLimitedThunk(time_limit, f)
+    return (args...; kwargs...) -> TimeLimitedThunk(time_limit, f, args, NamedTuple(kwargs))
 end
-function TimeLimitedThunk(timeout)
-    return (f, args...; kwargs...) -> TimeLimitedThunk(timeout, f, args, NamedTuple(kwargs))
+function TimeLimitedThunk(time_limit)
+    return (f, args...; kwargs...) ->
+        TimeLimitedThunk(time_limit, f, args, NamedTuple(kwargs))
 end
 
 # See https://github.com/tbenst/Thunks.jl/blob/ff2a553/src/core.jl#L113-L123
@@ -111,7 +112,7 @@ function reify!(thunk::TimeLimitedThunk)
         put!(istimedout, false)
     end
     timer = @async begin
-        sleep(thunk.timeout)
+        sleep(thunk.time_limit)
         put!(istimedout, true)
         Base.throwto(main, TimeoutException())
     end
@@ -173,7 +174,7 @@ function Base.show(io::IO, thunk::TimeLimitedThunk)
         print(io, ' ', "def: ")
         printfunc(io, thunk)
         println(io)
-        println(io, " time limit: ", thunk.timeout)
+        println(io, " time limit: ", thunk.time_limit)
         println(io, " evaluated: ", thunk.evaluated)
         result = thunk.result
         if result isa ErredResult
