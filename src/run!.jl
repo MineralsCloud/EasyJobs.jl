@@ -41,7 +41,7 @@ function run_repeatedly!(job; n=1, δt=1)
     end
     return job
 end
-function run_inner!(job::Job)  # Do not export!
+function run_inner!(job)  # Do not export!
     if ispending(job)
         if !isexecuted(job)
             push!(JOB_REGISTRY, job => nothing)
@@ -52,7 +52,7 @@ function run_inner!(job::Job)  # Do not export!
         return run_inner!(job)
     end
 end
-function run_core!(job::Job)  # Do not export!
+function run_core!(job)  # Do not export!
     job.status = RUNNING
     job.start_time = now()
     reify!(job.thunk)
