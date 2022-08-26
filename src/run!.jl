@@ -1,6 +1,6 @@
 using Dates: now
 
-using .Thunks: ErredResult, reify!
+using .Thunks: TimeoutException, ErredResult, reify!
 
 export run!, interrupt!
 
@@ -63,8 +63,11 @@ function run_core!(job)  # Do not export!
     reify!(job.thunk)
     job.stop_time = now()
     job.status = if job.thunk.erred
-        if something(getresult(job.thunk)) isa ErredResult{InterruptException}
+        thrown = something(getresult(job.thunk)).thrown
+        if thrown isa InterruptException
             INTERRUPTED
+        elseif thrown isa TimeoutException
+            TIMED_OUT
         else
             FAILED
         end
