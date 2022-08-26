@@ -2,6 +2,9 @@ module Thunks
 
 export Thunk, reify!, getresult
 
+# See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L4
+struct TimeoutException <: Exception end
+
 "Capture errors and stack traces from a running `Thunk`."
 struct ErredResult{T}
     thrown::T
