@@ -65,6 +65,30 @@ function SimpleJob(job::SimpleJob)
     new_job.children = job.children
     return new_job
 end
+mutable struct SubsequentJob <: Job
+    id::UUID
+    thunk::Thunk
+    desc::String
+    user::String
+    created_time::DateTime
+    start_time::DateTime
+    stop_time::DateTime
+    "Track the job status."
+    status::JobStatus
+    count::UInt64
+    "These jobs runs before the current job."
+    parents::Vector{Job}
+    "These jobs runs after the current job."
+    children::Vector{Job}
+    function SubsequentJob(thunk::Thunk; desc="", user="")
+        if !isempty(thunk.args)
+            @warn "the functional arguments of a `SubsequentJob` are not empty!"
+        end
+        return new(
+            uuid1(), thunk, desc, user, now(), DateTime(0), DateTime(0), PENDING, 0, [], []
+        )
+    end
+end
 
 function Base.show(io::IO, job::Job)
     if get(io, :compact, false) || get(io, :typeinfo, nothing) == typeof(job)
