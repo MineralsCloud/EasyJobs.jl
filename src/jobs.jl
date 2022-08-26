@@ -65,6 +65,27 @@ function SimpleJob(job::SimpleJob)
     new_job.children = job.children
     return new_job
 end
+mutable struct SubsequentJob <: Job
+    id::UUID
+    thunk::Thunk
+    desc::String
+    user::String
+    created_time::DateTime
+    start_time::DateTime
+    stop_time::DateTime
+    "Track the job status."
+    status::JobStatus
+    count::UInt64
+    "These jobs runs before the current job."
+    parents::Vector{Job}
+    "These jobs runs after the current job."
+    children::Vector{Job}
+    function SubsequentJob(thunk::Thunk; desc="", user="")
+        return new(
+            uuid1(), thunk, desc, user, now(), DateTime(0), DateTime(0), PENDING, 0, [], []
+        )
+    end
+end
 mutable struct ConsequentJob <: Job
     id::UUID
     thunk::Thunk
