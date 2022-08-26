@@ -24,6 +24,31 @@ function run!(job::Job; n=1, δt=1)
     end
     return job
 end
+function run!(job::SubsequentJob; n=1, δt=1)
+    @assert isinteger(n) && n >= 1
+    # Use previous results as arguments
+    parents = job.parents
+    @assert all(isexited(parent) for parent in parents)
+    job.thunk.args = if length(parents) == 0
+        ()
+    elseif length(parents) == 1
+        (getresult(parent),)
+    else  # > 1
+        collect(getresult(parent) for parent in parents)
+    end
+    for _ in 1:n
+        if !issucceeded(job)
+            run_inner!(job)
+        end
+        if issucceeded(job)
+            break  # Stop immediately
+        end
+        if !iszero(δt)  # Still unsuccessful
+            sleep(δt)  # `if-else` is faster than `sleep(0)`
+        end
+    end
+    return job
+end
 function run_inner!(job::Job)  # Do not export!
     if ispending(job)
         if !isexecuted(job)
