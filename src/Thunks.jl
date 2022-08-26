@@ -102,34 +102,12 @@ and then evaluating the `Thunk`'s function with the evaluated arguments.
 
 See also [`Thunk`](@ref).
 """
-function reify!(thunk::Thunk)
-    if thunk.evaluated
-        return getresult(thunk)
-    else
-        try
-            thunk.result = Some(thunk.f(thunk.args...; thunk.kwargs...))
-        catch e
-            thunk.erred = true
-            s = stacktrace(catch_backtrace())
-            thunk.result = Some(ErredResult(e, s))
-        finally
-            thunk.evaluated = true
-        end
-    end
-end
+reify!(thunk::Thunk) = thunk.evaluated ? getresult(thunk) : reify_core!(thunk)
 # See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L18-L45
 function reify!(thunk::TimeLimitedThunk)
     istimedout = Channel{Bool}(1)
     main = @async begin
-        try
-            thunk.result = Some(thunk.f(thunk.args...; thunk.kwargs...))
-        catch e
-            thunk.erred = true
-            s = stacktrace(catch_backtrace())
-            thunk.result = Some(ErredResult(e, s))
-        finally
-            thunk.evaluated = true
-        end
+        reify_core!(thunk)
         put!(istimedout, false)
     end
     timer = @async begin
@@ -142,6 +120,17 @@ function reify!(thunk::TimeLimitedThunk)
     _kill(main)  # Kill all `Task`s after done.
     _kill(timer)
     return thunk.result
+end
+function reify_core!(think)
+    try
+        think.result = Some(think.f(think.args...; think.kwargs...))
+    catch e
+        think.erred = true
+        s = stacktrace(catch_backtrace())
+        think.result = Some(ErredResult(e, s))
+    finally
+        think.evaluated = true
+    end
 end
 
 """
