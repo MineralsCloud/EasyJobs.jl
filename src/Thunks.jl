@@ -1,6 +1,8 @@
 module Thunks
 
 export Thunk, reify!, getresult
+using Dates: Period, Second
+
 
 # See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L4
 struct TimeoutException <: Exception end
@@ -65,6 +67,21 @@ mutable struct Thunk <: Think
 end
 Thunk(f, args...; kwargs...) = Thunk(f, args, NamedTuple(kwargs))
 Thunk(f) = (args...; kwargs...) -> Thunk(f, args, NamedTuple(kwargs))
+
+mutable struct TimeLimitedThink <: Think
+    f
+    args::Tuple
+    kwargs::NamedTuple
+    evaluated::Bool
+    erred::Bool
+    result::Union{Some,Nothing}
+    timeout::Period
+    function TimeLimitedThink(
+        f, args::Tuple, kwargs::NamedTuple=NamedTuple(), timeout=Second(0)
+    )
+        return new(f, args, kwargs, false, false, nothing, timeout)
+    end
+end
 
 # See https://github.com/tbenst/Thunks.jl/blob/ff2a553/src/core.jl#L113-L123
 """
