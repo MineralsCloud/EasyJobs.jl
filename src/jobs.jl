@@ -11,6 +11,7 @@ export SimpleJob
     SUCCEEDED
     FAILED
     INTERRUPTED
+    TIMED_OUT
 end
 
 abstract type Job end
@@ -131,7 +132,7 @@ function Base.show(io::IO, job::Job)
             if isrunning(job)
                 print(io, "still running...")
             else
-                println(io, format(stoptime(job), "dd-u-YYYY HH:MM:SS.s"))
+                # println(io, format(stoptime(job), "dd-u-YYYY HH:MM:SS.s"))
                 print(io, ' ', "uses: ", elapsed(job))
             end
         end
