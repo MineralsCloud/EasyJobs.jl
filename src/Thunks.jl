@@ -2,7 +2,7 @@ module Thunks
 
 using Dates: Period, Second
 
-export Thunk, TimeLimitedThink, reify!, getresult
+export Thunk, TimeLimitedThunk, reify!, getresult
 
 # See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L4
 struct TimeoutException <: Exception end
@@ -68,19 +68,26 @@ end
 Thunk(f, args...; kwargs...) = Thunk(f, args, NamedTuple(kwargs))
 Thunk(f) = (args...; kwargs...) -> Thunk(f, args, NamedTuple(kwargs))
 
-mutable struct TimeLimitedThink <: Think
+mutable struct TimeLimitedThunk <: Think
+    timeout::Period
     f
     args::Tuple
     kwargs::NamedTuple
     evaluated::Bool
     erred::Bool
     result::Union{Some,Nothing}
-    timeout::Period
-    function TimeLimitedThink(
-        f, args::Tuple, kwargs::NamedTuple=NamedTuple(), timeout=Second(0)
-    )
-        return new(f, args, kwargs, false, false, nothing, timeout)
+    function TimeLimitedThunk(timeout, f, args::Tuple, kwargs::NamedTuple=NamedTuple())
+        return new(timeout, f, args, kwargs, false, false, nothing)
     end
+end
+function TimeLimitedThunk(timeout, f, args...; kwargs...)
+    return TimeLimitedThunk(timeout, f, args, NamedTuple(kwargs))
+end
+function TimeLimitedThunk(timeout, f)
+    return (args...; kwargs...) -> TimeLimitedThunk(timeout, f, args, NamedTuple(kwargs))
+end
+function TimeLimitedThunk(timeout)
+    return (f, args...; kwargs...) -> TimeLimitedThunk(timeout, f, args, NamedTuple(kwargs))
 end
 
 # See https://github.com/tbenst/Thunks.jl/blob/ff2a553/src/core.jl#L113-L123
@@ -111,7 +118,7 @@ function reify!(thunk::Thunk)
     end
 end
 # See https://github.com/goropikari/Timeout.jl/blob/c7df3cd/src/Timeout.jl#L18-L45
-function reify!(thunk::TimeLimitedThink)
+function reify!(thunk::TimeLimitedThunk)
     istimedout = Channel{Bool}(1)
     main = @async begin
         try
