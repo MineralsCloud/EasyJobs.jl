@@ -157,7 +157,30 @@ function Base.show(io::IO, thunk::Thunk)
         printfunc(io, thunk)
         println(io)
         println(io, " evaluated: ", thunk.evaluated)
-        println(io, " result: ", thunk.result)
+        result = thunk.result
+        if result isa ErredResult
+            println(io, " result: ", result.thrown)
+        else
+            println(io, " result: ", result)
+        end
+    end
+end
+function Base.show(io::IO, thunk::TimeLimitedThunk)
+    if get(io, :compact, false) || get(io, :typeinfo, nothing) == typeof(thunk)
+        Base.show_default(IOContext(io, :limit => true), thunk)  # From https://github.com/mauro3/Parameters.jl/blob/ecbf8df/src/Parameters.jl#L556
+    else
+        println(io, summary(thunk))
+        print(io, ' ', "def: ")
+        printfunc(io, thunk)
+        println(io)
+        println(io, " time limit: ", thunk.timeout)
+        println(io, " evaluated: ", thunk.evaluated)
+        result = thunk.result
+        if result isa ErredResult
+            println(io, " result: ", result.thrown)
+        else
+            println(io, " result: ", result)
+        end
     end
 end
 
