@@ -8,6 +8,8 @@ struct ErredResult{T}
     stacktrace::Base.StackTraces.StackTrace
 end
 
+abstract type Think end
+
 # Idea from https://github.com/tbenst/Thunks.jl/blob/ff2a553/src/core.jl#L11-L20
 """
     Thunk(::Function, args::Tuple, kwargs::NamedTuple)
@@ -47,7 +49,7 @@ julia> e = Thunk(sin, "1");  # Catch errors
 julia> reify!(e);
 ```
 """
-mutable struct Thunk
+mutable struct Thunk <: Think
     f
     args::Tuple
     kwargs::NamedTuple
