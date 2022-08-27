@@ -10,19 +10,17 @@ export run!, interrupt!
 Run a `Job` with maximum `n` attempts, with each attempt separated by `δt` seconds.
 """
 function run!(job::Job; n=1, δt=1, t=0)
-    @assert isinteger(n) && n >= 1
+    run_check(job; n=1)
     return run_outer!(job; n=n, δt=δt, t=t)
 end
 function run!(job::SubsequentJob; n=1, δt=1, t=0)
-    @assert isinteger(n) && n >= 1
-    @assert all(isexited(parent) for parent in job.parents)
+    run_check(job; n=1)
     return run_outer!(job; n=n, δt=δt, t=t)
 end
 function run!(job::ConsequentJob; n=1, δt=1, t=0)
-    @assert isinteger(n) && n >= 1
+    run_check(job; n=1)
     # Use previous results as arguments
     parents = job.parents
-    @assert all(isexited(parent) for parent in parents)
     job.core.args = if length(parents) == 0
         ()
     elseif length(parents) == 1
@@ -81,6 +79,11 @@ function run_core!(job)  # Do not export!
     end
     job.count += 1
     return job
+end
+run_check(::Job; n=1, kwargs...) = @assert isinteger(n) && n >= 1
+function run_check(job::Union{SubsequentJob,ConsequentJob}; n=1, kwargs...)
+    @assert isinteger(n) && n >= 1
+    @assert all(isexited(parent) for parent in job.parents)
 end
 
 function waituntil(t::Period)
