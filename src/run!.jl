@@ -9,16 +9,16 @@ export run!, interrupt!
 
 Run a `Job` with maximum `n` attempts, with each attempt separated by `δt` seconds.
 """
-function run!(job::Job; n=1, δt=1)
+function run!(job::Job; n=1, δt=1, t=0)
     @assert isinteger(n) && n >= 1
-    return run_repeatedly!(job; n=n, δt=δt)
+    return run_repeatedly!(job; n=n, δt=δt, t=t)
 end
-function run!(job::SubsequentJob; n=1, δt=1)
+function run!(job::SubsequentJob; n=1, δt=1, t=0)
     @assert isinteger(n) && n >= 1
     @assert all(isexited(parent) for parent in job.parents)
-    return run_repeatedly!(job; n=n, δt=δt)
+    return run_repeatedly!(job; n=n, δt=δt, t=t)
 end
-function run!(job::ConsequentJob; n=1, δt=1)
+function run!(job::ConsequentJob; n=1, δt=1, t=0)
     @assert isinteger(n) && n >= 1
     # Use previous results as arguments
     parents = job.parents
@@ -30,9 +30,10 @@ function run!(job::ConsequentJob; n=1, δt=1)
     else  # > 1
         collect(getresult(parent) for parent in parents)
     end
-    return run_repeatedly!(job; n=n, δt=δt)
+    return run_repeatedly!(job; n=n, δt=δt, t=t)
 end
-function run_repeatedly!(job; n=1, δt=1)
+function run_repeatedly!(job; n=1, δt=1, t=0)
+    waituntil(t)
     for _ in 1:n
         if !issucceeded(job)
             run_inner!(job)
