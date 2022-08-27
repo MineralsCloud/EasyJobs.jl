@@ -37,18 +37,19 @@ function run_outer!(job; n=1, δt=1, t=0)
     return run_repeatedly!(job; n=n, δt=δt)
 end
 function run_repeatedly!(job; n=1, δt=1)
-    for _ in 1:n
-        if !issucceeded(job)
-            run_inner!(job)
-        end
+    if iszero(n)
+        return job
+    else
+        run_inner!(job)
         if issucceeded(job)
-            break  # Stop immediately
-        end
-        if !iszero(δt)  # Still unsuccessful
-            sleep(δt)  # `if-else` is faster than `sleep(0)`
+            return job  # Stop immediately
+        else
+            if !iszero(δt)
+                sleep(δt)  # `if-else` is faster than `sleep(0)`
+            end
+            return run_repeatedly!(job; n=n - 1, δt=δt)
         end
     end
-    return job
 end
 function run_inner!(job)  # Do not export!
     if ispending(job)
