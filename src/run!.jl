@@ -1,4 +1,4 @@
-using Dates: now
+using Dates: Period, now
 
 using .Thunks: TimeoutException, ErredResult, reify!, _kill
 
@@ -76,6 +76,20 @@ function run_core!(job)  # Do not export!
     end
     job.count += 1
     return job
+end
+
+function waituntil(t::Period)
+    if t > zero(t)
+        wait(t)
+    end
+    return nothing
+end
+function waituntil(t::DateTime)
+    current_time = now()
+    if t > current_time
+        wait(t - current_time)
+    end
+    return nothing
 end
 
 """
