@@ -17,12 +17,12 @@ end
 abstract type Job end
 # Reference: https://github.com/cihga39871/JobSchedulers.jl/blob/aca52de/src/jobs.jl#L35-L69
 """
-    Job(thunk::Thunk; desc="", user="")
+    Job(core::Thunk; desc="", user="")
 
 Create a simple job.
 
 # Arguments
-- `thunk`: a `Thunk` that encloses the job definition.
+- `core`: a `Thunk` that encloses the job definition.
 - `desc::String=""`: describe briefly what this job does.
 - `user::String=""`: indicate who executes this job.
 
@@ -35,7 +35,7 @@ julia> b = Job(Thunk(run, `pwd` & `ls`); user="me", desc="Run some commands");
 """
 mutable struct SimpleJob <: Job
     id::UUID
-    thunk::Think
+    core::Think
     desc::String
     user::String
     created_time::DateTime
@@ -48,9 +48,9 @@ mutable struct SimpleJob <: Job
     parents::Vector{Job}
     "These jobs runs after the current job."
     children::Vector{Job}
-    function SimpleJob(thunk::Think; desc="", user="")
+    function SimpleJob(core::Think; desc="", user="")
         return new(
-            uuid1(), thunk, desc, user, now(), DateTime(0), DateTime(0), PENDING, 0, [], []
+            uuid1(), core, desc, user, now(), DateTime(0), DateTime(0), PENDING, 0, [], []
         )
     end
 end
@@ -60,14 +60,14 @@ end
 Create a new `SimpleJob` from an existing `SimpleJob`.
 """
 function SimpleJob(job::SimpleJob)
-    new_job = SimpleJob(job.thunk; desc=job.desc, user=job.user)
+    new_job = SimpleJob(job.core; desc=job.desc, user=job.user)
     new_job.parents = job.parents
     new_job.children = job.children
     return new_job
 end
 mutable struct SubsequentJob <: Job
     id::UUID
-    thunk::Think
+    core::Think
     desc::String
     user::String
     created_time::DateTime
@@ -80,15 +80,15 @@ mutable struct SubsequentJob <: Job
     parents::Vector{Job}
     "These jobs runs after the current job."
     children::Vector{Job}
-    function SubsequentJob(thunk::Think; desc="", user="")
+    function SubsequentJob(core::Think; desc="", user="")
         return new(
-            uuid1(), thunk, desc, user, now(), DateTime(0), DateTime(0), PENDING, 0, [], []
+            uuid1(), core, desc, user, now(), DateTime(0), DateTime(0), PENDING, 0, [], []
         )
     end
 end
 mutable struct ConsequentJob <: Job
     id::UUID
-    thunk::Think
+    core::Think
     desc::String
     user::String
     created_time::DateTime
@@ -101,12 +101,12 @@ mutable struct ConsequentJob <: Job
     parents::Vector{Job}
     "These jobs runs after the current job."
     children::Vector{Job}
-    function ConsequentJob(thunk::Think; desc="", user="")
-        if !isempty(thunk.args)
+    function ConsequentJob(core::Think; desc="", user="")
+        if !isempty(core.args)
             @warn "the functional arguments of a `ConsequentJob` are not empty!"
         end
         return new(
-            uuid1(), thunk, desc, user, now(), DateTime(0), DateTime(0), PENDING, 0, [], []
+            uuid1(), core, desc, user, now(), DateTime(0), DateTime(0), PENDING, 0, [], []
         )
     end
 end
@@ -123,7 +123,7 @@ function Base.show(io::IO, job::Job)
             println(io)
         end
         print(io, ' ', "def: ")
-        printfunc(io, job.thunk)
+        printfunc(io, job.core)
         print(io, '\n', ' ', "status: ")
         printstyled(io, getstatus(job); bold=true)
         if !ispending(job)

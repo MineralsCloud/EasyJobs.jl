@@ -23,7 +23,7 @@ function run!(job::ConsequentJob; n=1, δt=1)
     # Use previous results as arguments
     parents = job.parents
     @assert all(isexited(parent) for parent in parents)
-    job.thunk.args = if length(parents) == 0
+    job.core.args = if length(parents) == 0
         ()
     elseif length(parents) == 1
         (getresult(parent),)
@@ -60,10 +60,10 @@ end
 function run_core!(job)  # Do not export!
     job.status = RUNNING
     job.start_time = now()
-    reify!(job.thunk)
+    reify!(job.core)
     job.stop_time = now()
-    job.status = if job.thunk.erred
-        thrown = something(getresult(job.thunk)).thrown
+    job.status = if job.core.erred
+        thrown = something(getresult(job.core)).thrown
         if thrown isa InterruptException
             INTERRUPTED
         elseif thrown isa TimeoutException
