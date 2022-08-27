@@ -1,4 +1,4 @@
-using Dates: now
+using Dates: Period, now
 
 using .Thunks: TimeoutException, ErredResult, reify!, _kill
 
@@ -9,20 +9,18 @@ export run!, interrupt!
 
 Run a `Job` with maximum `n` attempts, with each attempt separated by `δt` seconds.
 """
-function run!(job::Job; n=1, δt=1)
-    @assert isinteger(n) && n >= 1
-    return run_repeatedly!(job; n=n, δt=δt)
+function run!(job::Job; n=1, δt=1, t=0)
+    run_check(job; n=1)
+    return run_outer!(job; n=n, δt=δt, t=t)
 end
-function run!(job::SubsequentJob; n=1, δt=1)
-    @assert isinteger(n) && n >= 1
-    @assert all(isexited(parent) for parent in job.parents)
-    return run_repeatedly!(job; n=n, δt=δt)
+function run!(job::SubsequentJob; n=1, δt=1, t=0)
+    run_check(job; n=1)
+    return run_outer!(job; n=n, δt=δt, t=t)
 end
-function run!(job::ConsequentJob; n=1, δt=1)
-    @assert isinteger(n) && n >= 1
+function run!(job::ConsequentJob; n=1, δt=1, t=0)
+    run_check(job; n=1)
     # Use previous results as arguments
     parents = job.parents
-    @assert all(isexited(parent) for parent in parents)
     job.core.args = if length(parents) == 0
         ()
     elseif length(parents) == 1
@@ -30,21 +28,26 @@ function run!(job::ConsequentJob; n=1, δt=1)
     else  # > 1
         collect(getresult(parent) for parent in parents)
     end
+    return run_outer!(job; n=n, δt=δt, t=t)
+end
+function run_outer!(job; n=1, δt=1, t=0)
+    waituntil(t)
     return run_repeatedly!(job; n=n, δt=δt)
 end
 function run_repeatedly!(job; n=1, δt=1)
-    for _ in 1:n
-        if !issucceeded(job)
-            run_inner!(job)
-        end
+    if iszero(n)
+        return job
+    else
+        run_inner!(job)
         if issucceeded(job)
-            break  # Stop immediately
-        end
-        if !iszero(δt)  # Still unsuccessful
-            sleep(δt)  # `if-else` is faster than `sleep(0)`
+            return job  # Stop immediately
+        else
+            if !iszero(δt)
+                sleep(δt)  # `if-else` is faster than `sleep(0)`
+            end
+            return run_repeatedly!(job; n=n - 1, δt=δt)
         end
     end
-    return job
 end
 function run_inner!(job)  # Do not export!
     if ispending(job)
@@ -76,6 +79,25 @@ function run_core!(job)  # Do not export!
     end
     job.count += 1
     return job
+end
+run_check(::Job; n=1, kwargs...) = @assert isinteger(n) && n >= 1
+function run_check(job::Union{SubsequentJob,ConsequentJob}; n=1, kwargs...)
+    @assert isinteger(n) && n >= 1
+    @assert all(isexited(parent) for parent in job.parents)
+end
+
+function waituntil(t::Period)
+    if t > zero(t)
+        wait(t)
+    end
+    return nothing
+end
+function waituntil(t::DateTime)
+    current_time = now()
+    if t > current_time
+        wait(t - current_time)
+    end
+    return nothing
 end
 
 """
