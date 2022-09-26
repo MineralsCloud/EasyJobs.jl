@@ -16,10 +16,18 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
+        "Manual" => [
+            "Installation guide" => "installation.md",
+        ],
+        "API Reference" => "public.md",
+        "Developer Docs" => [
+            "Contributing" => "developers/contributing.md",
+            "Style Guide" => "developers/style.md",
+        ],
+        "Troubleshooting" => "troubleshooting.md",
     ],
 )
 
 deploydocs(;
     repo="github.com/MineralsCloud/EasyJobs.jl",
-    devbranch="main",
 )
