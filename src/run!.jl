@@ -5,7 +5,7 @@ using .Thunks: TimeoutException, ErredResult, reify!, _kill
 export run!, interrupt!
 
 """
-    run!(job::Job; n=1, δt=1)
+    run!(job::Job; n=1, δt=1, t=0)
 
 Run a `Job` with maximum `n` attempts, with each attempt separated by `δt` seconds.
 """
