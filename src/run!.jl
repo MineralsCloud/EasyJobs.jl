@@ -31,7 +31,7 @@ function run!(job::ConsequentJob; n=1, δt=1, t=0)
     return run_outer!(job; n=n, δt=δt, t=t)
 end
 function run_outer!(job; n=1, δt=1, t=0)
-    waituntil(t)
+    _sleep(t)
     return run_repeatedly!(job; n=n, δt=δt)
 end
 function run_repeatedly!(job; n=1, δt=1)
@@ -86,13 +86,13 @@ function run_check(job::Union{SubsequentJob,ConsequentJob}; n=1, kwargs...)
     @assert all(isexited(parent) for parent in job.parents)
 end
 
-function waituntil(t)
+function _sleep(t)
     if t > zero(t)
         sleep(t)
     end
     return nothing
 end
-function waituntil(t::DateTime)
+function _sleep(t::DateTime)
     current_time = now()
     if t > current_time
         sleep(t - current_time)
