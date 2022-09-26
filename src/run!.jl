@@ -5,7 +5,7 @@ using .Thunks: TimeoutException, ErredResult, reify!, _kill
 export run!, interrupt!
 
 """
-    run!(job::Job; n=1, δt=1)
+    run!(job::Job; n=1, δt=1, t=0)
 
 Run a `Job` with maximum `n` attempts, with each attempt separated by `δt` seconds.
 """
@@ -31,7 +31,7 @@ function run!(job::ConsequentJob; n=1, δt=1, t=0)
     return run_outer!(job; n=n, δt=δt, t=t)
 end
 function run_outer!(job; n=1, δt=1, t=0)
-    waituntil(t)
+    _sleep(t)
     return run_repeatedly!(job; n=n, δt=δt)
 end
 function run_repeatedly!(job; n=1, δt=1)
@@ -86,16 +86,16 @@ function run_check(job::Union{SubsequentJob,ConsequentJob}; n=1, kwargs...)
     @assert all(isexited(parent) for parent in job.parents)
 end
 
-function waituntil(t::Period)
+function _sleep(t)
     if t > zero(t)
-        wait(t)
+        sleep(t)
     end
     return nothing
 end
-function waituntil(t::DateTime)
+function _sleep(t::DateTime)
     current_time = now()
     if t > current_time
-        wait(t - current_time)
+        sleep(t - current_time)
     end
     return nothing
 end
