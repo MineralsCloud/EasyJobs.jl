@@ -17,7 +17,7 @@ end
 abstract type Job end
 # Reference: https://github.com/cihga39871/JobSchedulers.jl/blob/aca52de/src/jobs.jl#L35-L69
 """
-    Job(core::Thunk; desc="", user="")
+    SimpleJob(core::Thunk; desc="", user="")
 
 Create a simple job.
 
