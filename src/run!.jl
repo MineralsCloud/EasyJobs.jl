@@ -86,16 +86,16 @@ function run_check(job::Union{SubsequentJob,ConsequentJob}; n=1, kwargs...)
     @assert all(isexited(parent) for parent in job.parents)
 end
 
-function waituntil(t::Period)
+function waituntil(t)
     if t > zero(t)
-        wait(t)
+        sleep(t)
     end
     return nothing
 end
 function waituntil(t::DateTime)
     current_time = now()
     if t > current_time
-        wait(t - current_time)
+        sleep(t - current_time)
     end
     return nothing
 end
