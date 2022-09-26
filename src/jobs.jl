@@ -28,9 +28,11 @@ Create a simple job.
 
 # Examples
 ```jldoctest
-julia> a = Job(Thunk(sleep)(5); user="me", desc="Sleep for 5 seconds");
+julia> using EasyJobs.Thunks
 
-julia> b = Job(Thunk(run, `pwd` & `ls`); user="me", desc="Run some commands");
+julia> a = SimpleJob(Thunk(sleep)(5); user="me", desc="Sleep for 5 seconds");
+
+julia> b = SimpleJob(Thunk(run, `pwd` & `ls`); user="me", desc="Run some commands");
 ```
 """
 mutable struct SimpleJob <: Job

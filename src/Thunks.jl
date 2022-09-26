@@ -25,6 +25,8 @@ Hold a `Function` and its arguments for lazy evaluation. Use `reify!` to evaluat
 
 # Examples
 ```jldoctest
+julia> using EasyJobs.Thunks
+
 julia> a = Thunk(x -> 3x, 4);
 
 julia> reify!(a)
