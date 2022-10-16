@@ -29,12 +29,12 @@ using EasyJobs.Thunks
         cos(x)
         return run(`pwd` & `ls`)
     end
-    i = SimpleJob(Thunk(f₁, ()); user="me", desc="i")
-    j = SimpleJob(Thunk(f₂, 3); user="he", desc="j")
-    k = SimpleJob(Thunk(f₃, 6); desc="k")
-    l = SimpleJob(Thunk(f₄, ()); desc="l", user="me")
-    m = SimpleJob(Thunk(f₅, 3, 1); desc="m")
-    n = SimpleJob(Thunk(f₆, 1; x=3); user="she", desc="n")
+    i = SimpleJob(Thunk(f₁, ()); user="me", description="i")
+    j = SimpleJob(Thunk(f₂, 3); user="he", description="j")
+    k = SimpleJob(Thunk(f₃, 6); description="k")
+    l = SimpleJob(Thunk(f₄, ()); description="l", user="me")
+    m = SimpleJob(Thunk(f₅, 3, 1); description="m")
+    n = SimpleJob(Thunk(f₆, 1; x=3); user="she", description="n")
     for job in (i, j, k, l, m, n)
         run!(job)
     end

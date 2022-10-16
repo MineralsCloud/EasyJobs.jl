@@ -17,28 +17,28 @@ end
 abstract type Job end
 # Reference: https://github.com/cihga39871/JobSchedulers.jl/blob/aca52de/src/jobs.jl#L35-L69
 """
-    SimpleJob(core::Thunk; desc="", user="")
+    SimpleJob(core::Thunk; description="", user="")
 
 Create a simple job.
 
 # Arguments
 - `core`: a `Thunk` that encloses the job definition.
-- `desc::String=""`: describe briefly what this job does.
+- `description::String=""`: describe briefly what this job does.
 - `user::String=""`: indicate who executes this job.
 
 # Examples
 ```jldoctest
 julia> using EasyJobs.Thunks
 
-julia> a = SimpleJob(Thunk(sleep)(5); user="me", desc="Sleep for 5 seconds");
+julia> a = SimpleJob(Thunk(sleep)(5); user="me", description="Sleep for 5 seconds");
 
-julia> b = SimpleJob(Thunk(run, `pwd` & `ls`); user="me", desc="Run some commands");
+julia> b = SimpleJob(Thunk(run, `pwd` & `ls`); user="me", description="Run some commands");
 ```
 """
 mutable struct SimpleJob <: Job
     id::UUID
     core::Think
-    desc::String
+    description::String
     user::String
     created_time::DateTime
     start_time::DateTime
@@ -50,9 +50,19 @@ mutable struct SimpleJob <: Job
     parents::Vector{Job}
     "These jobs runs after the current job."
     children::Vector{Job}
-    function SimpleJob(core::Think; desc="", user="")
+    function SimpleJob(core::Think; description="", user="")
         return new(
-            uuid1(), core, desc, user, now(), DateTime(0), DateTime(0), PENDING, 0, [], []
+            uuid1(),
+            core,
+            description,
+            user,
+            now(),
+            DateTime(0),
+            DateTime(0),
+            PENDING,
+            0,
+            [],
+            [],
         )
     end
 end
@@ -62,7 +72,7 @@ end
 Create a new `SimpleJob` from an existing `SimpleJob`.
 """
 function SimpleJob(job::SimpleJob)
-    new_job = SimpleJob(job.core; desc=job.desc, user=job.user)
+    new_job = SimpleJob(job.core; desc=job.description, user=job.user)
     new_job.parents = job.parents
     new_job.children = job.children
     return new_job
@@ -70,7 +80,7 @@ end
 mutable struct SubsequentJob <: Job
     id::UUID
     core::Think
-    desc::String
+    description::String
     user::String
     created_time::DateTime
     start_time::DateTime
@@ -82,16 +92,26 @@ mutable struct SubsequentJob <: Job
     parents::Vector{Job}
     "These jobs runs after the current job."
     children::Vector{Job}
-    function SubsequentJob(core::Think; desc="", user="")
+    function SubsequentJob(core::Think; description="", user="")
         return new(
-            uuid1(), core, desc, user, now(), DateTime(0), DateTime(0), PENDING, 0, [], []
+            uuid1(),
+            core,
+            description,
+            user,
+            now(),
+            DateTime(0),
+            DateTime(0),
+            PENDING,
+            0,
+            [],
+            [],
         )
     end
 end
 mutable struct ConsequentJob <: Job
     id::UUID
     core::Think
-    desc::String
+    description::String
     user::String
     created_time::DateTime
     start_time::DateTime
@@ -103,12 +123,22 @@ mutable struct ConsequentJob <: Job
     parents::Vector{Job}
     "These jobs runs after the current job."
     children::Vector{Job}
-    function ConsequentJob(core::Think; desc="", user="")
+    function ConsequentJob(core::Think; description="", user="")
         if !isempty(core.args)
             @warn "the functional arguments of a `ConsequentJob` are not empty!"
         end
         return new(
-            uuid1(), core, desc, user, now(), DateTime(0), DateTime(0), PENDING, 0, [], []
+            uuid1(),
+            core,
+            description,
+            user,
+            now(),
+            DateTime(0),
+            DateTime(0),
+            PENDING,
+            0,
+            [],
+            [],
         )
     end
 end
@@ -119,9 +149,9 @@ function Base.show(io::IO, job::Job)
     else
         println(io, summary(job))
         println(io, ' ', "id: ", job.id)
-        if !isempty(job.desc)
+        if !isempty(job.description)
             print(io, ' ', "description: ")
-            show(io, job.desc)
+            show(io, job.description)
             println(io)
         end
         print(io, ' ', "def: ")

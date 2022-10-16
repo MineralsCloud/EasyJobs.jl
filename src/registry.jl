@@ -30,7 +30,7 @@ function queue(; sortby=:created_time)
         elapsed=map(elapsed, jobs),
         status=map(getstatus, jobs),
         times=map(ntimes, jobs),
-        desc=map(description, jobs),
+        description=map(description, jobs),
     )
     return sort(df, [:id, sortby])
 end

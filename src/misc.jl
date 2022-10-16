@@ -16,7 +16,7 @@ ntimes(job::Job) = Int(job.count)
 
 Return the description of a `Job`.
 """
-description(job::Job) = job.desc
+description(job::Job) = job.description
 
 "Return the created time of a `Job`."
 createdtime(job::Job) = job.created_time
