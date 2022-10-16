@@ -23,6 +23,7 @@ function queue(; sortby=:created_time)
     jobs = collect(keys(JOB_REGISTRY))
     df = DataFrame(;
         id=[job.id for job in jobs],
+        name=map(Base.Fix2(getfield, :name), jobs),
         username=[job.username for job in jobs],
         created_time=map(createdtime, jobs),
         start_time=map(starttime, jobs),
@@ -30,7 +31,6 @@ function queue(; sortby=:created_time)
         elapsed=map(elapsed, jobs),
         status=map(getstatus, jobs),
         times=map(ntimes, jobs),
-        description=map(description, jobs),
     )
     return sort(df, [:id, sortby])
 end
