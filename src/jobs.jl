@@ -17,14 +17,14 @@ end
 abstract type Job end
 # Reference: https://github.com/cihga39871/JobSchedulers.jl/blob/aca52de/src/jobs.jl#L35-L69
 """
-    SimpleJob(core::Thunk; description="", user="")
+    SimpleJob(core::Thunk; description="", username="")
 
 Create a simple job.
 
 # Arguments
 - `core`: a `Thunk` that encloses the job definition.
 - `description::String=""`: describe briefly what this job does.
-- `user::String=""`: indicate who executes this job.
+- `username::String=""`: indicate who executes this job.
 
 # Examples
 ```jldoctest
@@ -32,14 +32,14 @@ julia> using EasyJobs.Thunks
 
 julia> a = SimpleJob(Thunk(sleep)(5); user="me", description="Sleep for 5 seconds");
 
-julia> b = SimpleJob(Thunk(run, `pwd` & `ls`); user="me", description="Run some commands");
+julia> b = SimpleJob(Thunk(run, `pwd` & `ls`); username="me", description="Run some commands");
 ```
 """
 mutable struct SimpleJob <: Job
     id::UUID
     core::Think
     description::String
-    user::String
+    username::String
     created_time::DateTime
     start_time::DateTime
     stop_time::DateTime
@@ -50,12 +50,12 @@ mutable struct SimpleJob <: Job
     parents::Vector{Job}
     "These jobs runs after the current job."
     children::Vector{Job}
-    function SimpleJob(core::Think; description="", user="")
+    function SimpleJob(core::Think; description="", username="")
         return new(
             uuid1(),
             core,
             description,
-            user,
+            username,
             now(),
             DateTime(0),
             DateTime(0),
@@ -72,7 +72,7 @@ end
 Create a new `SimpleJob` from an existing `SimpleJob`.
 """
 function SimpleJob(job::SimpleJob)
-    new_job = SimpleJob(job.core; desc=job.description, user=job.user)
+    new_job = SimpleJob(job.core; desc=job.description, user=job.username)
     new_job.parents = job.parents
     new_job.children = job.children
     return new_job
@@ -81,7 +81,7 @@ mutable struct SubsequentJob <: Job
     id::UUID
     core::Think
     description::String
-    user::String
+    username::String
     created_time::DateTime
     start_time::DateTime
     stop_time::DateTime
@@ -92,12 +92,12 @@ mutable struct SubsequentJob <: Job
     parents::Vector{Job}
     "These jobs runs after the current job."
     children::Vector{Job}
-    function SubsequentJob(core::Think; description="", user="")
+    function SubsequentJob(core::Think; description="", username="")
         return new(
             uuid1(),
             core,
             description,
-            user,
+            username,
             now(),
             DateTime(0),
             DateTime(0),
@@ -112,7 +112,7 @@ mutable struct ConsequentJob <: Job
     id::UUID
     core::Think
     description::String
-    user::String
+    username::String
     created_time::DateTime
     start_time::DateTime
     stop_time::DateTime
@@ -123,7 +123,7 @@ mutable struct ConsequentJob <: Job
     parents::Vector{Job}
     "These jobs runs after the current job."
     children::Vector{Job}
-    function ConsequentJob(core::Think; description="", user="")
+    function ConsequentJob(core::Think; description="", username="")
         if !isempty(core.args)
             @warn "the functional arguments of a `ConsequentJob` are not empty!"
         end
@@ -131,7 +131,7 @@ mutable struct ConsequentJob <: Job
             uuid1(),
             core,
             description,
-            user,
+            username,
             now(),
             DateTime(0),
             DateTime(0),
