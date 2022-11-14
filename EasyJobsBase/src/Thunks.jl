@@ -17,7 +17,7 @@ abstract type Think end
 
 # Idea from https://github.com/tbenst/Thunks.jl/blob/ff2a553/src/core.jl#L11-L20
 """
-    Thunk(::Function, args::Tuple, kwargs::NamedTuple)
+    Thunk(::Function, args::Tuple, kwargs::Iterators.Pairs)
     Thunk(::Function, args...; kwargs...)
     Thunk(::Function)
 
@@ -59,38 +59,37 @@ julia> reify!(e);
 mutable struct Thunk <: Think
     f
     args::Tuple
-    kwargs::NamedTuple
+    kwargs::Iterators.Pairs
     evaluated::Bool
     erred::Bool
     result::Union{Some,Nothing}
-    function Thunk(f, args::Tuple, kwargs::NamedTuple=NamedTuple())
+    function Thunk(f, args::Tuple, kwargs::Iterators.Pairs)
         return new(f, args, kwargs, false, false, nothing)
     end
 end
-Thunk(f, args...; kwargs...) = Thunk(f, args, NamedTuple(kwargs))
-Thunk(f) = (args...; kwargs...) -> Thunk(f, args, NamedTuple(kwargs))
+Thunk(f, args...; kwargs...) = Thunk(f, args, kwargs)
+Thunk(f) = (args...; kwargs...) -> Thunk(f, args, kwargs)
 
 mutable struct TimeLimitedThunk <: Think
     time_limit::Period
     f
     args::Tuple
-    kwargs::NamedTuple
+    kwargs::Iterators.Pairs
     evaluated::Bool
     erred::Bool
     result::Union{Some,Nothing}
-    function TimeLimitedThunk(time_limit, f, args::Tuple, kwargs::NamedTuple=NamedTuple())
+    function TimeLimitedThunk(time_limit, f, args::Tuple, kwargs::Iterators.Pairs)
         return new(time_limit, f, args, kwargs, false, false, nothing)
     end
 end
 function TimeLimitedThunk(time_limit, f, args...; kwargs...)
-    return TimeLimitedThunk(time_limit, f, args, NamedTuple(kwargs))
+    return TimeLimitedThunk(time_limit, f, args, kwargs)
 end
 function TimeLimitedThunk(time_limit, f)
-    return (args...; kwargs...) -> TimeLimitedThunk(time_limit, f, args, NamedTuple(kwargs))
+    return (args...; kwargs...) -> TimeLimitedThunk(time_limit, f, args, kwargs)
 end
 function TimeLimitedThunk(time_limit)
-    return (f, args...; kwargs...) ->
-        TimeLimitedThunk(time_limit, f, args, NamedTuple(kwargs))
+    return (f, args...; kwargs...) -> TimeLimitedThunk(time_limit, f, args, kwargs)
 end
 
 # See https://github.com/tbenst/Thunks.jl/blob/ff2a553/src/core.jl#L113-L123
