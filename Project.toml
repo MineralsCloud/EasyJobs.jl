@@ -4,13 +4,10 @@ authors = ["singularitti <singularitti@outlook.com> and contributors"]
 version = "0.1.0"
 
 [deps]
-Configurations = "5218b696-f38b-4ac9-8b61-a12ec717816d"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
-UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+EasyJobsBase = "db8ca866-b61f-4bd1-a9b9-75c107d645d4"
 
 [compat]
-Configurations = "0.17"
 DataFrames = "1"
 julia = "1"
 

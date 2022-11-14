@@ -1,13 +1,7 @@
 using DataFrames: DataFrame, sort
+using EasyJobsBase: JOB_REGISTRY
 
 export initialize!, queue, query, isexecuted
-
-const JOB_REGISTRY = Dict{Job,Union{Nothing,Task}}()
-
-function initialize!()
-    empty!(JOB_REGISTRY)
-    return nothing
-end
 
 """
     queue(; sortby = :created_time)
@@ -43,5 +37,3 @@ Query a specific (or a list of `Job`s) by its (theirs) ID.
 """
 query(id::Integer) = filter(row -> row.id == id, queue())
 query(ids::AbstractVector{<:Integer}) = map(id -> query(id), ids)
-
-isexecuted(job::Job) = job in keys(JOB_REGISTRY)
