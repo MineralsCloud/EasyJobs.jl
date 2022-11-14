@@ -1,5 +1,3 @@
-using DataFrames: DataFrame, sort
-
 export initialize!, isexecuted
 
 const JOB_REGISTRY = Dict{Job,Union{Nothing,Task}}()
