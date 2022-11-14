@@ -29,9 +29,9 @@ Create a simple job.
 
 # Examples
 ```jldoctest
-julia> using EasyJobs.Thunks
+julia> using EasyJobsBase.Thunks
 
-julia> a = SimpleJob(Thunk(sleep)(5); user="me", description="Sleep for 5 seconds");
+julia> a = SimpleJob(Thunk(sleep)(5); username="me", description="Sleep for 5 seconds");
 
 julia> b = SimpleJob(Thunk(run, `pwd` & `ls`); username="me", description="Run some commands");
 ```
