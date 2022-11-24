@@ -1,5 +1,9 @@
 using EasyJobsBase:
-    SimpleJob,
+    AbstractJob,
+    DependentJob,
+    Job,
+    SubsequentJob,
+    PipeJob,
     chain,
     converge,
     createdtime,
@@ -38,7 +42,9 @@ using EasyJobsBase:
     ⬱,
     ⭃
 
-export SimpleJob,
+export Job,
+    SubsequentJob,
+    PipeJob,
     chain,
     converge,
     createdtime,
