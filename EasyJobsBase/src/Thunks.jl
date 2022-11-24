@@ -68,7 +68,6 @@ mutable struct Thunk <: Think
     end
 end
 Thunk(f, args...; kwargs...) = Thunk(f, args, kwargs)
-Thunk(f) = (args...; kwargs...) -> Thunk(f, args, kwargs)
 
 mutable struct TimeLimitedThunk <: Think
     time_limit::Period

@@ -29,14 +29,15 @@ using EasyJobsBase.Thunks
         cos(x)
         return run(`pwd` & `ls`)
     end
-    i = Job(Thunk(f₁, ()); username="me", name="i")
+    i = Job(Thunk(f₁); username="me", name="i")
     j = Job(Thunk(f₂, 3); username="he", name="j")
     k = Job(Thunk(f₃, 6); name="k")
-    l = Job(Thunk(f₄, ()); name="l", username="me")
+    l = Job(Thunk(f₄); name="l", username="me")
     m = Job(Thunk(f₅, 3, 1); name="m")
     n = Job(Thunk(f₆, 1; x=3); username="she", name="n")
     for job in (i, j, k, l, m, n)
         run!(job)
+        wait(job)
         @test issucceeded(job)
     end
 end
