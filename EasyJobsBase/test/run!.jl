@@ -37,6 +37,7 @@ using EasyJobsBase.Thunks
     n = Job(Thunk(f₆, 1; x=3); username="she", name="n")
     for job in (i, j, k, l, m, n)
         run!(job)
+        @test issucceeded(job)
     end
 end
 
