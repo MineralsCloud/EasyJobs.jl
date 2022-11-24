@@ -39,3 +39,24 @@ using EasyJobsBase.Thunks
         run!(job)
     end
 end
+
+@testset "Test running `PipeJob`s" begin
+    f₁(x) = x^2
+    f₂(y) = y + 1
+    f₃(z) = z / 2
+    i = Job(Thunk(f₁, 5); username="me", name="i")
+    j = PipeJob(Thunk(f₂, 3); username="he", name="j")
+    k = PipeJob(Thunk(f₃, 6); username="she", name="k")
+    i → j → k
+    @test_throws AssertionError run!(j)
+    run!(i)
+    wait(i)
+    @test getresult(i) == Some(25)
+    @test_throws AssertionError run!(k)
+    run!(j)
+    wait(j)
+    @test getresult(j) == Some(26)
+    run!(k)
+    wait(k)
+    @test getresult(k) == Some(13.0)
+end
