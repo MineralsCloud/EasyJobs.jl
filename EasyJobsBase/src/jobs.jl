@@ -15,6 +15,7 @@ export SimpleJob
 end
 
 abstract type Job end
+abstract type DependentJob <: Job end
 # Reference: https://github.com/cihga39871/JobSchedulers.jl/blob/aca52de/src/jobs.jl#L35-L69
 """
     SimpleJob(core::Thunk; description="", username="")
