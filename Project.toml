@@ -9,7 +9,7 @@ EasyJobsBase = "db8ca866-b61f-4bd1-a9b9-75c107d645d4"
 
 [compat]
 DataFrames = "1"
-EasyJobsBase = "0.1, 0.2"
+EasyJobsBase = "0.2"
 julia = "1"
 
 [extras]
