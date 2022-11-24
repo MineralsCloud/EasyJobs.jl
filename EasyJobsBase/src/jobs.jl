@@ -3,7 +3,7 @@ using UUIDs: UUID, uuid1
 
 using .Thunks: Think, printfunc
 
-export SimpleJob, SubsequentJob, ConsequentJob
+export SimpleJob, SubsequentJob, PipeJob
 
 @enum JobStatus begin
     PENDING
@@ -116,7 +116,7 @@ mutable struct SubsequentJob <: DependentJob
         )
     end
 end
-mutable struct ConsequentJob <: DependentJob
+mutable struct PipeJob <: DependentJob
     id::UUID
     core::Think
     name::String
@@ -132,9 +132,9 @@ mutable struct ConsequentJob <: DependentJob
     parents::Vector{Job}
     "These jobs runs after the current job."
     children::Vector{Job}
-    function ConsequentJob(core::Think; name="", description="", username="")
+    function PipeJob(core::Think; name="", description="", username="")
         if !isempty(core.args)
-            @warn "the functional arguments of a `ConsequentJob` are not empty!"
+            @warn "the functional arguments of a `PipeJob` are not empty!"
         end
         return new(
             uuid1(),

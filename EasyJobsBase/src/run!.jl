@@ -17,7 +17,7 @@ function run!(job::SubsequentJob; n=1, δt=1, t=0)
     run_check(job; n=1)
     return run_outer!(job; n=n, δt=δt, t=t)
 end
-function run!(job::ConsequentJob; n=1, δt=1, t=0)
+function run!(job::PipeJob; n=1, δt=1, t=0)
     run_check(job; n=1)
     # Use previous results as arguments
     parents = job.parents
