@@ -3,7 +3,7 @@ using UUIDs: UUID, uuid1
 
 using .Thunks: Think, printfunc
 
-export SimpleJob
+export SimpleJob, SubsequentJob, ConsequentJob
 
 @enum JobStatus begin
     PENDING
@@ -83,7 +83,7 @@ function SimpleJob(job::SimpleJob)
     new_job.children = job.children
     return new_job
 end
-mutable struct SubsequentJob <: Job
+mutable struct SubsequentJob <: DependentJob
     id::UUID
     core::Think
     name::String
@@ -116,7 +116,7 @@ mutable struct SubsequentJob <: Job
         )
     end
 end
-mutable struct ConsequentJob <: Job
+mutable struct ConsequentJob <: DependentJob
     id::UUID
     core::Think
     name::String
