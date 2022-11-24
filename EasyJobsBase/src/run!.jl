@@ -81,7 +81,7 @@ function run_core!(job)  # Do not export!
     return job
 end
 run_check(::Job; n=1, kwargs...) = @assert isinteger(n) && n >= 1
-function run_check(job::Union{SubsequentJob,ConsequentJob}; n=1, kwargs...)
+function run_check(job::DependentJob; n=1, kwargs...)
     @assert isinteger(n) && n >= 1
     @assert all(isexited(parent) for parent in job.parents)
 end
