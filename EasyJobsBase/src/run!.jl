@@ -17,7 +17,7 @@ function run!(job::SubsequentJob; n=1, δt=1, t=0)
     run_check(job; n=1)
     return run_outer!(job; n=n, δt=δt, t=t)
 end
-function run!(job::ConsequentJob; n=1, δt=1, t=0)
+function run!(job::PipeJob; n=1, δt=1, t=0)
     run_check(job; n=1)
     # Use previous results as arguments
     parents = job.parents
@@ -81,7 +81,7 @@ function run_core!(job)  # Do not export!
     return job
 end
 run_check(::Job; n=1, kwargs...) = @assert isinteger(n) && n >= 1
-function run_check(job::Union{SubsequentJob,ConsequentJob}; n=1, kwargs...)
+function run_check(job::DependentJob; n=1, kwargs...)
     @assert isinteger(n) && n >= 1
     @assert all(isexited(parent) for parent in job.parents)
 end
