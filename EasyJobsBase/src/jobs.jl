@@ -14,8 +14,8 @@ export SimpleJob, SubsequentJob, PipeJob
     TIMED_OUT
 end
 
-abstract type Job end
-abstract type DependentJob <: Job end
+abstract type AbstractJob end
+abstract type DependentJob <: AbstractJob end
 # Reference: https://github.com/cihga39871/JobSchedulers.jl/blob/aca52de/src/jobs.jl#L35-L69
 """
     SimpleJob(core::Thunk; description="", username="")
@@ -37,7 +37,7 @@ julia> a = SimpleJob(Thunk(sleep)(5); username="me", description="Sleep for 5 se
 julia> b = SimpleJob(Thunk(run, `pwd` & `ls`); username="me", description="Run some commands");
 ```
 """
-mutable struct SimpleJob <: Job
+mutable struct SimpleJob <: AbstractJob
     id::UUID
     core::Think
     name::String
@@ -50,9 +50,9 @@ mutable struct SimpleJob <: Job
     status::JobStatus
     count::UInt64
     "These jobs runs before the current job."
-    parents::Vector{Job}
+    parents::Vector{AbstractJob}
     "These jobs runs after the current job."
-    children::Vector{Job}
+    children::Vector{AbstractJob}
     function SimpleJob(core::Think; name="", description="", username="")
         return new(
             uuid1(),
@@ -96,9 +96,9 @@ mutable struct SubsequentJob <: DependentJob
     status::JobStatus
     count::UInt64
     "These jobs runs before the current job."
-    parents::Vector{Job}
+    parents::Vector{AbstractJob}
     "These jobs runs after the current job."
-    children::Vector{Job}
+    children::Vector{AbstractJob}
     function SubsequentJob(core::Think; name="", description="", username="")
         return new(
             uuid1(),
@@ -129,9 +129,9 @@ mutable struct PipeJob <: DependentJob
     status::JobStatus
     count::UInt64
     "These jobs runs before the current job."
-    parents::Vector{Job}
+    parents::Vector{AbstractJob}
     "These jobs runs after the current job."
-    children::Vector{Job}
+    children::Vector{AbstractJob}
     function PipeJob(core::Think; name="", description="", username="")
         if !isempty(core.args)
             @warn "the functional arguments of a `PipeJob` are not empty!"
@@ -153,7 +153,7 @@ mutable struct PipeJob <: DependentJob
     end
 end
 
-function Base.show(io::IO, job::Job)
+function Base.show(io::IO, job::AbstractJob)
     if get(io, :compact, false) || get(io, :typeinfo, nothing) == typeof(job)
         Base.show_default(IOContext(io, :limit => true), job)  # From https://github.com/mauro3/Parameters.jl/blob/ecbf8df/src/Parameters.jl#L556
     else
