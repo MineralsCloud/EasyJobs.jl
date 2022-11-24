@@ -203,7 +203,7 @@ function printfunc(io::IO, think::Think)
         for (k, v) in zip(keys(kwargs)[1:(end - 1)], Tuple(kwargs)[1:(end - 1)])
             print(io, ' ', k, '=', v, ",")
         end
-        print(io, ' ', keys(kwargs)[end], '=', kwargs[end])
+        print(io, ' ', last(keys(kwargs)), '=', last(values(kwargs)))
         print(io, ')')
     end
 end

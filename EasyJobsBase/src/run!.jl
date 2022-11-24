@@ -24,9 +24,9 @@ function run!(job::PipeJob; n=1, δt=1, t=0)
     job.core.args = if length(parents) == 0
         ()
     elseif length(parents) == 1
-        (something(getresult(parent)),)
+        (something(getresult(first(parents))),)
     else  # > 1
-        collect(something(getresult(parent)) for parent in parents)
+        (collect(something(getresult(parent)) for parent in parents),)
     end
     return run_outer!(job; n=n, δt=δt, t=t)
 end
