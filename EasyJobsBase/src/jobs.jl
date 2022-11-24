@@ -32,7 +32,7 @@ Create a simple job.
 ```jldoctest
 julia> using EasyJobsBase.Thunks
 
-julia> a = Job(Thunk(sleep)(5); username="me", description="Sleep for 5 seconds");
+julia> a = Job(Thunk(sleep, 5); username="me", description="Sleep for 5 seconds");
 
 julia> b = Job(Thunk(run, `pwd` & `ls`); username="me", description="Run some commands");
 ```

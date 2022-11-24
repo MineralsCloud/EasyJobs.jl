@@ -19,7 +19,6 @@ abstract type Think end
 """
     Thunk(::Function, args::Tuple, kwargs::Iterators.Pairs)
     Thunk(::Function, args...; kwargs...)
-    Thunk(::Function)
 
 Hold a `Function` and its arguments for lazy evaluation. Use `reify!` to evaluate.
 
@@ -37,7 +36,7 @@ julia> b = Thunk(+, 4, 5);
 julia> reify!(b)
 Some(9)
 
-julia> c = Thunk(sleep)(1);
+julia> c = Thunk(sleep, 1);
 
 julia> getresult(c)  # `c` has not been evaluated
 
@@ -46,7 +45,7 @@ Some(nothing)
 
 julia> f(args...; kwargs...) = collect(kwargs);
 
-julia> d = Thunk(f)(1, 2, 3; x=1.0, y=4, z="5");
+julia> d = Thunk(f, 1, 2, 3; x=1.0, y=4, z="5");
 
 julia> reify!(d)
 Some(Pair{Symbol, Any}[:x => 1.0, :y => 4, :z => "5"])
