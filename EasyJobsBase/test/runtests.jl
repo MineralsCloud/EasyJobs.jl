@@ -2,5 +2,5 @@ using EasyJobsBase
 using Test
 
 @testset "EasyJobsBase.jl" begin
-    include("jobs.jl")
+    include("run!.jl")
 end
