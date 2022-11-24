@@ -25,7 +25,7 @@ getresult(::Thunk)
 CurrentModule = EasyJobs
 DocTestSetup = quote
     using EasyJobs
-    using EasyJobs: Job
+    using EasyJobs: AbstractJob
 end
 ```
 
@@ -33,8 +33,8 @@ end
 
 ```@docs
 SimpleJob
-getresult(::Job)
-getstatus(::Job)
+getresult(::AbstractJob)
+getstatus
 ispending
 isrunning
 isexited
@@ -52,7 +52,7 @@ starttime
 stoptime
 elapsed
 description
-run!(::Job)
+run!
 interrupt!
 queue
 query
