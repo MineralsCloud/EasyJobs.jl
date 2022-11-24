@@ -3,7 +3,7 @@ using UUIDs: UUID, uuid1
 
 using .Thunks: Think, printfunc
 
-export SimpleJob, SubsequentJob, PipeJob
+export Job, SubsequentJob, PipeJob
 
 @enum JobStatus begin
     PENDING
@@ -18,7 +18,7 @@ abstract type AbstractJob end
 abstract type DependentJob <: AbstractJob end
 # Reference: https://github.com/cihga39871/JobSchedulers.jl/blob/aca52de/src/jobs.jl#L35-L69
 """
-    SimpleJob(core::Thunk; description="", username="")
+    Job(core::Thunk; description="", username="")
 
 Create a simple job.
 
@@ -32,12 +32,12 @@ Create a simple job.
 ```jldoctest
 julia> using EasyJobsBase.Thunks
 
-julia> a = SimpleJob(Thunk(sleep)(5); username="me", description="Sleep for 5 seconds");
+julia> a = Job(Thunk(sleep)(5); username="me", description="Sleep for 5 seconds");
 
-julia> b = SimpleJob(Thunk(run, `pwd` & `ls`); username="me", description="Run some commands");
+julia> b = Job(Thunk(run, `pwd` & `ls`); username="me", description="Run some commands");
 ```
 """
-mutable struct SimpleJob <: AbstractJob
+mutable struct Job <: AbstractJob
     id::UUID
     core::Think
     name::String
@@ -53,7 +53,7 @@ mutable struct SimpleJob <: AbstractJob
     parents::Vector{AbstractJob}
     "These jobs runs after the current job."
     children::Vector{AbstractJob}
-    function SimpleJob(core::Think; name="", description="", username="")
+    function Job(core::Think; name="", description="", username="")
         return new(
             uuid1(),
             core,
@@ -71,12 +71,12 @@ mutable struct SimpleJob <: AbstractJob
     end
 end
 """
-    SimpleJob(job::SimpleJob)
+    Job(job::Job)
 
-Create a new `SimpleJob` from an existing `SimpleJob`.
+Create a new `Job` from an existing `Job`.
 """
-function SimpleJob(job::SimpleJob)
-    new_job = SimpleJob(
+function Job(job::Job)
+    new_job = Job(
         job.core; name=job.name, description=job.description, username=job.username
     )
     new_job.parents = job.parents

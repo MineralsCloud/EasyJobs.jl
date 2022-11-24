@@ -1,6 +1,6 @@
 using EasyJobsBase.Thunks
 
-@testset "Test running `SimpleJob`s" begin
+@testset "Test running `Job`s" begin
     function f₁()
         println("Start job `i`!")
         return sleep(5)
@@ -29,12 +29,12 @@ using EasyJobsBase.Thunks
         cos(x)
         return run(`pwd` & `ls`)
     end
-    i = SimpleJob(Thunk(f₁, ()); username="me", name="i")
-    j = SimpleJob(Thunk(f₂, 3); username="he", name="j")
-    k = SimpleJob(Thunk(f₃, 6); name="k")
-    l = SimpleJob(Thunk(f₄, ()); name="l", username="me")
-    m = SimpleJob(Thunk(f₅, 3, 1); name="m")
-    n = SimpleJob(Thunk(f₆, 1; x=3); username="she", name="n")
+    i = Job(Thunk(f₁, ()); username="me", name="i")
+    j = Job(Thunk(f₂, 3); username="he", name="j")
+    k = Job(Thunk(f₃, 6); name="k")
+    l = Job(Thunk(f₄, ()); name="l", username="me")
+    m = Job(Thunk(f₅, 3, 1); name="m")
+    n = Job(Thunk(f₆, 1; x=3); username="she", name="n")
     for job in (i, j, k, l, m, n)
         run!(job)
     end
