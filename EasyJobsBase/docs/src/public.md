@@ -32,7 +32,7 @@ end
 ## `Jobs` module
 
 ```@docs
-SimpleJob
+Job
 getresult(::Job)
 getstatus(::Job)
 ispending

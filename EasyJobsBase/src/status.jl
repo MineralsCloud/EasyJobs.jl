@@ -19,29 +19,29 @@ export getstatus,
 
 Get the current status of a `Job`.
 """
-getstatus(job::Job) = job.status
-getstatus(jobs::AbstractArray{Job}) = map(getstatus, jobs)
+getstatus(job::AbstractJob) = job.status
+getstatus(jobs::AbstractArray{AbstractJob}) = map(getstatus, jobs)
 
 "Test if the `Job` is still pending."
-ispending(job::Job) = getstatus(job) === PENDING
+ispending(job::AbstractJob) = getstatus(job) === PENDING
 
 "Test if the `Job` is running."
-isrunning(job::Job) = getstatus(job) === RUNNING
+isrunning(job::AbstractJob) = getstatus(job) === RUNNING
 
 "Test if the `Job` has exited."
-isexited(job::Job) = getstatus(job) in (SUCCEEDED, FAILED, INTERRUPTED)
+isexited(job::AbstractJob) = getstatus(job) in (SUCCEEDED, FAILED, INTERRUPTED)
 
 "Test if the `Job` was successfully run."
-issucceeded(job::Job) = getstatus(job) === SUCCEEDED
+issucceeded(job::AbstractJob) = getstatus(job) === SUCCEEDED
 
 "Test if the `Job` failed during running."
-isfailed(job::Job) = getstatus(job) === FAILED
+isfailed(job::AbstractJob) = getstatus(job) === FAILED
 
 "Test if the `Job` was interrupted during running."
-isinterrupted(job::Job) = getstatus(job) === INTERRUPTED
+isinterrupted(job::AbstractJob) = getstatus(job) === INTERRUPTED
 
 "Test if the `Job` was timed out during running."
-istimedout(job::Job) = getstatus(job) === TIMED_OUT
+istimedout(job::AbstractJob) = getstatus(job) === TIMED_OUT
 
 """
     pendingjobs(jobs)

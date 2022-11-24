@@ -9,7 +9,7 @@ export run!, interrupt!
 
 Run a `Job` with maximum `n` attempts, with each attempt separated by `δt` seconds.
 """
-function run!(job::Job; n=1, δt=1, t=0)
+function run!(job::AbstractJob; n=1, δt=1, t=0)
     run_check(job; n=1)
     return run_outer!(job; n=n, δt=δt, t=t)
 end
@@ -80,7 +80,7 @@ function run_core!(job)  # Do not export!
     job.count += 1
     return job
 end
-run_check(::Job; n=1, kwargs...) = @assert isinteger(n) && n >= 1
+run_check(::AbstractJob; n=1, kwargs...) = @assert isinteger(n) && n >= 1
 function run_check(job::DependentJob; n=1, kwargs...)
     @assert isinteger(n) && n >= 1
     @assert all(isexited(parent) for parent in job.parents)
@@ -105,7 +105,7 @@ end
 
 Manually interrupt a `Job`, works only if it is running.
 """
-function interrupt!(job::Job)
+function interrupt!(job::AbstractJob)
     if isexited(job)
         @info "the job $(job.id) has already exited!"
     elseif ispending(job)
@@ -116,4 +116,4 @@ function interrupt!(job::Job)
     return job
 end
 
-Base.wait(job::Job) = wait(JOB_REGISTRY[job])
+Base.wait(job::AbstractJob) = wait(JOB_REGISTRY[job])
