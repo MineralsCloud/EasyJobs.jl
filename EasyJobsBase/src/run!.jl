@@ -81,7 +81,12 @@ end
 run_check(::AbstractJob; n=1, kwargs...) = @assert isinteger(n) && n >= 1
 function run_check(job::DependentJob; n=1, kwargs...)
     @assert isinteger(n) && n >= 1
-    @assert all(isexited(parent) for parent in job.parents)
+    if job.strict
+        @assert all(issucceeded(parent) for parent in job.parents)
+    else
+        @assert all(isexited(parent) for parent in job.parents)
+    end
+    return nothing
 end
 
 function _sleep(t)
