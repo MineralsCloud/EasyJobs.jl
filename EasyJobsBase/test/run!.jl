@@ -42,20 +42,20 @@ using EasyJobsBase.Thunks
     end
 end
 
-@testset "Test running `SubsequentJob`s" begin
-    f₁(x) = write("file", string(x))
-    f₂() = read("file", String)
-    i = Job(Thunk(f₁, 1001); username="me", name="i")
-    j = SubsequentJob(Thunk(map, f₂); username="he", name="j")
-    i → j
-    @test_throws AssertionError run!(j)
-    @test getresult(j) === nothing
-    run!(i)
-    wait(i)
-    run!(j)
-    wait(j)
-    @test getresult(j) == Some("1001")
-end
+# @testset "Test running `SubsequentJob`s" begin
+#     f₁(x) = write("file", string(x))
+#     f₂() = read("file", String)
+#     i = Job(Thunk(f₁, 1001); username="me", name="i")
+#     j = SubsequentJob(Thunk(map, f₂); username="he", name="j")
+#     i → j
+#     @test_throws AssertionError run!(j)
+#     @test getresult(j) === nothing
+#     run!(i)
+#     wait(i)
+#     run!(j)
+#     wait(j)
+#     @test getresult(j) == Some("1001")
+# end
 
 @testset "Test running piped jobs" begin
     f₁(x) = x^2
