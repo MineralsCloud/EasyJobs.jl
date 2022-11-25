@@ -13,20 +13,18 @@ function run!(job::AbstractJob; n=1, δt=1, t=0)
     run_check(job; n=1)
     return run_outer!(job; n=n, δt=δt, t=t)
 end
-function run!(job::SubsequentJob; n=1, δt=1, t=0)
+function run!(job::DependentJob; n=1, δt=1, t=0)
     run_check(job; n=1)
-    return run_outer!(job; n=n, δt=δt, t=t)
-end
-function run!(job::PipeJob; n=1, δt=1, t=0)
-    run_check(job; n=1)
-    # Use previous results as arguments
-    parents = job.parents
-    job.core.args = if length(parents) == 0
-        ()
-    elseif length(parents) == 1
-        (something(getresult(first(parents))),)
-    else  # > 1
-        (collect(something(getresult(parent)) for parent in parents),)
+    if job.args_from_previous
+        # Use previous results as arguments
+        parents = job.parents
+        job.core.args = if length(parents) == 0
+            ()
+        elseif length(parents) == 1
+            (something(getresult(first(parents))),)
+        else  # > 1
+            (collect(something(getresult(parent)) for parent in parents),)
+        end
     end
     return run_outer!(job; n=n, δt=δt, t=t)
 end
