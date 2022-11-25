@@ -1,7 +1,7 @@
 module EasyJobsBase
 
 include("Thunks.jl")
-include("jobs.jl")
+include("core.jl")
 include("operations.jl")
 include("run!.jl")
 include("registry.jl")
