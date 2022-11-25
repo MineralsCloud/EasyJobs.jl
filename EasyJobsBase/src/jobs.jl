@@ -3,7 +3,7 @@ using UUIDs: UUID, uuid1
 
 using .Thunks: Think, printfunc
 
-export Job, SubsequentJob, PipeJob
+export Job, DependentJob
 
 @enum JobStatus begin
     PENDING
@@ -15,7 +15,6 @@ export Job, SubsequentJob, PipeJob
 end
 
 abstract type AbstractJob end
-abstract type DependentJob <: AbstractJob end
 # Reference: https://github.com/cihga39871/JobSchedulers.jl/blob/aca52de/src/jobs.jl#L35-L69
 """
     Job(core::Thunk; description="", username="")
@@ -83,7 +82,7 @@ function Job(job::Job)
     new_job.children = job.children
     return new_job
 end
-mutable struct SubsequentJob <: DependentJob
+mutable struct DependentJob <: AbstractJob
     id::UUID
     core::Think
     name::String
@@ -99,7 +98,8 @@ mutable struct SubsequentJob <: DependentJob
     parents::Vector{AbstractJob}
     "These jobs runs after the current job."
     children::Vector{AbstractJob}
-    function SubsequentJob(core::Think; name="", description="", username="")
+    args_from_previous::Bool
+    function DependentJob(core::Think; name="", description="", username="")
         return new(
             uuid1(),
             core,
@@ -113,42 +113,7 @@ mutable struct SubsequentJob <: DependentJob
             0,
             [],
             [],
-        )
-    end
-end
-mutable struct PipeJob <: DependentJob
-    id::UUID
-    core::Think
-    name::String
-    description::String
-    username::String
-    created_time::DateTime
-    start_time::DateTime
-    stop_time::DateTime
-    "Track the job status."
-    status::JobStatus
-    count::UInt64
-    "These jobs runs before the current job."
-    parents::Vector{AbstractJob}
-    "These jobs runs after the current job."
-    children::Vector{AbstractJob}
-    function PipeJob(core::Think; name="", description="", username="")
-        if !isempty(core.args)
-            @warn "the functional arguments of a `PipeJob` are not empty!"
-        end
-        return new(
-            uuid1(),
-            core,
-            name,
-            description,
-            username,
-            now(),
-            DateTime(0),
-            DateTime(0),
-            PENDING,
-            0,
-            [],
-            [],
+            false,
         )
     end
 end
