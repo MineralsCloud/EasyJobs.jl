@@ -57,14 +57,14 @@ end
     @test getresult(j) == Some("1001")
 end
 
-@testset "Test running `PipeJob`s" begin
+@testset "Test running piped jobs" begin
     f₁(x) = x^2
     f₂(y) = y + 1
     f₃(z) = z / 2
     i = Job(Thunk(f₁, 5); username="me", name="i")
-    j = PipeJob(Thunk(f₂, 3); username="he", name="j")
-    k = PipeJob(Thunk(f₃, 6); username="she", name="k")
-    i → j → k
+    j = DependentJob(Thunk(f₂, 3); username="he", name="j")
+    k = DependentJob(Thunk(f₃, 6); username="she", name="k")
+    i ⇒ j ⇒ k
     @test_throws AssertionError run!(j)
     run!(i)
     wait(i)
@@ -78,7 +78,7 @@ end
     @test getresult(k) == Some(13.0)
 end
 
-@testset "Test running a `PipeJob` with more than one parents" begin
+@testset "Test running a piped job with more than one parents" begin
     f₁(x) = x^2
     f₂(y) = y + 1
     f₃(z) = z / 2
@@ -86,9 +86,9 @@ end
     i = Job(Thunk(f₁, 5); username="me", name="i")
     j = Job(Thunk(f₂, 3); username="he", name="j")
     k = Job(Thunk(f₃, 6); username="she", name="k")
-    l = PipeJob(Thunk(f₄, ()); username="she", name="me")
+    l = DependentJob(Thunk(f₄, ()); username="she", name="me")
     for job in (i, j, k)
-        job → l
+        job ⇒ l
     end
     @test_throws AssertionError run!(l)
     for job in (i, j, k)
