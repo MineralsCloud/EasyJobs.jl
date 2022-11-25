@@ -68,7 +68,7 @@ pipe!(x::AbstractJob, y::AbstractJob, z::AbstractJob...) = foldr(pipe!, (x, y, z
 
 Chain multiple vectors of `Job`s, each `Job` in `xs` has a corresponding `Job` in `ys`.`
 """
-function thread!(xs::AbstractVector{AbstractJob}, ys::AbstractVector{AbstractJob})
+function thread!(xs::AbstractVector, ys::AbstractVector)
     if size(xs) != size(ys)
         throw(DimensionMismatch("`xs` and `ys` must have the same size!"))
     end
@@ -77,11 +77,7 @@ function thread!(xs::AbstractVector{AbstractJob}, ys::AbstractVector{AbstractJob
     end
     return xs
 end
-function thread!(
-    xs::AbstractVector{AbstractJob},
-    ys::AbstractVector{AbstractJob},
-    zs::AbstractVector{AbstractJob}...,
-)
+function thread!(xs::AbstractVector, ys::AbstractVector, zs::AbstractVector...)
     return foldr(thread!, (xs, ys, zs...))
 end
 """
@@ -89,13 +85,13 @@ end
 
 Chain two vectors of `Job`s.
 """
-⇶(xs::AbstractVector{AbstractJob}, ys::AbstractVector{AbstractJob}) = thread!(xs, ys)
+⇶(xs::AbstractVector, ys::AbstractVector) = thread!(xs, ys)
 """
     ⬱(ys, xs)
 
 Chain two vectors of `Job`s reversely.
 """
-⬱(ys::AbstractVector{AbstractJob}, xs::AbstractVector{AbstractJob}) = xs ⇶ ys
+⬱(ys::AbstractVector, xs::AbstractVector) = xs ⇶ ys
 
 """
     fork(x::Job, ys::AbstractVector{Job})
@@ -103,7 +99,7 @@ Chain two vectors of `Job`s reversely.
 
 Attach a group of parallel `Job`s (`ys`) to a single `Job` (`x`).
 """
-function fork!(x::AbstractJob, ys::AbstractVector{AbstractJob})
+function fork!(x::AbstractJob, ys::AbstractVector)
     for y in ys
         chain!(x, y)
     end
@@ -117,7 +113,7 @@ const ⇉ = fork!
 
 Finish a group a parallel `Job`s (`xs`) by a single `Job` (`y`).
 """
-function converge!(xs::AbstractVector{AbstractJob}, y::AbstractJob)
+function converge!(xs::AbstractVector, y::AbstractJob)
     for x in xs
         chain!(x, y)
     end
@@ -130,4 +126,4 @@ const ⭃ = converge!
 
 Start from a `Job` (`x`), followed by a series of `Job`s (`ys`), finished by a single `Job` (`z`).
 """
-spindle!(x::AbstractJob, ys::AbstractVector{AbstractJob}, z::AbstractJob) = x ⇉ ys ⭃ z
+spindle!(x::AbstractJob, ys::AbstractVector, z::AbstractJob) = x ⇉ ys ⭃ z
