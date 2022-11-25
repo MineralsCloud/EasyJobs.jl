@@ -1,4 +1,4 @@
-export chain, thread, fork, converge, spindle, →, ←, ⇶, ⬱, ⇉, ⭃
+export chain, pipe, thread, fork, converge, spindle, →, ←, ⇒, ⇐, ⇶, ⬱, ⇉, ⭃
 
 """
     chain(x::Job, y::Job, z::Job...)
@@ -27,6 +27,15 @@ Chain two `Job`s.
 Chain two `Job`s reversely.
 """
 ←(y::AbstractJob, x::AbstractJob) = x → y
+
+function pipe(x::AbstractJob, y::AbstractJob)
+    chain(x, y)
+    y.args_from_previous = true
+    return x
+end
+pipe(x::AbstractJob, y::AbstractJob, z::AbstractJob...) = foldr(pipe, (x, y, z...))
+⇒(x::AbstractJob, y::AbstractJob) = pipe(x, y)
+⇐(y::AbstractJob, x::AbstractJob) = x ⇒ y
 
 """
     thread(xs::AbstractVector{Job}, ys::AbstractVector{Job}, zs::AbstractVector{Job}...)
