@@ -98,6 +98,7 @@ mutable struct DependentJob <: AbstractJob
     parents::Vector{AbstractJob}
     "These jobs runs after the current job."
     children::Vector{AbstractJob}
+    strict::Bool
     args_from_previous::Bool
     function DependentJob(core::Think; name="", description="", username="")
         return new(
@@ -113,6 +114,7 @@ mutable struct DependentJob <: AbstractJob
             0,
             [],
             [],
+            false,
             false,
         )
     end

@@ -28,6 +28,13 @@ Chain two `Job`s reversely.
 """
 ←(y::AbstractJob, x::AbstractJob) = x → y
 
+function follow(x::AbstractJob, y::AbstractJob)
+    chain(x, y)
+    y.strict = true
+    return x
+end
+↠(x::AbstractJob, y::AbstractJob) = follow(x, y)
+
 """
     pipe(x::Job, y::Job, z::Job...)
 
