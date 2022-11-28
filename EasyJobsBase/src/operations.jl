@@ -46,7 +46,7 @@ directing the returned value of one job to the input of another.
 """
 function pipe!(x::AbstractJob, y::AbstractJob)
     chain!(x, y)
-    y.args_from_previous = true
+    push!(y.args_from, x)
     return x
 end
 pipe!(x::AbstractJob, y::AbstractJob, z::AbstractJob...) = foldr(pipe!, (x, y, z...))

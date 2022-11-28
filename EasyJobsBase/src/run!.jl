@@ -15,15 +15,15 @@ function run!(job::AbstractJob; n=1, δt=1, t=0)
 end
 function run!(job::DependentJob; n=1, δt=1, t=0)
     run_check(job; n=1)
-    if job.args_from_previous
+    if !isempty(job.args_from)
         # Use previous results as arguments
-        parents = job.parents
-        job.core.args = if length(parents) == 0
+        source = job.args_from
+        job.core.args = if length(source) == 0
             ()
-        elseif length(parents) == 1
-            (something(getresult(first(parents))),)
+        elseif length(source) == 1
+            (something(getresult(first(source))),)
         else  # > 1
-            (collect(something(getresult(parent)) for parent in parents),)
+            (collect(something(getresult(job)) for job in source),)
         end
     end
     return run_outer!(job; n=n, δt=δt, t=t)

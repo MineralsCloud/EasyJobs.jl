@@ -99,7 +99,7 @@ mutable struct DependentJob <: AbstractJob
     "These jobs runs after the current job."
     children::Vector{AbstractJob}
     strict::Bool
-    args_from_previous::Bool
+    args_from::Vector{AbstractJob}
     function DependentJob(core::Think; name="", description="", username="")
         return new(
             uuid1(),
@@ -115,7 +115,7 @@ mutable struct DependentJob <: AbstractJob
             [],
             [],
             false,
-            false,
+            [],
         )
     end
 end
