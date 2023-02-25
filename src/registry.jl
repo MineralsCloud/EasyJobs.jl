@@ -4,6 +4,8 @@ using UUIDs: UUID
 
 export maketable, queue, query
 
+defaultsink() = collect
+
 function maketable(sink, registry=Job[])
     return @from job in registry begin
         @select {
