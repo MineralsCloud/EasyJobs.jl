@@ -11,7 +11,7 @@ Print all `Job`s that are pending, running, or finished as a table.
 Accpetable arguments for `sortby` are `:created_time`, `:user`, `:start_time`, `:stop_time`,
 `:elapsed`, `:status`, and `:times`.
 """
-function maketable(sink, registry)
+function maketable(sink, registry=Job[])
     return @from job in registry begin
         @select {
             id = job.id,
