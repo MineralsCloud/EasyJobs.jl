@@ -8,11 +8,13 @@ function maketable(sink, registry=Job[])
         @select {
             id = job.id,
             def = string(job.core),
+            user = string(job.username),
             created_time = job.created_time,
             start_time = starttime(job),
             stop_time = stoptime(job),
             duration = elapsed(job),
             status = getstatus(job),
+            times = ntimes(job),
         }
         @collect sink
     end
