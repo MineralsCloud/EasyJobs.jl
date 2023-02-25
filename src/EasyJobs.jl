@@ -1,7 +1,10 @@
 module EasyJobs
 
+using Reexport: @reexport
+
+@reexport using EasyJobsBase
+
 include("Thunks.jl")
-include("export.jl")
 include("registry.jl")
 # include("from.jl")
 
