@@ -1,5 +1,6 @@
 using EasyJobsBase: Job
 using Query: @from, @select, @orderby
+using UUIDs: UUID
 
 export maketable, queue, query
 
@@ -38,10 +39,22 @@ function queue(table; sortby=:created_time)
 end
 
 """
-    query(id::Integer)
-    query(ids::AbstractVector{<:Integer})
+    query(table, id::AbstractString)
+    query(table, ids::AbstractVector{<:AbstractString})
 
 Query a specific (or a list of `Job`s) by its (theirs) ID.
 """
-query(id::Integer) = filter(row -> row.id == id, queue())
-query(ids::AbstractVector{<:Integer}) = map(id -> query(id), ids)
+function query(table, id::AbstractString)
+    id = UUID(id)
+    return @from item in table begin
+        @where item.id == id
+        @select item
+    end
+end
+function query(table, ids::AbstractVector{<:AbstractString})
+    return @from id in ids begin
+        @from item in table
+        @where item.id == id
+        @select item
+    end
+end
