@@ -1,7 +1,7 @@
 using EasyJobsBase: Job
 using Query: @from, @select, @orderby
 
-export maketable
+export maketable, queue, query
 
 function maketable(sink, registry=Job[])
     return @from job in registry begin
