@@ -1,5 +1,6 @@
 using EasyJobsBase: Job
 using Query: @from, @select, @orderby
+using Requires: @require
 using UUIDs: UUID
 
 export maketable, queue, query
@@ -75,5 +76,12 @@ function query(table, ids::AbstractVector{<:AbstractString})
         @from item in table
         @where item.id == id
         @select item
+    end
+end
+
+function __init__()
+    @require DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0" begin
+        @eval using DataFrames: DataFrame
+        defaultsink() = DataFrame
     end
 end
