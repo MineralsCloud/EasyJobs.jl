@@ -21,21 +21,19 @@ function maketable(sink, registry=Job[])
 end
 
 """
-    queue(sink, registry=Job[]; sortby=:created_time)
+    queue(table; sortby=:created_time)
 
 Print all `Job`s that are pending, running, or finished as a table.
 
 Accpetable arguments for `sortby` are `:user`, `:created_time`, `:start_time`, `:stop_time`,
 `:duration`, `:status`, and `:times`.
 """
-function queue(sink, registry=Job[]; sortby=:created_time)
+function queue(table; sortby=:created_time)
     @assert sortby in
         (:user, :created_time, :start_time, :stop_time, :duration, :status, :times)
-    table = maketable(sink, registry)
-    return @from i in table begin
-        @orderby descending(getfield(i, sortby))
-        @select i
-        @collect sink
+    return @from item in table begin
+        @orderby descending(getfield(item, sortby))
+        @select item
     end
 end
 
