@@ -7,6 +7,7 @@ version = "0.3.0"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 EasyJobsBase = "db8ca866-b61f-4bd1-a9b9-75c107d645d4"
 Query = "1a8c2f83-1ff3-5112-b086-8aa67b057ba1"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 
 [compat]
 DataFrames = "1"
