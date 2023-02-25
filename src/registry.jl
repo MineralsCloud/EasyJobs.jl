@@ -22,6 +22,7 @@ function maketable(sink, registry=Job[])
         @collect sink
     end
 end
+maketable(registry=Job[]) = maketable(defaultsink(), registry)
 
 """
     queue(table; sortby=:created_time)
