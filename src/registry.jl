@@ -7,7 +7,7 @@ export maketable, queue, query
 
 defaultsink() = collect
 
-function maketable(sink, registry=Job[])
+function maketable(sink, registry)
     return @from job in registry begin
         @select {
             id = job.id,
