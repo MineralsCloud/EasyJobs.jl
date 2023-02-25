@@ -1,7 +1,7 @@
 module Thunks
 
-using EasyJobsBase.Thunks: Thunk, TimeLimitedThunk, getresult, reify!
+using Reexport: @reexport
 
-export Thunk, TimeLimitedThunk, getresult, reify!
+@reexport using EasyJobsBase.Thunks
 
 end
