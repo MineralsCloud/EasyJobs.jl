@@ -1,16 +1,8 @@
 using EasyJobsBase: Job
-using Query
+using Query: @from, @select, @orderby
 
 export maketable
 
-"""
-    queue(; sortby = :created_time)
-
-Print all `Job`s that are pending, running, or finished as a table.
-
-Accpetable arguments for `sortby` are `:created_time`, `:user`, `:start_time`, `:stop_time`,
-`:elapsed`, `:status`, and `:times`.
-"""
 function maketable(sink, registry=Job[])
     return @from job in registry begin
         @select {
@@ -22,6 +14,25 @@ function maketable(sink, registry=Job[])
             duration = elapsed(job),
             status = getstatus(job),
         }
+        @collect sink
+    end
+end
+
+"""
+    queue(sink, registry=Job[]; sortby=:created_time)
+
+Print all `Job`s that are pending, running, or finished as a table.
+
+Accpetable arguments for `sortby` are `:user`, `:created_time`, `:start_time`, `:stop_time`,
+`:duration`, `:status`, and `:times`.
+"""
+function queue(sink, registry=Job[]; sortby=:created_time)
+    @assert sortby in
+        (:user, :created_time, :start_time, :stop_time, :duration, :status, :times)
+    table = maketable(sink, registry)
+    return @from i in table begin
+        @orderby descending(getfield(i, sortby))
+        @select i
         @collect sink
     end
 end
