@@ -84,4 +84,12 @@ function __init__()
         @eval using DataFrames: DataFrame
         defaultsink() = DataFrame
     end
+    @require IndexedTables = "6deec6e2-d858-57c5-ab9b-e6ca5bd20e43" begin
+        @eval using IndexedTables: table
+        defaultsink() = table
+    end
+    @require TypedTables = "9d95f2ec-7b3d-5a63-8d20-e2491e220bb9" begin
+        @eval using TypedTables: Table
+        defaultsink() = Table
+    end
 end
