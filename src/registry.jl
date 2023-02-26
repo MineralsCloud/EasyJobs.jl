@@ -21,7 +21,7 @@ end
 """
     queue(table; sortby=:created_time)
 
-Print all `Job`s that are pending, running, or finished as a table.
+Return all `Job`s that are pending, running, or finished.
 
 Accpetable arguments for `sortby` are `:user`, `:created_time`, `:start_time`, `:stop_time`,
 `:duration`, `:status`, and `:times`.
@@ -36,7 +36,7 @@ end
     query(table, id::Integer)
     query(table, ids::AbstractVector{<:Integer})
 
-Query a specific (or a list of `Job`s) by its (theirs) ID.
+Query a specific (or a list of `Job`s) by its (theirs) ID(s).
 """
 query(table, id::UUID) = table |> @filter _.id == id
 query(table, ids::AbstractVector{<:UUID}) = table |> @filter _.id in ids
