@@ -56,12 +56,11 @@ macOS, and Windows.
 
 ## Questions and contributions
 
-Usage questions can be posted on [our discussion page][discussions-url].
+You are welcome to post usage questions on [our discussion page][discussions-url].
 
 Contributions are very welcome, as are feature requests and suggestions. Please open an
-[issue][issues-url] if you encounter any problems. The [contributing](@ref) page has
-a few guidelines that should be followed when opening pull requests and contributing code.
+[issue][issues-url] if you encounter any problems. The [Contributing](@ref) page has
+guidelines that should be followed when opening pull requests and contributing code.
 
 [discussions-url]: https://github.com/MineralsCloud/EasyJobs.jl/discussions
 [issues-url]: https://github.com/MineralsCloud/EasyJobs.jl/issues
-[contrib-url]: https://github.com/MineralsCloud/EasyJobs.jl/discussions
