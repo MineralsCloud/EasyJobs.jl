@@ -7,23 +7,19 @@ export maketable, queue, query
 
 defaultsink() = collect
 
-function maketable(sink, registry)
-    return @from job in registry begin
-        @select {
-            id = job.id,
-            def = string(job.core),
-            user = string(job.username),
-            created_time = job.created_time,
-            start_time = starttime(job),
-            stop_time = stoptime(job),
-            duration = elapsed(job),
-            status = getstatus(job),
-            times = ntimes(job),
-        }
-        @collect sink
-    end
+function maketable(registry)
+    return registry |> @map {
+        id = _.id,
+        def = string(_.core),
+        user = string(_.username),
+        created_time = _.created_time,
+        start_time = starttime(_),
+        stop_time = stoptime(_),
+        duration = elapsed(_),
+        status = getstatus(_),
+        times = ntimes(_),
+    }
 end
-maketable(registry=Job[]) = maketable(defaultsink(), registry)
 
 """
     queue(table; sortby=:created_time)
