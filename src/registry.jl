@@ -43,8 +43,8 @@ function queue(table; sortby=:created_time)
 end
 
 """
-    query(table, id::AbstractString)
-    query(table, ids::AbstractVector{<:AbstractString})
+    query(table, id::Integer)
+    query(table, ids::AbstractVector{<:Integer})
 
 Query a specific (or a list of `Job`s) by its (theirs) ID.
 """
@@ -60,6 +60,7 @@ function query(table, ids::AbstractVector{<:UUID})
         @select item
     end
 end
+query(table, ids::Union{Integer,<:AbstractVector{<:Integer}}) = query(table, UUID.(ids))
 
 function __init__()
     @require DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0" begin
