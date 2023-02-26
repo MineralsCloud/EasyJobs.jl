@@ -12,6 +12,7 @@ UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [compat]
 EasyJobsBase = "0.2, 0.3, 0.4"
+Requires = "1"
 Query = "1"
 Reexport = "1"
 julia = "1"
