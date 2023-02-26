@@ -41,18 +41,8 @@ end
 
 Query a specific (or a list of `Job`s) by its (theirs) ID.
 """
-function query(table, id::UUID)
-    return @from item in table begin
-        @where item.id == id
-        @select item
-    end
-end
-function query(table, ids::AbstractVector{<:UUID})
-    return @from item in table begin
-        @where item.id in ids
-        @select item
-    end
-end
+query(table, id::UUID) = table |> @filter _.id == id
+query(table, ids::AbstractVector{<:UUID}) = table |> @filter _.id in ids
 query(table, ids::Union{Integer,<:AbstractVector{<:Integer}}) = query(table, UUID.(ids))
 
 function __init__()
