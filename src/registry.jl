@@ -55,22 +55,6 @@ function query(table, id::AbstractString)
         @select item
     end
 end
-function query(id::AbstractString)
-    id = UUID(id)
-    return @from item in table begin
-        @where item.id == id
-        @select item
-        @collect defaultsink()
-    end
-end
-function query(ids::AbstractVector{<:AbstractString})
-    return @from id in ids begin
-        @from item in table
-        @where item.id == id
-        @select item
-        @collect defaultsink()
-    end
-end
 function query(table, ids::AbstractVector{<:AbstractString})
     return @from id in ids begin
         @from item in table
