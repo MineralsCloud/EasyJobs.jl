@@ -5,7 +5,7 @@ using Reexport: @reexport
 @reexport using EasyJobsBase
 
 include("Thunks.jl")
-include("registry.jl")
+include("query.jl")
 # include("from.jl")
 
 end
