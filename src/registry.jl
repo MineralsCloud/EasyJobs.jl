@@ -1,5 +1,5 @@
 using EasyJobsBase: Job
-using Query: @from, @select, @orderby
+using Query: @map, @orderby_descending, @filter
 using UUIDs: UUID
 
 export maketable, queue, query
