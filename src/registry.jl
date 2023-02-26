@@ -4,8 +4,6 @@ using UUIDs: UUID
 
 export maketable, queue, query
 
-defaultsink() = collect
-
 function maketable(registry)
     return registry |> @map {
         id = _.id,
