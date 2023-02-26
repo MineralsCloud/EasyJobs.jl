@@ -1,6 +1,5 @@
 using EasyJobsBase: Job
 using Query: @from, @select, @orderby
-using Requires: @require
 using UUIDs: UUID
 
 export maketable, queue, query
@@ -44,18 +43,3 @@ Query a specific (or a list of `Job`s) by its (theirs) ID.
 query(table, id::UUID) = table |> @filter _.id == id
 query(table, ids::AbstractVector{<:UUID}) = table |> @filter _.id in ids
 query(table, ids::Union{Integer,<:AbstractVector{<:Integer}}) = query(table, UUID.(ids))
-
-function __init__()
-    @require DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0" begin
-        @eval using DataFrames: DataFrame
-        defaultsink() = DataFrame
-    end
-    @require IndexedTables = "6deec6e2-d858-57c5-ab9b-e6ca5bd20e43" begin
-        @eval using IndexedTables: table
-        defaultsink() = table
-    end
-    @require TypedTables = "9d95f2ec-7b3d-5a63-8d20-e2491e220bb9" begin
-        @eval using TypedTables: Table
-        defaultsink() = Table
-    end
-end
