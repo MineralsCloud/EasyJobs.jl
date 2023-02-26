@@ -48,17 +48,15 @@ end
 
 Query a specific (or a list of `Job`s) by its (theirs) ID.
 """
-function query(table, id::AbstractString)
-    id = UUID(id)
+function query(table, id::UUID)
     return @from item in table begin
         @where item.id == id
         @select item
     end
 end
-function query(table, ids::AbstractVector{<:AbstractString})
-    return @from id in ids begin
-        @from item in table
-        @where item.id == id
+function query(table, ids::AbstractVector{<:UUID})
+    return @from item in table begin
+        @where item.id in ids
         @select item
     end
 end
