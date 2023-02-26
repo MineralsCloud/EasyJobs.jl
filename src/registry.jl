@@ -32,10 +32,7 @@ Accpetable arguments for `sortby` are `:user`, `:created_time`, `:start_time`, `
 function queue(table; sortby=:created_time)
     @assert sortby in
         (:user, :created_time, :start_time, :stop_time, :duration, :status, :times)
-    return @from item in table begin
-        @orderby descending(getfield(item, sortby))
-        @select item
-    end
+    return table |> @orderby_descending getfield(_, sortby)
 end
 
 """
