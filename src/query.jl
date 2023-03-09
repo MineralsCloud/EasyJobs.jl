@@ -1,21 +1,23 @@
 using EasyJobsBase: Job
-using Query: @map, @orderby_descending, @filter
+using Query: @from, @filter
 using UUIDs: UUID
 
 export maketable, queue, query
 
 function maketable(registry)
-    return registry |> @map {
-        id = _.id,
-        def = string(_.core),
-        user = string(_.username),
-        created_time = _.created_time,
-        start_time = starttime(_),
-        stop_time = stoptime(_),
-        duration = elapsed(_),
-        status = getstatus(_),
-        times = ntimes(_),
-    }
+    return @from job in registry begin
+        @select {
+            id = job.id,
+            def = string(job.core),
+            user = string(job.username),
+            created_time = job.created_time,
+            start_time = starttime(job),
+            stop_time = stoptime(job),
+            duration = elapsed(job),
+            status = getstatus(job),
+            times = ntimes(job),
+        }
+    end
 end
 
 """
@@ -29,7 +31,10 @@ Accpetable arguments for `sortby` are `:user`, `:created_time`, `:start_time`, `
 function queue(table; sortby=:created_time)
     @assert sortby in
         (:user, :created_time, :start_time, :stop_time, :duration, :status, :times)
-    return table |> @orderby_descending getfield(_, sortby)
+    return @from job in table begin
+        @orderby descending(getfield(job, sortby))
+        @select job
+    end
 end
 
 """
