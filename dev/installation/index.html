@@ -13,44 +13,21 @@ julia&gt; Pkg.add(&quot;EasyJobs&quot;)</code></pre></li><li><p>Run</p><pre><cod
     Updating git-repo `https://github.com/MineralsCloud/EasyJobs.jl`
    Resolving package versions...
     Updating `~/work/EasyJobs.jl/EasyJobs.jl/docs/build/developers/Project.toml`
-  [66d786ec] ~ EasyJobs v0.3.0 ⇒ v0.3.0 `https://github.com/MineralsCloud/EasyJobs.jl#main`
+  [66d786ec] ~ EasyJobs v0.4.0 ⇒ v0.4.0 `https://github.com/MineralsCloud/EasyJobs.jl#main`
     Updating `~/work/EasyJobs.jl/EasyJobs.jl/docs/build/developers/Manifest.toml`
-  [a93c6f00] - DataFrames v1.5.0
-  [e7dc6d0d] + DataValues v0.4.13
-  [66d786ec] ~ EasyJobs v0.3.0 ⇒ v0.3.0 `https://github.com/MineralsCloud/EasyJobs.jl#main`
-  [59287772] - Formatting v0.4.2
-  [842dd82b] - InlineStrings v1.4.0
-  [41ab1584] - InvertedIndices v1.2.0
-  [1c8ee90f] + IterableTables v1.0.0
-  [b964fa9f] - LaTeXStrings v1.3.0
-  [1914dd2f] + MacroTools v0.5.10
-  [2dfb63ee] - PooledArrays v1.4.2
-  [08abe8d2] - PrettyTables v2.2.2
-  [1a8c2f83] + Query v1.0.0
-  [2aef5ad7] + QueryOperators v0.9.3
-  [ae029012] + Requires v1.3.0
-  [91c51154] - SentinelArrays v1.3.18
-  [a2af1166] - SortingAlgorithms v1.1.0
-  [892a3eda] - StringManipulation v0.3.0
-  [5e66a065] + TableShowUtils v0.2.5
-  [382cd787] + TableTraitsUtils v1.0.2
-  [bd369af6] - Tables v1.10.0
-  [9fa8497b] - Future
+  [66d786ec] ~ EasyJobs v0.4.0 ⇒ v0.4.0 `https://github.com/MineralsCloud/EasyJobs.jl#main`
 Precompiling project...
 <span class="sgr33">  ✓ </span>EasyJobs
-  1 dependency successfully precompiled in 2 seconds. 37 already precompiled.
+  1 dependency successfully precompiled in 2 seconds. 35 already precompiled.
   <span class="sgr33">1</span> dependency precompiled but a different version is currently loaded. Restart julia to access the new version</code></pre><p>in the second step above.</p><h2 id="Update-EasyJobs"><a class="docs-heading-anchor" href="#Update-EasyJobs">Update EasyJobs</a><a id="Update-EasyJobs-1"></a><a class="docs-heading-anchor-permalink" href="#Update-EasyJobs" title="Permalink"></a></h2><p>Please <a href="https://docs.github.com/en/account-and-profile/managing-subscriptions-and-notifications-on-github/setting-up-notifications/configuring-notifications#configuring-your-watch-settings-for-an-individual-repository">watch</a> our <a href="https://github.com/MineralsCloud/EasyJobs.jl">GitHub repository</a> for new releases. Once we release a new version, you can update EasyJobs by typing</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using Pkg</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; Pkg.update(&quot;EasyJobs&quot;)</code><code class="nohighlight hljs ansi" style="display:block;">    Updating registry at `~/.julia/registries/General`
     Updating git-repo `https://github.com/JuliaRegistries/General.git`
     Updating git-repo `https://github.com/MineralsCloud/EasyJobs.jl`
   No Changes to `~/work/EasyJobs.jl/EasyJobs.jl/docs/build/developers/Project.toml`
-    Updating `~/work/EasyJobs.jl/EasyJobs.jl/docs/build/developers/Manifest.toml`
-  [5218b696] - Configurations v0.17.4
-  [db8ca866] ↑ EasyJobsBase v0.2.0 ⇒ v0.4.0
-  [55351af7] - ExproniconLite v0.7.11</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; Pkg.gc()</code><code class="nohighlight hljs ansi" style="display:block;">      Active manifest files: 4 found
+  No Changes to `~/work/EasyJobs.jl/EasyJobs.jl/docs/build/developers/Manifest.toml`</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; Pkg.gc()</code><code class="nohighlight hljs ansi" style="display:block;">      Active manifest files: 4 found
       Active artifact files: 0 found
       Active scratchspaces: 0 found
      Deleted no artifacts, repos, packages or scratchspaces</code></pre><p>in the Julia REPL.</p><h2 id="Uninstall-and-reinstall-EasyJobs"><a class="docs-heading-anchor" href="#Uninstall-and-reinstall-EasyJobs">Uninstall and reinstall EasyJobs</a><a id="Uninstall-and-reinstall-EasyJobs-1"></a><a class="docs-heading-anchor-permalink" href="#Uninstall-and-reinstall-EasyJobs" title="Permalink"></a></h2><p>Sometimes errors may occur if the package is not properly installed. In this case, you may want to uninstall and reinstall the package. Here is how to do that:</p><ol><li><p>To uninstall, in a Julia session, run</p><pre><code class="language-julia-repl hljs">julia&gt; using Pkg
 
 julia&gt; Pkg.rm(&quot;EasyJobs&quot;)
 
-julia&gt; Pkg.gc()</code></pre></li><li><p>Press <code>ctrl+d</code> to quit the current session. Start a new Julia session and reinstall EasyJobs.</p></li></ol></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../public/">Public API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Sunday 26 February 2023 05:46">Sunday 26 February 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+julia&gt; Pkg.gc()</code></pre></li><li><p>Press <code>ctrl+d</code> to quit the current session. Start a new Julia session and reinstall EasyJobs.</p></li></ol></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../public/">Public API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Thursday 9 March 2023 02:31">Thursday 9 March 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
