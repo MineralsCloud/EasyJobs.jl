@@ -9,19 +9,6 @@ Pages = ["public.md"]
 ```
 
 ```@meta
-CurrentModule = EasyJobsBase.Thunks
-```
-
-## `Thunks` module
-
-```@docs
-Thunk
-ErredResult
-reify!
-getresult(::Thunk)
-```
-
-```@meta
 CurrentModule = EasyJobsBase
 DocTestSetup = quote
     using EasyJobsBase
