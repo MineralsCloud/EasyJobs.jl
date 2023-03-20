@@ -1,4 +1,4 @@
-import .Thunks: getresult
+import Thinkers: getresult
 
 export ntimes, description, createdtime, starttime, stoptime, elapsed, interrupt!, getresult
 

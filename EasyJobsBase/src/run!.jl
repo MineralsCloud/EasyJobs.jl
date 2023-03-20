@@ -1,6 +1,6 @@
 using Dates: Period, now
 
-using .Thunks: TimeoutException, ErredResult, reify!, _kill
+using Thinkers: TimeoutException, ErrorInfo, reify!, _kill
 
 export run!, interrupt!
 

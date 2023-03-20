@@ -1,7 +1,7 @@
 using Dates: DateTime, now, format
 using UUIDs: UUID, uuid1
 
-using .Thunks: Think, printfunc
+using Thinkers: Think
 
 export Job, DependentJob
 
@@ -131,7 +131,7 @@ function Base.show(io::IO, job::AbstractJob)
             println(io)
         end
         print(io, ' ', "def: ")
-        printfunc(io, job.core)
+        print(io, job.core)
         print(io, '\n', ' ', "status: ")
         printstyled(io, getstatus(job); bold=true)
         if !ispending(job)
