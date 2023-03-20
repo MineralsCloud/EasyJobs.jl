@@ -1,4 +1,4 @@
-using EasyJobsBase.Thunks
+using Thinkers
 
 @testset "Test running `Job`s" begin
     function f₁()

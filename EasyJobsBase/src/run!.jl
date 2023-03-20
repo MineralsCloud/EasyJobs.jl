@@ -1,6 +1,6 @@
 using Dates: Period, now
 
-using .Thunks: TimeoutException, ErredResult, reify!, _kill
+using Thinkers: TimeoutException, ErrorInfo, reify!, haserred, _kill
 
 export run!, interrupt!
 
@@ -63,7 +63,7 @@ function run_core!(job)  # Do not export!
     job.start_time = now()
     reify!(job.core)
     job.stop_time = now()
-    job.status = if job.core.erred
+    job.status = if haserred(job.core)
         ex = something(getresult(job.core)).thrown
         ex isa Union{InterruptException,TimeoutException} ? INTERRUPTED : FAILED
     else
