@@ -5,14 +5,12 @@ export getstatus,
     issucceeded,
     isfailed,
     isinterrupted,
-    istimedout,
     pendingjobs,
     runningjobs,
     exitedjobs,
     succeededjobs,
     failedjobs,
-    interruptedjobs,
-    timedoutjobs
+    interruptedjobs
 
 """
     getstatus(x::Job)
@@ -39,9 +37,6 @@ isfailed(job::AbstractJob) = getstatus(job) === FAILED
 
 "Test if the `Job` was interrupted during running."
 isinterrupted(job::AbstractJob) = getstatus(job) === INTERRUPTED
-
-"Test if the `Job` was timed out during running."
-istimedout(job::AbstractJob) = getstatus(job) === TIMED_OUT
 
 """
     pendingjobs(jobs)
@@ -84,10 +79,3 @@ failedjobs(jobs) = filter(isfailed, jobs)
 Filter only the interrupted jobs in a sequence of `Job`s.
 """
 interruptedjobs(jobs) = filter(isinterrupted, jobs)
-
-"""
-    timedoutjobs(jobs)
-
-Filter only the timed-out jobs in a sequence of `Job`s.
-"""
-timedoutjobs(jobs) = filter(istimedout, jobs)
