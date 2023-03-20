@@ -64,14 +64,8 @@ function run_core!(job)  # Do not export!
     reify!(job.core)
     job.stop_time = now()
     job.status = if job.core.erred
-        thrown = something(getresult(job.core)).thrown
-        if thrown isa InterruptException
-            INTERRUPTED
-        elseif thrown isa TimeoutException
-            TIMED_OUT
-        else
-            FAILED
-        end
+        ex = something(getresult(job.core)).thrown
+        ex isa Union{InterruptException,TimeoutException} ? INTERRUPTED : FAILED
     else
         SUCCEEDED
     end
