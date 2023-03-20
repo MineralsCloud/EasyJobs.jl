@@ -11,7 +11,6 @@ export Job, DependentJob
     SUCCEEDED
     FAILED
     INTERRUPTED
-    TIMED_OUT
 end
 
 abstract type AbstractJob end
