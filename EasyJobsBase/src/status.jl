@@ -5,12 +5,12 @@ export getstatus,
     issucceeded,
     isfailed,
     isinterrupted,
-    pendingjobs,
-    runningjobs,
-    exitedjobs,
-    succeededjobs,
-    failedjobs,
-    interruptedjobs
+    listpending,
+    listrunning,
+    listexited,
+    listsucceeded,
+    listfailed,
+    listinterrupted
 
 """
     getstatus(x::Job)
@@ -43,39 +43,39 @@ isinterrupted(job::AbstractJob) = getstatus(job) === INTERRUPTED
 
 Filter only the pending jobs in a sequence of `Job`s.
 """
-pendingjobs(jobs) = filter(ispending, jobs)
+listpending(jobs) = filter(ispending, jobs)
 
 """
     runningjobs(jobs)
 
 Filter only the running jobs in a sequence of `Job`s.
 """
-runningjobs(jobs) = filter(isrunning, jobs)
+listrunning(jobs) = filter(isrunning, jobs)
 
 """
     exitedjobs(jobs)
 
 Filter only the exited jobs in a sequence of `Job`s.
 """
-exitedjobs(jobs) = filter(isexited, jobs)
+listexited(jobs) = filter(isexited, jobs)
 
 """
     succeededjobs(jobs)
 
 Filter only the succeeded jobs in a sequence of `Job`s.
 """
-succeededjobs(jobs) = filter(issucceeded, jobs)
+listsucceeded(jobs) = filter(issucceeded, jobs)
 
 """
     failedjobs(jobs)
 
 Filter only the failed jobs in a sequence of `Job`s.
 """
-failedjobs(jobs) = filter(isfailed, jobs)
+listfailed(jobs) = filter(isfailed, jobs)
 
 """
     interruptedjobs(jobs)
 
 Filter only the interrupted jobs in a sequence of `Job`s.
 """
-interruptedjobs(jobs) = filter(isinterrupted, jobs)
+listinterrupted(jobs) = filter(isinterrupted, jobs)
