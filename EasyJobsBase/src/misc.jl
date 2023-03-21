@@ -9,7 +9,6 @@ export countexecution,
 
 Return how many times a `Job` has been rerun.
 """
-countexecution(id::Integer) = countexecution(first(filter(x -> x.id == id, JOB_REGISTRY)))
 countexecution(job::AbstractJob) = Int(job.count)
 
 """
