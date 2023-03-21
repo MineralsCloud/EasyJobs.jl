@@ -14,13 +14,15 @@ function Base.show(io::IO, job::AbstractJob)
         print(io, '\n', ' ', "status: ")
         printstyled(io, getstatus(job); bold=true)
         if !ispending(job)
-            println(io, '\n', ' ', "from: ", format(getstarttime(job), "dd-u-YYYY HH:MM:SS.s"))
+            println(
+                io, '\n', ' ', "from: ", format(starttimeof(job), "dd-u-YYYY HH:MM:SS.s")
+            )
             print(io, ' ', "to: ")
             if isrunning(job)
                 print(io, "still running...")
             else
                 # println(io, format(stoptime(job), "dd-u-YYYY HH:MM:SS.s"))
-                print(io, ' ', "uses: ", timecost(job))
+                print(io, ' ', "uses: ", timecostof(job))
             end
         end
     end
