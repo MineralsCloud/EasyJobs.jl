@@ -1,6 +1,6 @@
 import Thinkers: getresult
 
-export ntimes,
+export countexecution,
     getdesc, getcreatedtime, getstarttime, getendtime, timecost, interrupt!, getresult
 
 """
@@ -9,8 +9,8 @@ export ntimes,
 
 Return how many times a `Job` has been rerun.
 """
-ntimes(id::Integer) = ntimes(first(filter(x -> x.id == id, JOB_REGISTRY)))
-ntimes(job::AbstractJob) = Int(job.count)
+countexecution(id::Integer) = countexecution(first(filter(x -> x.id == id, JOB_REGISTRY)))
+countexecution(job::AbstractJob) = Int(job.count)
 
 """
     description(job::Job)
