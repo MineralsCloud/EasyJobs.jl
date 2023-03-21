@@ -50,7 +50,7 @@ function timecost(job::AbstractJob)
     elseif isrunning(job)
         return now() - job.start_time
     else  # Exited
-        return job.stop_time - job.start_time
+        return job.end_time - job.start_time
     end
 end
 

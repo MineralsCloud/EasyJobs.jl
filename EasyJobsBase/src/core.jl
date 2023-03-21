@@ -43,7 +43,7 @@ mutable struct Job <: AbstractJob
     username::String
     created_time::DateTime
     start_time::DateTime
-    stop_time::DateTime
+    end_time::DateTime
     "Track the job status."
     status::JobStatus
     count::UInt64
@@ -89,7 +89,7 @@ mutable struct DependentJob <: AbstractJob
     username::String
     created_time::DateTime
     start_time::DateTime
-    stop_time::DateTime
+    end_time::DateTime
     "Track the job status."
     status::JobStatus
     count::UInt64

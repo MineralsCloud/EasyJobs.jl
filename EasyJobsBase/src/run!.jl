@@ -62,7 +62,7 @@ function run_core!(job)  # Do not export!
     job.status = RUNNING
     job.start_time = now()
     reify!(job.core)
-    job.stop_time = now()
+    job.end_time = now()
     job.status = if haserred(job.core)
         ex = something(getresult(job.core)).thrown
         ex isa Union{InterruptException,TimeoutException} ? INTERRUPTED : FAILED
