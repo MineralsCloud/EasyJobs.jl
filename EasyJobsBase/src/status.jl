@@ -38,42 +38,42 @@ isfailed(job::AbstractJob) = getstatus(job) === FAILED
 isinterrupted(job::AbstractJob) = getstatus(job) === INTERRUPTED
 
 """
-    pendingjobs(jobs)
+    listpending(jobs)
 
 Filter only the pending jobs in a sequence of `Job`s.
 """
 listpending(jobs) = filter(ispending, jobs)
 
 """
-    runningjobs(jobs)
+listrunning(jobs)
 
 Filter only the running jobs in a sequence of `Job`s.
 """
 listrunning(jobs) = filter(isrunning, jobs)
 
 """
-    exitedjobs(jobs)
+    listexited(jobs)
 
 Filter only the exited jobs in a sequence of `Job`s.
 """
 listexited(jobs) = filter(isexited, jobs)
 
 """
-    succeededjobs(jobs)
+    listsucceeded(jobs)
 
 Filter only the succeeded jobs in a sequence of `Job`s.
 """
 listsucceeded(jobs) = filter(issucceeded, jobs)
 
 """
-    failedjobs(jobs)
+    listfailed(jobs)
 
 Filter only the failed jobs in a sequence of `Job`s.
 """
 listfailed(jobs) = filter(isfailed, jobs)
 
 """
-    interruptedjobs(jobs)
+    listinterrupted(jobs)
 
 Filter only the interrupted jobs in a sequence of `Job`s.
 """
