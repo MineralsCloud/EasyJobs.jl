@@ -1,7 +1,7 @@
 import Thinkers: getresult
 
 export countexecution,
-    getdesc, getcreationtime, getstarttime, getendtime, timecost, getresult
+    descriptionof, creationtimeof, starttimeof, endtimeof, timecostof, getresult
 
 """
     countexecution(job::Job)
@@ -15,24 +15,24 @@ countexecution(job::AbstractJob) = Int(job.count)
 
 Return the description of a `Job`.
 """
-getdesc(job::AbstractJob) = job.description
+descriptionof(job::AbstractJob) = job.description
 
 "Return the creation time of a `Job`."
-getcreationtime(job::AbstractJob) = job.creation_time
+creationtimeof(job::AbstractJob) = job.creation_time
 
 """
     getstarttime(job::Job)
 
 Return the start time of a `Job`. Return `nothing` if it is still pending.
 """
-getstarttime(job::AbstractJob) = ispending(job) ? nothing : job.start_time
+starttimeof(job::AbstractJob) = ispending(job) ? nothing : job.start_time
 
 """
     getendtime(job::Job)
 
-Return the stop time of a `Job`. Return `nothing` if it has not exited.
+Return the end time of a `Job`. Return `nothing` if it has not exited.
 """
-getendtime(job::AbstractJob) = isexited(job) ? job.end_time : nothing
+endtimeof(job::AbstractJob) = isexited(job) ? job.end_time : nothing
 
 """
     timecost(job::Job)
@@ -42,7 +42,7 @@ Return the time cost of a `Job` since it started running.
 If `nothing`, the `Job` is still pending. If it is finished, return how long it took to
 complete.
 """
-function timecost(job::AbstractJob)
+function timecostof(job::AbstractJob)
     if ispending(job)
         return nothing
     elseif isrunning(job)
