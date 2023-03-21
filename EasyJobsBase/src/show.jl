@@ -10,7 +10,7 @@ function Base.show(io::IO, job::AbstractJob)
             println(io)
         end
         print(io, ' ', "def: ")
-        print(io, job.core)
+        print(io, job.def)
         print(io, '\n', ' ', "status: ")
         printstyled(io, getstatus(job); bold=true)
         if !ispending(job)

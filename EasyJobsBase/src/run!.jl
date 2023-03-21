@@ -18,7 +18,7 @@ function run!(job::DependentJob; n=1, δt=1, t=0)
     if !isempty(job.args_from)
         # Use previous results as arguments
         source = job.args_from
-        job.core.args = if length(source) == 0
+        job.def.args = if length(source) == 0
             ()
         elseif length(source) == 1
             (something(getresult(first(source))),)
@@ -61,10 +61,10 @@ end
 function run_core!(job)  # Do not export!
     job.status = RUNNING
     job.start_time = now()
-    reify!(job.core)
+    reify!(job.def)
     job.end_time = now()
-    job.status = if haserred(job.core)
-        ex = something(getresult(job.core)).thrown
+    job.status = if haserred(job.def)
+        ex = something(getresult(job.def)).thrown
         ex isa Union{InterruptException,TimeoutException} ? INTERRUPTED : FAILED
     else
         SUCCEEDED

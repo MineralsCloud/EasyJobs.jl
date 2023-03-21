@@ -16,12 +16,12 @@ end
 abstract type AbstractJob end
 # Reference: https://github.com/cihga39871/JobSchedulers.jl/blob/aca52de/src/jobs.jl#L35-L69
 """
-    Job(core::Thunk; description="", username="")
+    Job(def::Thunk; description="", username="")
 
 Create a simple job.
 
 # Arguments
-- `core`: a `Thunk` that encloses the job definition.
+- `def`: a `Thunk` that encloses the job definition.
 = `name`: give a short name to the job.
 - `description::String=""`: describe what the job does in more detail.
 - `username::String=""`: indicate who executes the job.
@@ -37,7 +37,7 @@ julia> b = Job(Thunk(run, `pwd` & `ls`); username="me", description="Run some co
 """
 mutable struct Job <: AbstractJob
     id::UUID
-    core::Think
+    def::Think
     name::String
     description::String
     username::String
@@ -51,10 +51,10 @@ mutable struct Job <: AbstractJob
     parents::Vector{AbstractJob}
     "These jobs runs after the current job."
     children::Vector{AbstractJob}
-    function Job(core::Think; name="", description="", username="")
+    function Job(def::Think; name="", description="", username="")
         return new(
             uuid1(),
-            core,
+            def,
             name,
             description,
             username,
@@ -75,7 +75,7 @@ Create a new `Job` from an existing `Job`.
 """
 function Job(job::Job)
     new_job = Job(
-        job.core; name=job.name, description=job.description, username=job.username
+        job.def; name=job.name, description=job.description, username=job.username
     )
     new_job.parents = job.parents
     new_job.children = job.children
@@ -83,7 +83,7 @@ function Job(job::Job)
 end
 mutable struct DependentJob <: AbstractJob
     id::UUID
-    core::Think
+    def::Think
     name::String
     description::String
     username::String
@@ -99,10 +99,10 @@ mutable struct DependentJob <: AbstractJob
     children::Vector{AbstractJob}
     strict::Bool
     args_from::Vector{AbstractJob}
-    function DependentJob(core::Think; name="", description="", username="")
+    function DependentJob(def::Think; name="", description="", username="")
         return new(
             uuid1(),
-            core,
+            def,
             name,
             description,
             username,
