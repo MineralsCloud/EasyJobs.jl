@@ -68,19 +68,6 @@ mutable struct Job <: AbstractJob
         )
     end
 end
-"""
-    Job(job::Job)
-
-Create a new `Job` from an existing `Job`.
-"""
-function Job(job::Job)
-    new_job = Job(
-        job.def; name=job.name, description=job.description, username=job.username
-    )
-    new_job.parents = job.parents
-    new_job.children = job.children
-    return new_job
-end
 mutable struct DependentJob <: AbstractJob
     id::UUID
     def::Think
