@@ -2,44 +2,9 @@
 CurrentModule = EasyJobsBase
 ```
 
-# Library
+# API Reference
 
-```@contents
-Pages = ["public.md"]
-```
-
-```@meta
-CurrentModule = EasyJobsBase
-DocTestSetup = quote
-    using EasyJobsBase
-    using EasyJobsBase: Job
-end
-```
-
-## `Jobs` module
-
-```@docs
-Job
-getresult(::Job)
-getstatus(::Job)
-ispending
-isrunning
-isexited
-issucceeded
-isfailed
-isinterrupted
-pendingjobs
-runningjobs
-exitedjobs
-succeededjobs
-failedjobs
-interruptedjobs
-createdtime
-starttime
-stoptime
-elapsed
-description
-run!(::Job)
-interrupt!
-ntimes
+```@autodocs
+Modules = [EasyJobsBase]
+Order   = [:type, :function]
 ```
