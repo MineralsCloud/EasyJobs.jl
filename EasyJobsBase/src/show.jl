@@ -20,7 +20,7 @@ function Base.show(io::IO, job::AbstractJob)
                 print(io, "still running...")
             else
                 # println(io, format(stoptime(job), "dd-u-YYYY HH:MM:SS.s"))
-                print(io, ' ', "uses: ", elapsed(job))
+                print(io, ' ', "uses: ", timecost(job))
             end
         end
     end

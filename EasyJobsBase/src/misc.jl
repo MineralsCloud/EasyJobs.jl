@@ -1,6 +1,7 @@
 import Thinkers: getresult
 
-export ntimes, description, createdtime, starttime, stoptime, elapsed, interrupt!, getresult
+export ntimes,
+    description, createdtime, starttime, stoptime, timecost, interrupt!, getresult
 
 """
     ntimes(id::Integer)
@@ -43,7 +44,7 @@ Return the elapsed time of a `Job` since it started running.
 If `nothing`, the `Job` is still pending. If it is finished, return how long it took to
 complete.
 """
-function elapsed(job::AbstractJob)
+function timecost(job::AbstractJob)
     if ispending(job)
         return nothing
     elseif isrunning(job)
