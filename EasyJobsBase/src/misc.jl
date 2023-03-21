@@ -1,55 +1,54 @@
 import Thinkers: getresult
 
-export ntimes, description, createdtime, starttime, stoptime, elapsed, interrupt!, getresult
+export countexecution,
+    getdesc, getcreationtime, getstarttime, getendtime, timecost, getresult
 
 """
-    ntimes(id::Integer)
-    ntimes(job::Job)
+    countexecution(job::Job)
 
-Return how many times a `Job` has been rerun.
+Count how many times a `Job` has been run.
 """
-ntimes(id::Integer) = ntimes(first(filter(x -> x.id == id, JOB_REGISTRY)))
-ntimes(job::AbstractJob) = Int(job.count)
+countexecution(job::AbstractJob) = Int(job.count)
 
 """
-    description(job::Job)
+    getdesc(job::Job)
 
 Return the description of a `Job`.
 """
-description(job::AbstractJob) = job.description
+getdesc(job::AbstractJob) = job.description
 
-"Return the created time of a `Job`."
-createdtime(job::AbstractJob) = job.created_time
+"Return the creation time of a `Job`."
+getcreationtime(job::AbstractJob) = job.creation_time
 
 """
-    starttime(job::Job)
+    getstarttime(job::Job)
 
 Return the start time of a `Job`. Return `nothing` if it is still pending.
 """
-starttime(job::AbstractJob) = ispending(job) ? nothing : job.start_time
+getstarttime(job::AbstractJob) = ispending(job) ? nothing : job.start_time
 
 """
-    stoptime(job::Job)
+    getendtime(job::Job)
 
 Return the stop time of a `Job`. Return `nothing` if it has not exited.
 """
-stoptime(job::AbstractJob) = isexited(job) ? job.stop_time : nothing
+getendtime(job::AbstractJob) = isexited(job) ? job.end_time : nothing
 
 """
-    elapsed(job::Job)
+    timecost(job::Job)
 
-Return the elapsed time of a `Job` since it started running.
+Return the time cost of a `Job` since it started running.
 
 If `nothing`, the `Job` is still pending. If it is finished, return how long it took to
 complete.
 """
-function elapsed(job::AbstractJob)
+function timecost(job::AbstractJob)
     if ispending(job)
         return nothing
     elseif isrunning(job)
         return now() - job.start_time
     else  # Exited
-        return job.stop_time - job.start_time
+        return job.end_time - job.start_time
     end
 end
 
