@@ -1,7 +1,7 @@
 import Thinkers: getresult
 
 export ntimes,
-    description, createdtime, starttime, stoptime, timecost, interrupt!, getresult
+    getdesc, getcreatedtime, getstarttime, getendtime, timecost, interrupt!, getresult
 
 """
     ntimes(id::Integer)
@@ -17,24 +17,24 @@ ntimes(job::AbstractJob) = Int(job.count)
 
 Return the description of a `Job`.
 """
-description(job::AbstractJob) = job.description
+getdesc(job::AbstractJob) = job.description
 
 "Return the created time of a `Job`."
-createdtime(job::AbstractJob) = job.created_time
+getcreatedtime(job::AbstractJob) = job.created_time
 
 """
     starttime(job::Job)
 
 Return the start time of a `Job`. Return `nothing` if it is still pending.
 """
-starttime(job::AbstractJob) = ispending(job) ? nothing : job.start_time
+getstarttime(job::AbstractJob) = ispending(job) ? nothing : job.start_time
 
 """
     stoptime(job::Job)
 
 Return the stop time of a `Job`. Return `nothing` if it has not exited.
 """
-stoptime(job::AbstractJob) = isexited(job) ? job.stop_time : nothing
+getendtime(job::AbstractJob) = isexited(job) ? job.end_time : nothing
 
 """
     elapsed(job::Job)
