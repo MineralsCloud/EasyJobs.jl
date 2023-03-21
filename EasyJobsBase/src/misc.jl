@@ -1,7 +1,7 @@
 import Thinkers: getresult
 
 export countexecution,
-    getdesc, getcreatedtime, getstarttime, getendtime, timecost, interrupt!, getresult
+    getdesc, getcreatedtime, getstarttime, getendtime, timecost, getresult
 
 """
     ntimes(id::Integer)
