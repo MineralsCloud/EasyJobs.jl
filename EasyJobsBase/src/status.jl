@@ -18,7 +18,6 @@ export getstatus,
 Get the current status of a `Job`.
 """
 getstatus(job::AbstractJob) = job.status
-getstatus(jobs::AbstractArray{AbstractJob}) = map(getstatus, jobs)
 
 "Test if the `Job` is still pending."
 ispending(job::AbstractJob) = getstatus(job) === PENDING
