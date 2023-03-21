@@ -11,7 +11,7 @@ Count how many times a `Job` has been run.
 countexecution(job::AbstractJob) = Int(job.count)
 
 """
-    getdesc(job::Job)
+    descriptionof(job::Job)
 
 Return the description of a `Job`.
 """
@@ -21,21 +21,21 @@ descriptionof(job::AbstractJob) = job.description
 creationtimeof(job::AbstractJob) = job.creation_time
 
 """
-    getstarttime(job::Job)
+    starttimeof(job::Job)
 
 Return the start time of a `Job`. Return `nothing` if it is still pending.
 """
 starttimeof(job::AbstractJob) = ispending(job) ? nothing : job.start_time
 
 """
-    getendtime(job::Job)
+    endtimeof(job::Job)
 
 Return the end time of a `Job`. Return `nothing` if it has not exited.
 """
 endtimeof(job::AbstractJob) = isexited(job) ? job.end_time : nothing
 
 """
-    timecost(job::Job)
+    timecostof(job::Job)
 
 Return the time cost of a `Job` since it started running.
 
