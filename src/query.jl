@@ -21,16 +21,16 @@ function maketable(registry)
 end
 
 """
-    queue(table; sortby=:created_time)
+    queue(table; sortby=:created_at)
 
 Return all `Job`s that are pending, running, or finished.
 
-Accpetable arguments for `sortby` are `:user`, `:created_time`, `:start_time`, `:stop_time`,
-`:duration`, `:status`, and `:times`.
+Accpetable arguments for `sortby` are `:created_by`, `:created_at`, `:started_at`,
+`:stopped_at`, `:spent`, `:status`, and `:n`.
 """
-function queue(table; sortby=:created_time)
+function queue(table; sortby=:created_at)
     @assert sortby in
-        (:user, :created_time, :start_time, :stop_time, :duration, :status, :times)
+        (:created_by, :created_at, :started_at, :stopped_at, :spent, :status, :n)
     return @from job in table begin
         @orderby descending(getfield(job, sortby))
         @select job
