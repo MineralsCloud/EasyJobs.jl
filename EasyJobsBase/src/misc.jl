@@ -1,7 +1,7 @@
 import Thinkers: getresult
 
 export countexecution,
-    getdesc, getcreatedtime, getstarttime, getendtime, timecost, getresult
+    getdesc, getcreationtime, getstarttime, getendtime, timecost, getresult
 
 """
     ntimes(id::Integer)
@@ -19,7 +19,7 @@ Return the description of a `Job`.
 getdesc(job::AbstractJob) = job.description
 
 "Return the created time of a `Job`."
-getcreatedtime(job::AbstractJob) = job.created_time
+getcreationtime(job::AbstractJob) = job.creation_time
 
 """
     starttime(job::Job)
