@@ -1,7 +1,7 @@
 export chain!, →, ←
 
 """
-    chain(x::Job, y::Job, z::Job...)
+    chain!(x::Job, y::Job, z::Job...)
 
 Chain multiple `Job`s one after another.
 """
