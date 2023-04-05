@@ -1,4 +1,4 @@
-export chain!, follow!, pipe!, fork!, converge!, spindle!, →, ←, ↠, ↞, ⇒, ⇐, ⇉, ⭃
+export chain!, follow!, pipe!, converge!, spindle!, →, ←, ↠, ↞, ⇒, ⇐, ⭃
 
 """
     chain(x::Job, y::Job, z::Job...)
@@ -66,20 +66,6 @@ pipe!(x::AbstractJob, y::AbstractJob, z::AbstractJob...) = foldr(pipe!, (x, y, z
 "Pipe" two jobs reversely.
 """
 ⇐(y::AbstractJob, x::AbstractJob) = x ⇒ y
-
-"""
-    fork(x::Job, ys::AbstractVector{Job})
-    ⇉(x, ys)
-
-Attach a group of parallel `Job`s (`ys`) to a single `Job` (`x`).
-"""
-function fork!(x::AbstractJob, ys::AbstractVector)
-    for y in ys
-        chain!(x, y)
-    end
-    return x
-end
-const ⇉ = fork!
 
 """
     converge(xs::AbstractVector{Job}, y::Job)
