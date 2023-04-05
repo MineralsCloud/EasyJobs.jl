@@ -44,7 +44,7 @@ follow!(x::AbstractJob, y::AbstractJob, z::AbstractJob...) = foldr(follow!, (x, 
 ↞(y::AbstractJob, x::AbstractJob) = x ↠ y
 
 """
-    pipe(x::Job, y::Job, z::Job...)
+    pipe!(x::Job, y::Job, z::Job...)
 
 Chain multiple jobs one after another, as well as
 directing the returned value of one job to the input of another.
