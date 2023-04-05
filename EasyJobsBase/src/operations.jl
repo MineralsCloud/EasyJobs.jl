@@ -20,16 +20,16 @@ function chain!(x::AbstractJob, y::AbstractJob)
     return x
 end
 chain!(x::AbstractJob, y::AbstractJob, z::AbstractJob...) = foldr(chain!, (x, y, z...))
-function chain!(x::DependentJob, y::DependentJob)
-    chain!(x, y)
-    y.strict = true
-    return x
-end
-function chain!(x::ArgDependentJob, y::ArgDependentJob)
-    chain!(x, y)
-    push!(y.args_from, x)
-    return x
-end
+# function chain!(x::DependentJob, y::DependentJob)
+#     chain!(x, y)
+#     y.strict = true
+#     return x
+# end
+# function chain!(x::ArgDependentJob, y::ArgDependentJob)
+#     chain!(x, y)
+#     push!(y.args_from, x)
+#     return x
+# end
 """
     →(x, y)
 
