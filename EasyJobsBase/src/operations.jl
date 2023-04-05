@@ -1,5 +1,4 @@
-export chain!,
-    follow!, pipe!, thread!, fork!, converge!, spindle!, →, ←, ↠, ↞, ⇒, ⇐, ⇶, ⬱, ⇉, ⭃
+export chain!, follow!, pipe!, fork!, converge!, spindle!, →, ←, ↠, ↞, ⇒, ⇐, ⇉, ⭃
 
 """
     chain(x::Job, y::Job, z::Job...)
@@ -67,36 +66,6 @@ pipe!(x::AbstractJob, y::AbstractJob, z::AbstractJob...) = foldr(pipe!, (x, y, z
 "Pipe" two jobs reversely.
 """
 ⇐(y::AbstractJob, x::AbstractJob) = x ⇒ y
-
-"""
-    thread(xs::AbstractVector{Job}, ys::AbstractVector{Job}, zs::AbstractVector{Job}...)
-
-Chain multiple vectors of `Job`s, each `Job` in `xs` has a corresponding `Job` in `ys`.`
-"""
-function thread!(xs::AbstractVector, ys::AbstractVector)
-    if size(xs) != size(ys)
-        throw(DimensionMismatch("`xs` and `ys` must have the same size!"))
-    end
-    for (x, y) in zip(xs, ys)
-        chain!(x, y)
-    end
-    return xs
-end
-function thread!(xs::AbstractVector, ys::AbstractVector, zs::AbstractVector...)
-    return foldr(thread!, (xs, ys, zs...))
-end
-"""
-    ⇶(xs, ys)
-
-Chain two vectors of `Job`s.
-"""
-⇶(xs::AbstractVector, ys::AbstractVector) = thread!(xs, ys)
-"""
-    ⬱(ys, xs)
-
-Chain two vectors of `Job`s reversely.
-"""
-⬱(ys::AbstractVector, xs::AbstractVector) = xs ⇶ ys
 
 """
     fork(x::Job, ys::AbstractVector{Job})
