@@ -1,4 +1,4 @@
-export chain!, follow!, pipe!, →, ←, ↠, ↞, ⇒, ⇐
+export chain!, pipe!, →, ←, ⇒, ⇐
 
 """
     chain(x::Job, y::Job, z::Job...)
@@ -20,6 +20,11 @@ function chain!(x::AbstractJob, y::AbstractJob)
     return x
 end
 chain!(x::AbstractJob, y::AbstractJob, z::AbstractJob...) = foldr(chain!, (x, y, z...))
+function chain!(x::DependentJob, y::DependentJob)
+    chain!(x, y)
+    y.strict = true
+    return x
+end
 """
     →(x, y)
 
@@ -32,15 +37,6 @@ Chain two `Job`s.
 Chain two `Job`s reversely.
 """
 ←(y::AbstractJob, x::AbstractJob) = x → y
-
-function follow!(x::AbstractJob, y::AbstractJob)
-    chain!(x, y)
-    y.strict = true
-    return x
-end
-follow!(x::AbstractJob, y::AbstractJob, z::AbstractJob...) = foldr(follow!, (x, y, z...))
-↠(x::AbstractJob, y::AbstractJob) = follow!(x, y)
-↞(y::AbstractJob, x::AbstractJob) = x ↠ y
 
 """
     pipe!(x::Job, y::Job, z::Job...)
