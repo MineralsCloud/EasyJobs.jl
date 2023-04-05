@@ -1,4 +1,4 @@
-export chain!, follow!, pipe!, spindle!, →, ←, ↠, ↞, ⇒, ⇐
+export chain!, follow!, pipe!, →, ←, ↠, ↞, ⇒, ⇐
 
 """
     chain(x::Job, y::Job, z::Job...)
@@ -66,10 +66,3 @@ pipe!(x::AbstractJob, y::AbstractJob, z::AbstractJob...) = foldr(pipe!, (x, y, z
 "Pipe" two jobs reversely.
 """
 ⇐(y::AbstractJob, x::AbstractJob) = x ⇒ y
-
-"""
-    spindle(x::Job, ys::AbstractVector{Job}, z::Job)
-
-Start from a `Job` (`x`), followed by a series of `Job`s (`ys`), finished by a single `Job` (`z`).
-"""
-spindle!(x::AbstractJob, ys::AbstractVector, z::AbstractJob) = x ⇉ ys ⭃ z
