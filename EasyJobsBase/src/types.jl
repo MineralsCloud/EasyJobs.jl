@@ -22,7 +22,7 @@ Create a simple job.
 
 # Arguments
 - `def`: a `Thunk` that encloses the job definition.
-= `name`: give a short name to the job.
+- `name`: give a short name to the job.
 - `description::String=""`: describe what the job does in more detail.
 - `username::String=""`: indicate who executes the job.
 
