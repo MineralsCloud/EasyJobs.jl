@@ -48,9 +48,9 @@ mutable struct Job <: AbstractJob
     status::JobStatus
     count::UInt64
     "These jobs runs before the current job."
-    parents::Vector{AbstractJob}
+    parents::Set{AbstractJob}
     "These jobs runs after the current job."
-    children::Vector{AbstractJob}
+    children::Set{AbstractJob}
     function Job(def::Think; name="", description="", username="")
         return new(
             uuid1(),
@@ -63,8 +63,8 @@ mutable struct Job <: AbstractJob
             DateTime(0),
             PENDING,
             0,
-            [],
-            [],
+            Set(),
+            Set(),
         )
     end
 end
@@ -81,9 +81,9 @@ mutable struct DependentJob <: AbstractJob
     status::JobStatus
     count::UInt64
     "These jobs runs before the current job."
-    parents::Vector{AbstractJob}
+    parents::Set{AbstractJob}
     "These jobs runs after the current job."
-    children::Vector{AbstractJob}
+    children::Set{AbstractJob}
     strict::Bool
     args_from::Vector{AbstractJob}
     function DependentJob(def::Think; name="", description="", username="")
@@ -98,8 +98,8 @@ mutable struct DependentJob <: AbstractJob
             DateTime(0),
             PENDING,
             0,
-            [],
-            [],
+            Set(),
+            Set(),
             false,
             [],
         )
