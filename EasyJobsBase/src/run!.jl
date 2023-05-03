@@ -9,14 +9,14 @@ export run!, interrupt!
 
 Run a `Job` with a maximum number of attempts, with each attempt separated by a few seconds.
 """
-run!(job::AbstractJob; kwargs...) = run!(Runner(job; kwargs...))
-function run!(runner::Runner)
-    dynamic_check(runner)
-    return run_outer!(runner)
+run!(job::AbstractJob; kwargs...) = run!(Executor(job; kwargs...))
+function run!(exe::Executor)
+    dynamic_check(exe)
+    return _run!(exe)
 end
-function run!(runner::Runner{DependentJob})
-    dynamic_check(runner)
-    job = runner.job
+function run!(exe::Executor{DependentJob})
+    dynamic_check(exe)
+    job = exe.job
     if !isempty(job.args_from)
         # Use previous results as arguments
         source = job.args_from
