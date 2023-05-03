@@ -5,7 +5,7 @@ using Thinkers: TimeoutException, ErrorInfo, reify!, haserred, _kill
 export run!, start!, kill!
 
 """
-    run!(job::Job; maxattempts=1, separation=1, skip=0)
+    run!(job::Job; maxattempts=1, interval=1, waitfor=0)
 
 Run a `Job` with a maximum number of attempts, with each attempt separated by a few seconds.
 """
@@ -89,9 +89,9 @@ function _sleep(t)
 end
 
 """
-    interrupt!(runner::JobRunner)
+    kill!(exe::Executor)
 
-Manually interrupt a `Job`, works only if it is running.
+Manually kill a `Job`, works only if it is running.
 """
 function kill!(exe::Executor)
     if isexited(exe.job)
