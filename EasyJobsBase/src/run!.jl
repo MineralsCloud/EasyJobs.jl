@@ -104,7 +104,7 @@ end
 
 Manually interrupt a `Job`, works only if it is running.
 """
-function interrupt!(runner::JobRunner)
+function interrupt!(runner::Runner)
     if isexited(runner.job)
         @info "the job $(runner.job.id) has already exited!"
     elseif ispending(runner.job)
@@ -115,4 +115,4 @@ function interrupt!(runner::JobRunner)
     return runner
 end
 
-Base.wait(runner::JobRunner) = wait(runner.ref)
+Base.wait(runner::Runner) = wait(runner.ref)
