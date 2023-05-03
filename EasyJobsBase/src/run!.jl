@@ -93,15 +93,15 @@ end
 
 Manually interrupt a `Job`, works only if it is running.
 """
-function interrupt!(runner::Runner)
-    if isexited(runner.job)
-        @info "the job $(runner.job.id) has already exited!"
-    elseif ispending(runner.job)
-        @info "the job $(runner.job.id) has not started!"
+function kill!(exe::Executor)
+    if isexited(exe.job)
+        @info "the job $(exe.job.id) has already exited!"
+    elseif ispending(exe.job)
+        @info "the job $(exe.job.id) has not started!"
     else
-        _kill(runner.task)
+        _kill(exe.task)
     end
-    return runner
+    return exe
 end
 
-Base.wait(runner::Executor) = wait(runner.task)
+Base.wait(exe::Executor) = wait(exe.task)
