@@ -44,15 +44,15 @@ function _run!(exe::Executor)  # Do not export!
         end
     end
 end
-function run_inner!(runner)  # Do not export!
-    if ispending(runner.job)
-        if !isexecuted(runner.job)
-            push!(JOB_REGISTRY, runner => nothing)
+function __run!(exe::Executor)  # Do not export!
+    if ispending(exe.job)
+        if !isexecuted(exe.job)
+            push!(JOB_REGISTRY, exe => nothing)
         end
-        schedule(runner.task)
+        schedule(exe.task)
     else
-        runner.job.status = PENDING
-        return run_inner!(runner)
+        exe.job.status = PENDING
+        return __run!(exe)
     end
 end
 function run_core!(job)  # Do not export!
