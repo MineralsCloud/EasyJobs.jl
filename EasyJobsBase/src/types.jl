@@ -107,14 +107,16 @@ mutable struct DependentJob <: AbstractJob
 end
 
 # See https://github.com/MineralsCloud/SimpleWorkflows.jl/issues/137
-mutable struct Runner{T<:AbstractJob}
+struct Runner{T<:AbstractJob}
     job::T
-    maxattempts::Integer
+    maxattempts::UInt64
     interval::Real
-    skip::Union{DateTime,Real}
-    ref::Task
-    function Runner(job::T, maxattempts=1, interval=1, skip=0) where {T}
+    waitfor::Real
+    task::Task
+    function Runner(job::T, maxattempts=1, interval=1, waitfor=0) where {T}
         @assert maxattempts >= 1
-        return new{T}(job, maxattempts, interval, skip)
+        @assert interval >= zero(interval)
+        @assert waitfor >= zero(waitfor)
+        return new{T}(job, maxattempts, interval, waitfor, Task(() -> run_core!(job)))
     end
 end

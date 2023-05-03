@@ -32,14 +32,14 @@ function run!(runner::Runner{DependentJob})
     return run_outer!(runner)
 end
 function run_outer!(runner::Runner)
-    _sleep(runner.skip)
+    _sleep(runner.waitfor)
     for _ in runner.maxattempts
         run_inner!(runner)
         if issucceeded(runner.job)
             return runner  # Stop immediately
         else
-            if !iszero(runner.separation)
-                sleep(runner.separation)  # `if-else` is faster than `sleep(0)`
+            if !iszero(runner.interval)
+                sleep(runner.interval)  # `if-else` is faster than `sleep(0)`
             end
         end
     end
