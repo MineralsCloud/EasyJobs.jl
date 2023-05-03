@@ -9,7 +9,7 @@ export run!, interrupt!
 
 Run a `Job` with a maximum number of attempts, with each attempt separated by a few seconds.
 """
-run!(job::AbstractJob; kwargs...) = Runner(job; kwargs...)()
+run!(job::AbstractJob; kwargs...) = run!(Runner(job, kwargs...))
 function run!(runner::Runner)
     dynamic_check(runner)
     return run_outer!(runner)
