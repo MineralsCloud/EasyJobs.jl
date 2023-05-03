@@ -1,7 +1,7 @@
 using EasyJobsBase
 using Documenter
 
-DocMeta.setdocmeta!(EasyJobsBase, :DocTestSetup, :(using EasyJobsBase); recursive=true)
+DocMeta.setdocmeta!(EasyJobsBase, :DocTestSetup, :(using EasyJobsBase, Thinkers); recursive=true)
 
 makedocs(;
     modules=[EasyJobsBase],
