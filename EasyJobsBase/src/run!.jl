@@ -62,8 +62,8 @@ function ___run!(job::AbstractJob)  # Do not export!
     reify!(job.def)
     job.end_time = now()
     job.status = if haserred(job.def)
-        ex = something(getresult(job.def)).thrown
-        ex isa Union{InterruptException,TimeoutException} ? INTERRUPTED : FAILED
+        e = something(getresult(job.def)).thrown
+        e isa Union{InterruptException,TimeoutException} ? INTERRUPTED : FAILED
     else
         SUCCEEDED
     end
