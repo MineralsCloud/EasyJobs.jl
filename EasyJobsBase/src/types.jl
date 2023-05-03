@@ -113,7 +113,7 @@ struct Runner{T<:AbstractJob}
     interval::Real
     waitfor::Real
     task::Task
-    function Runner(job::T, maxattempts=1, interval=1, waitfor=0) where {T}
+    function Runner(job::T; maxattempts=1, interval=1, waitfor=0) where {T}
         @assert maxattempts >= 1
         @assert interval >= zero(interval)
         @assert waitfor >= zero(waitfor)
