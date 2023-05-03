@@ -55,7 +55,7 @@ function __run!(exe::Executor)  # Do not export!
         return __run!(exe)
     end
 end
-function run_core!(job)  # Do not export!
+function ___run!(job::AbstractJob)  # Do not export!
     job.status = RUNNING
     job.start_time = now()
     reify!(job.def)
