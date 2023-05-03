@@ -98,9 +98,9 @@ function interrupt!(runner::Runner)
     elseif ispending(runner.job)
         @info "the job $(runner.job.id) has not started!"
     else
-        _kill(runner.ref)
+        _kill(runner.task)
     end
     return runner
 end
 
-Base.wait(runner::Runner) = wait(runner.ref)
+Base.wait(runner::Runner) = wait(runner.task)
