@@ -33,15 +33,13 @@ function start!(exe::Executor{DependentJob})
     return _run!(exe)
 end
 function _run!(exe::Executor)  # Do not export!
-    _sleep(exe.waitfor)
+    sleep(exe.waitfor)
     for _ in exe.maxattempts
         __run!(exe)
         if issucceeded(exe.job)
             return exe  # Stop immediately
         else
-            if !iszero(exe.interval)
-                sleep(exe.interval)  # `if-else` is faster than `sleep(0)`
-            end
+            sleep(exe.interval)
         end
     end
 end
@@ -77,13 +75,6 @@ function dynamic_check(runner::Executor{DependentJob})
         @assert all(issucceeded(parent) for parent in runner.job.parents)
     else
         @assert all(isexited(parent) for parent in runner.job.parents)
-    end
-    return nothing
-end
-
-function _sleep(t)
-    if t > zero(t)
-        sleep(t)
     end
     return nothing
 end
