@@ -72,11 +72,7 @@ end
 
 dynamic_check(::Executor) = nothing
 function dynamic_check(runner::Executor{DependentJob})
-    if runner.job.strict
-        @assert all(issucceeded(parent) for parent in runner.job.parents)
-    else
-        @assert all(isexited(parent) for parent in runner.job.parents)
-    end
+    @assert all(issucceeded(parent) for parent in runner.job.parents)
     return nothing
 end
 
