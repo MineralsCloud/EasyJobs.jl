@@ -107,7 +107,8 @@ mutable struct DependentJob <: AbstractJob
 end
 
 # See https://github.com/MineralsCloud/SimpleWorkflows.jl/issues/137
-struct JobRunner{T<:AbstractJob}
-    job::T
-    ref::Union{Task,Nothing}
+mutable struct JobRunner
+    job::AbstractJob
+    ref::Task
+    JobRunner(job::AbstractJob) = new(job)
 end
