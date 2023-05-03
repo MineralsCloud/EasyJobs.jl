@@ -1,9 +1,9 @@
 export chain!, →, ←
 
 """
-    chain!(x::Job, y::Job, z::Job...)
+    chain!(x::AbstractJob, y::AbstractJob, z::AbstractJob...)
 
-Chain multiple `Job`s one after another.
+Chain multiple `AbstractJob`s one after another.
 """
 function chain!(x::AbstractJob, y::AbstractJob)
     if x == y
@@ -23,12 +23,12 @@ chain!(x::AbstractJob, y::AbstractJob, z::AbstractJob...) = foldr(chain!, (x, y,
 """
     →(x, y)
 
-Chain two `Job`s.
+Chain two `AbstractJob`s.
 """
 →(x::AbstractJob, y::AbstractJob) = chain!(x, y)
 """
     ←(y, x)
 
-Chain two `Job`s reversely.
+Chain two `AbstractJob`s reversely.
 """
 ←(y::AbstractJob, x::AbstractJob) = x → y
