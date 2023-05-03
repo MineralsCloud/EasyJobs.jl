@@ -53,7 +53,8 @@ function run_inner!(job)  # Do not export!
         if !isexecuted(job)
             push!(JOB_REGISTRY, job => nothing)
         end
-        JOB_REGISTRY[job] = @async run_core!(job)
+        runner = JobRunner(job)
+        runner.ref = @async run_core!(job)
     else
         job.status = PENDING
         return run_inner!(job)
