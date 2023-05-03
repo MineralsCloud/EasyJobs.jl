@@ -53,7 +53,7 @@ function run_inner!(job)  # Do not export!
         if !isexecuted(job)
             push!(JOB_REGISTRY, job => nothing)
         end
-        runner = JobRunner(job)
+        runner = Runner(job)
         runner.ref = @async run_core!(job)
     else
         job.status = PENDING
@@ -74,13 +74,13 @@ function run_core!(job)  # Do not export!
     job.count += 1
     return job
 end
-run_check(::AbstractJob; n=1, kwargs...) = @assert isinteger(n) && n >= 1
-function run_check(job::DependentJob; n=1, kwargs...)
-    @assert isinteger(n) && n >= 1
-    if job.strict
-        @assert all(issucceeded(parent) for parent in job.parents)
+
+dynamic_check(::Runner) = nothing
+function dynamic_check(runner::Runner{DependentJob})
+    if runner.job.strict
+        @assert all(issucceeded(parent) for parent in runner.job.parents)
     else
-        @assert all(isexited(parent) for parent in job.parents)
+        @assert all(isexited(parent) for parent in runner.job.parents)
     end
     return nothing
 end
