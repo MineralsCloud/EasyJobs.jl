@@ -110,11 +110,11 @@ end
 mutable struct Runner{T<:AbstractJob}
     job::T
     maxattempts::Integer
-    separation::Real
+    interval::Real
     skip::Union{DateTime,Real}
     ref::Task
-    function Runner(job::T, maxattempts=1, separation=1, skip=0) where {T}
+    function Runner(job::T, maxattempts=1, interval=1, skip=0) where {T}
         @assert maxattempts >= 1
-        return new{T}(job, maxattempts, separation, skip)
+        return new{T}(job, maxattempts, interval, skip)
     end
 end
