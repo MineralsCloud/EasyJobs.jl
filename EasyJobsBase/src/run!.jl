@@ -70,8 +70,8 @@ function ___run!(job::AbstractJob)  # Do not export!
     return job
 end
 
-dynamic_check(::Runner) = nothing
-function dynamic_check(runner::Runner{DependentJob})
+dynamic_check(::Executor) = nothing
+function dynamic_check(runner::Executor{DependentJob})
     if runner.job.strict
         @assert all(issucceeded(parent) for parent in runner.job.parents)
     else
@@ -103,4 +103,4 @@ function interrupt!(runner::Runner)
     return runner
 end
 
-Base.wait(runner::Runner) = wait(runner.task)
+Base.wait(runner::Executor) = wait(runner.task)
