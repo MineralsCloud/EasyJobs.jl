@@ -45,9 +45,6 @@ function _run!(exe::Executor)  # Do not export!
 end
 function __run!(exe::Executor)  # Do not export!
     if ispending(exe.job)
-        if !isexecuted(exe.job)
-            push!(JOB_REGISTRY, exe => nothing)
-        end
         schedule(exe.task)
     else
         exe.job.status = PENDING
