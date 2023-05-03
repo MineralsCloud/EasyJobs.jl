@@ -2,7 +2,7 @@ using Dates: Period, now
 
 using Thinkers: TimeoutException, ErrorInfo, reify!, haserred, _kill
 
-export run!, interrupt!
+export run!, start!, kill!
 
 """
     run!(job::Job; maxattempts=1, separation=1, skip=0)
