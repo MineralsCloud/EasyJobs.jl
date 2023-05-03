@@ -66,39 +66,39 @@ isinterrupted(job::AbstractJob) = getstatus(job) === INTERRUPTED
 
 Filter only the pending jobs in a sequence of `Job`s.
 """
-listpending(jobs) = filter(ispending, jobs)
+listpending(jobs) = Iterators.filter(ispending, jobs)
 
 """
 listrunning(jobs)
 
 Filter only the running jobs in a sequence of `Job`s.
 """
-listrunning(jobs) = filter(isrunning, jobs)
+listrunning(jobs) = Iterators.filter(isrunning, jobs)
 
 """
     listexited(jobs)
 
 Filter only the exited jobs in a sequence of `Job`s.
 """
-listexited(jobs) = filter(isexited, jobs)
+listexited(jobs) = Iterators.filter(isexited, jobs)
 
 """
     listsucceeded(jobs)
 
 Filter only the succeeded jobs in a sequence of `Job`s.
 """
-listsucceeded(jobs) = filter(issucceeded, jobs)
+listsucceeded(jobs) = Iterators.filter(issucceeded, jobs)
 
 """
     listfailed(jobs)
 
 Filter only the failed jobs in a sequence of `Job`s.
 """
-listfailed(jobs) = filter(isfailed, jobs)
+listfailed(jobs) = Iterators.filter(isfailed, jobs)
 
 """
     listinterrupted(jobs)
 
 Filter only the interrupted jobs in a sequence of `Job`s.
 """
-listinterrupted(jobs) = filter(isinterrupted, jobs)
+listinterrupted(jobs) = Iterators.filter(isinterrupted, jobs)
