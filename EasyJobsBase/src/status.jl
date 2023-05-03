@@ -13,28 +13,52 @@ export getstatus,
     listinterrupted
 
 """
-    getstatus(x::Job)
+    getstatus(job::AbstractJob)
 
-Get the current status of a `Job`.
+Get the current status of `job`.
 """
 getstatus(job::AbstractJob) = job.status
 
-"Test if the `Job` is still pending."
+"""
+    ispending(job::AbstractJob)
+
+Test if `job` is still pending.
+"""
 ispending(job::AbstractJob) = getstatus(job) === PENDING
 
-"Test if the `Job` is running."
+"""
+    isrunning(job::AbstractJob)
+
+Test if `job` is running.
+"""
 isrunning(job::AbstractJob) = getstatus(job) === RUNNING
 
-"Test if the `Job` has exited."
+"""
+    isexited(job::AbstractJob)
+
+Test if `job` has exited.
+"""
 isexited(job::AbstractJob) = getstatus(job) in (SUCCEEDED, FAILED, INTERRUPTED)
 
-"Test if the `Job` was successfully run."
+"""
+    issucceeded(job::AbstractJob)
+
+Test if `job` was successfully run.
+"""
 issucceeded(job::AbstractJob) = getstatus(job) === SUCCEEDED
 
-"Test if the `Job` failed during running."
+"""
+    isfailed(job::AbstractJob)
+
+Test if `job` failed during running.
+"""
 isfailed(job::AbstractJob) = getstatus(job) === FAILED
 
-"Test if the `Job` was interrupted during running."
+"""
+    isinterrupted(job::AbstractJob)
+
+Test if `job` was interrupted during running.
+"""
 isinterrupted(job::AbstractJob) = getstatus(job) === INTERRUPTED
 
 """
