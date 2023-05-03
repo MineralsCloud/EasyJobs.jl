@@ -4,6 +4,28 @@ using Thinkers: TimeoutException, ErrorInfo, reify!, haserred, _kill
 
 export run!, interrupt!
 
+function (runner::Runner)()
+    dynamic_check(runner)
+    return run_outer!(runner.job; n=runner.maxattempts, δt=runner.separation, t=runner.skip)
+end
+function (runner::Runner{DependentJob})()
+    dynamic_check(runner)
+    job = runner.job
+    if !isempty(job.args_from)
+        # Use previous results as arguments
+        source = job.args_from
+        args = if length(source) == 0
+            ()
+        elseif length(source) == 1
+            (something(getresult(first(source))),)
+        else  # > 1
+            (collect(something(getresult(job)) for job in source),)
+        end
+        job.def = typeof(job.def)(job.def.callable, args, job.def.kwargs)  # Create a new `Think` instance
+    end
+    return run_outer!(runner.job; n=runner.maxattempts, δt=runner.separation, t=runner.skip)
+end
+
 """
     run!(job::Job; maxattempts=1, separation=1, skip=0)
 
