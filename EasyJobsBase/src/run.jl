@@ -9,7 +9,11 @@ export run!, start!, kill!
 
 Run a `Job` with a maximum number of attempts, with each attempt separated by a few seconds.
 """
-run!(job::AbstractJob; kwargs...) = start!(Executor(job; kwargs...))
+function run!(job::AbstractJob; kwargs...)
+    exe = Executor(job; kwargs...)
+    start!(exe)
+    return exe
+end
 
 function start!(exe::Executor)
     dynamic_check(exe)
