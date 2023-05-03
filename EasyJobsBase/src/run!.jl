@@ -44,16 +44,15 @@ function run_outer!(runner::Runner)
         end
     end
 end
-function run_inner!(job)  # Do not export!
-    if ispending(job)
-        if !isexecuted(job)
-            push!(JOB_REGISTRY, job => nothing)
+function run_inner!(runner)  # Do not export!
+    if ispending(runner.job)
+        if !isexecuted(runner.job)
+            push!(JOB_REGISTRY, runner => nothing)
         end
-        runner = Runner(job)
-        runner.ref = @async run_core!(job)
+        runner.ref = @async run_core!(runner.job)
     else
-        job.status = PENDING
-        return run_inner!(job)
+        runner.job.status = PENDING
+        return run_inner!(runner)
     end
 end
 function run_core!(job)  # Do not export!
