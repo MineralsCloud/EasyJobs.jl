@@ -2,19 +2,22 @@ using Dates: Period, now
 
 using Thinkers: TimeoutException, ErrorInfo, reify!, haserred, _kill
 
-export run!, interrupt!
+export run!, start!, kill!
 
 """
-    run!(job::Job; n=1, δt=1, t=0)
+    run!(job::Job; maxattempts=1, interval=1, waitfor=0)
 
-Run a `Job` with maximum `n` attempts, with each attempt separated by `δt` seconds.
+Run a `Job` with a maximum number of attempts, with each attempt separated by a few seconds.
 """
-function run!(job::AbstractJob; n=1, δt=1, t=0)
-    run_check(job; n=1)
-    return run_outer!(job; n=n, δt=δt, t=t)
+run!(job::AbstractJob; kwargs...) = start!(Executor(job; kwargs...))
+
+function start!(exe::Executor)
+    dynamic_check(exe)
+    return _run!(exe)
 end
-function run!(job::DependentJob; n=1, δt=1, t=0)
-    run_check(job; n=1)
+function start!(exe::Executor{DependentJob})
+    dynamic_check(exe)
+    job = exe.job
     if !isempty(job.args_from)
         # Use previous results as arguments
         source = job.args_from
@@ -27,91 +30,66 @@ function run!(job::DependentJob; n=1, δt=1, t=0)
         end
         job.def = typeof(job.def)(job.def.callable, args, job.def.kwargs)  # Create a new `Think` instance
     end
-    return run_outer!(job; n=n, δt=δt, t=t)
+    return _run!(exe)
 end
-function run_outer!(job; n=1, δt=1, t=0)
-    _sleep(t)
-    return run_repeatedly!(job; n=n, δt=δt)
-end
-function run_repeatedly!(job; n=1, δt=1)
-    if iszero(n)
-        return job
-    else
-        run_inner!(job)
-        if issucceeded(job)
-            return job  # Stop immediately
+function _run!(exe::Executor)  # Do not export!
+    sleep(exe.waitfor)
+    for _ in exe.maxattempts
+        __run!(exe)
+        if issucceeded(exe.job)
+            return exe  # Stop immediately
         else
-            if !iszero(δt)
-                sleep(δt)  # `if-else` is faster than `sleep(0)`
-            end
-            return run_repeatedly!(job; n=n - 1, δt=δt)
+            sleep(exe.interval)
         end
     end
 end
-function run_inner!(job)  # Do not export!
-    if ispending(job)
-        if !isexecuted(job)
-            push!(JOB_REGISTRY, job => nothing)
-        end
-        JOB_REGISTRY[job] = @async run_core!(job)
+function __run!(exe::Executor)  # Do not export!
+    if ispending(exe.job)
+        schedule(exe.task)
     else
-        job.status = PENDING
-        return run_inner!(job)
+        exe.job.status = PENDING
+        return __run!(exe)
     end
 end
-function run_core!(job)  # Do not export!
+function ___run!(job::AbstractJob)  # Do not export!
     job.status = RUNNING
     job.start_time = now()
     reify!(job.def)
     job.end_time = now()
     job.status = if haserred(job.def)
-        ex = something(getresult(job.def)).thrown
-        ex isa Union{InterruptException,TimeoutException} ? INTERRUPTED : FAILED
+        e = something(getresult(job.def)).thrown
+        e isa Union{InterruptException,TimeoutException} ? INTERRUPTED : FAILED
     else
         SUCCEEDED
     end
     job.count += 1
     return job
 end
-run_check(::AbstractJob; n=1, kwargs...) = @assert isinteger(n) && n >= 1
-function run_check(job::DependentJob; n=1, kwargs...)
-    @assert isinteger(n) && n >= 1
-    if job.strict
-        @assert all(issucceeded(parent) for parent in job.parents)
-    else
-        @assert all(isexited(parent) for parent in job.parents)
-    end
-    return nothing
-end
 
-function _sleep(t)
-    if t > zero(t)
-        sleep(t)
-    end
-    return nothing
-end
-function _sleep(t::DateTime)
-    current_time = now()
-    if t > current_time
-        sleep(t - current_time)
+dynamic_check(::Executor) = nothing
+function dynamic_check(runner::Executor{DependentJob})
+    if runner.job.strict
+        @assert all(issucceeded(parent) for parent in runner.job.parents)
+    else
+        @assert all(isexited(parent) for parent in runner.job.parents)
     end
     return nothing
 end
 
 """
-    interrupt!(job::Job)
+    kill!(exe::Executor)
 
-Manually interrupt a `Job`, works only if it is running.
+Manually kill a `Job`, works only if it is running.
 """
-function interrupt!(job::AbstractJob)
-    if isexited(job)
-        @info "the job $(job.id) has already exited!"
-    elseif ispending(job)
-        @info "the job $(job.id) has not started!"
+function kill!(exe::Executor)
+    if isexited(exe.job)
+        @info "the job $(exe.job.id) has already exited!"
+    elseif ispending(exe.job)
+        @info "the job $(exe.job.id) has not started!"
     else
-        _kill(JOB_REGISTRY[job])
+        _kill(exe.task)
     end
-    return job
+    return exe
 end
 
-Base.wait(job::AbstractJob) = wait(JOB_REGISTRY[job])
+Base.wait(exe::Executor) = wait(exe.task)
