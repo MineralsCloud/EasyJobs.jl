@@ -100,19 +100,19 @@ function _sleep(t::DateTime)
 end
 
 """
-    interrupt!(job::Job)
+    interrupt!(runner::JobRunner)
 
 Manually interrupt a `Job`, works only if it is running.
 """
-function interrupt!(job::AbstractJob)
-    if isexited(job)
-        @info "the job $(job.id) has already exited!"
-    elseif ispending(job)
-        @info "the job $(job.id) has not started!"
+function interrupt!(runner::JobRunner)
+    if isexited(runner.job)
+        @info "the job $(runner.job.id) has already exited!"
+    elseif ispending(runner.job)
+        @info "the job $(runner.job.id) has not started!"
     else
-        _kill(JOB_REGISTRY[job])
+        _kill(runner.ref)
     end
-    return job
+    return runner
 end
 
-Base.wait(job::AbstractJob) = wait(JOB_REGISTRY[job])
+Base.wait(runner::JobRunner) = wait(runner.ref)
