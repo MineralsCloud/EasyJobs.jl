@@ -4,6 +4,13 @@ using Thinkers: TimeoutException, ErrorInfo, reify!, haserred, _kill
 
 export run!, interrupt!
 
+"""
+    run!(job::Job; maxattempts=1, separation=1, skip=0)
+
+Run a `Job` with a maximum number of attempts, with each attempt separated by a few seconds.
+"""
+run!(job::AbstractJob; kwargs...) = Runner(job; kwargs...)()
+
 function (runner::Runner)()
     dynamic_check(runner)
     return run_outer!(runner.job; n=runner.maxattempts, dt=runner.separation, t=runner.skip)
@@ -25,14 +32,6 @@ function (runner::Runner{DependentJob})()
     end
     return run_outer!(runner.job; n=runner.maxattempts, dt=runner.separation, t=runner.skip)
 end
-
-"""
-    run!(job::Job; maxattempts=1, separation=1, skip=0)
-
-Run a `Job` with a maximum attempts, with each attempt separated by a few seconds.
-"""
-run!(job::AbstractJob; kwargs...) = Runner(job; kwargs...)()
-
 function run_outer!(job; n=1, dt=1, t=0)
     _sleep(t)
     return run_repeatedly!(job; n=n, dt=dt)
