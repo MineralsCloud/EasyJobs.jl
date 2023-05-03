@@ -16,11 +16,11 @@ function run!(job::AbstractJob; kwargs...)
 end
 
 function start!(exe::Executor)
-    dynamic_check(exe)
+    @assert isready(exe)
     return _run!(exe)
 end
 function start!(exe::Executor{DependentJob})
-    dynamic_check(exe)
+    @assert isready(exe)
     job = exe.job
     if !isempty(job.args_from)
         # Use previous results as arguments
@@ -70,11 +70,9 @@ function ___run!(job::AbstractJob)  # Do not export!
     return job
 end
 
-dynamic_check(::Executor) = nothing
-function dynamic_check(runner::Executor{DependentJob})
-    @assert all(issucceeded(parent) for parent in runner.job.parents)
-    return nothing
-end
+Base.isready(::Executor) = true
+Base.isready(exe::Executor{DependentJob}) =
+    all(issucceeded(parent) for parent in exe.job.parents)
 
 """
     kill!(exe::Executor)
