@@ -36,18 +36,15 @@ function run_outer!(job; n=1, dt=1, t=0)
     _sleep(t)
     return run_repeatedly!(job; n=n, dt=dt)
 end
-function run_repeatedly!(job; n=1, dt=1)
-    if iszero(n)
-        return job
-    else
-        run_inner!(job)
-        if issucceeded(job)
-            return job  # Stop immediately
+function run_repeatedly!(runner::Runner)
+    for _ in runner.maxattempts
+        run_inner!(runner)
+        if issucceeded(runner.job)
+            return runner  # Stop immediately
         else
-            if !iszero(dt)
-                sleep(dt)  # `if-else` is faster than `sleep(0)`
+            if !iszero(runner.separation)
+                sleep(runner.separation)  # `if-else` is faster than `sleep(0)`
             end
-            return run_repeatedly!(job; n=n - 1, dt=dt)
         end
     end
 end
