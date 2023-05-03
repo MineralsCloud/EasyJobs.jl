@@ -4,42 +4,46 @@ export countexecution,
     descriptionof, creationtimeof, starttimeof, endtimeof, timecostof, getresult
 
 """
-    countexecution(job::Job)
+    countexecution(job::AbstractJob)
 
-Count how many times a `Job` has been run.
+Count how many times the `job` has been run.
 """
 countexecution(job::AbstractJob) = Int(job.count)
 
 """
-    descriptionof(job::Job)
+    descriptionof(job::AbstractJob)
 
-Return the description of a `Job`.
+Return the description of the `job`.
 """
 descriptionof(job::AbstractJob) = job.description
 
-"Return the creation time of a `Job`."
+"""
+    creationtimeof(job::AbstractJob)
+
+Return the creation time of the `job`.
+"""
 creationtimeof(job::AbstractJob) = job.creation_time
 
 """
-    starttimeof(job::Job)
+    starttimeof(job::AbstractJob)
 
-Return the start time of a `Job`. Return `nothing` if it is still pending.
+Return the start time of the `job`. Return `nothing` if it is still pending.
 """
 starttimeof(job::AbstractJob) = ispending(job) ? nothing : job.start_time
 
 """
-    endtimeof(job::Job)
+    endtimeof(job::AbstractJob)
 
-Return the end time of a `Job`. Return `nothing` if it has not exited.
+Return the end time of the `job`. Return `nothing` if it has not exited.
 """
 endtimeof(job::AbstractJob) = isexited(job) ? job.end_time : nothing
 
 """
-    timecostof(job::Job)
+    timecostof(job::AbstractJob)
 
-Return the time cost of a `Job` since it started running.
+Return the time cost of the `job` since it started running.
 
-If `nothing`, the `Job` is still pending. If it is finished, return how long it took to
+If `nothing`, the `job` is still pending. If it is finished, return how long it took to
 complete.
 """
 function timecostof(job::AbstractJob)
@@ -53,11 +57,11 @@ function timecostof(job::AbstractJob)
 end
 
 """
-    getresult(job::Job)
+    getresult(job::AbstractJob)
 
-Get the running result of a `Job`.
+Get the running result of the `job`.
 
 The result is wrapped by a `Some` type. Use `something` to retrieve its value.
-If it is `nothing`, the `Job` is not finished.
+If it is `nothing`, the `job` is not finished.
 """
 getresult(job::AbstractJob) = isexited(job) ? getresult(job.def) : nothing

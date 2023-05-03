@@ -15,90 +15,90 @@ export getstatus,
 """
     getstatus(job::AbstractJob)
 
-Get the current status of `job`.
+Get the current status of the `job`.
 """
 getstatus(job::AbstractJob) = job.status
 
 """
     ispending(job::AbstractJob)
 
-Test if `job` is still pending.
+Test if the `job` is still pending.
 """
 ispending(job::AbstractJob) = getstatus(job) === PENDING
 
 """
     isrunning(job::AbstractJob)
 
-Test if `job` is running.
+Test if the `job` is running.
 """
 isrunning(job::AbstractJob) = getstatus(job) === RUNNING
 
 """
     isexited(job::AbstractJob)
 
-Test if `job` has exited.
+Test if the `job` has exited.
 """
 isexited(job::AbstractJob) = getstatus(job) in (SUCCEEDED, FAILED, INTERRUPTED)
 
 """
     issucceeded(job::AbstractJob)
 
-Test if `job` was successfully run.
+Test if the `job` was successfully run.
 """
 issucceeded(job::AbstractJob) = getstatus(job) === SUCCEEDED
 
 """
     isfailed(job::AbstractJob)
 
-Test if `job` failed during running.
+Test if the `job` failed during running.
 """
 isfailed(job::AbstractJob) = getstatus(job) === FAILED
 
 """
     isinterrupted(job::AbstractJob)
 
-Test if `job` was interrupted during running.
+Test if the `job` was interrupted during running.
 """
 isinterrupted(job::AbstractJob) = getstatus(job) === INTERRUPTED
 
 """
     listpending(jobs)
 
-Filter only the pending jobs in a sequence of `Job`s.
+Filter the pending jobs in a sequence of jobs.
 """
 listpending(jobs) = Iterators.filter(ispending, jobs)
 
 """
 listrunning(jobs)
 
-Filter only the running jobs in a sequence of `Job`s.
+Filter the running jobs in a sequence of jobs.
 """
 listrunning(jobs) = Iterators.filter(isrunning, jobs)
 
 """
     listexited(jobs)
 
-Filter only the exited jobs in a sequence of `Job`s.
+Filter the exited jobs in a sequence of jobs.
 """
 listexited(jobs) = Iterators.filter(isexited, jobs)
 
 """
     listsucceeded(jobs)
 
-Filter only the succeeded jobs in a sequence of `Job`s.
+Filter the succeeded jobs in a sequence of jobs.
 """
 listsucceeded(jobs) = Iterators.filter(issucceeded, jobs)
 
 """
     listfailed(jobs)
 
-Filter only the failed jobs in a sequence of `Job`s.
+Filter the failed jobs in a sequence of jobs.
 """
 listfailed(jobs) = Iterators.filter(isfailed, jobs)
 
 """
     listinterrupted(jobs)
 
-Filter only the interrupted jobs in a sequence of `Job`s.
+Filter the interrupted jobs in a sequence of jobs.
 """
 listinterrupted(jobs) = Iterators.filter(isinterrupted, jobs)
