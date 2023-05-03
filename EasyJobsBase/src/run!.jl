@@ -86,13 +86,6 @@ function _sleep(t)
     end
     return nothing
 end
-function _sleep(t::DateTime)
-    current_time = now()
-    if t > current_time
-        sleep(t - current_time)
-    end
-    return nothing
-end
 
 """
     interrupt!(runner::JobRunner)
