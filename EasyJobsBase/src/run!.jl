@@ -5,30 +5,11 @@ using Thinkers: TimeoutException, ErrorInfo, reify!, haserred, _kill
 export run!, interrupt!
 
 """
-    run!(job::Job; n=1, δt=1, t=0)
+    run!(job::Job; maxattempts=1, separation=1, skip=0)
 
-Run a `Job` with maximum `n` attempts, with each attempt separated by `δt` seconds.
+Run a `Job` with a maximum attempts, with each attempt separated by a few seconds.
 """
-function run!(job::AbstractJob; n=1, δt=1, t=0)
-    run_check(job; n=1)
-    return run_outer!(job; n=n, δt=δt, t=t)
-end
-function run!(job::DependentJob; n=1, δt=1, t=0)
-    run_check(job; n=1)
-    if !isempty(job.args_from)
-        # Use previous results as arguments
-        source = job.args_from
-        args = if length(source) == 0
-            ()
-        elseif length(source) == 1
-            (something(getresult(first(source))),)
-        else  # > 1
-            (collect(something(getresult(job)) for job in source),)
-        end
-        job.def = typeof(job.def)(job.def.callable, args, job.def.kwargs)  # Create a new `Think` instance
-    end
-    return run_outer!(job; n=n, δt=δt, t=t)
-end
+run!(job::AbstractJob; kwargs...) = Runner(job; kwargs...)()
 function run_outer!(job; n=1, δt=1, t=0)
     _sleep(t)
     return run_repeatedly!(job; n=n, δt=δt)
