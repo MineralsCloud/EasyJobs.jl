@@ -6,7 +6,7 @@ export run!, interrupt!
 
 function (runner::Runner)()
     dynamic_check(runner)
-    return run_outer!(runner.job; n=runner.maxattempts, δt=runner.separation, t=runner.skip)
+    return run_outer!(runner.job; n=runner.maxattempts, dt=runner.separation, t=runner.skip)
 end
 function (runner::Runner{DependentJob})()
     dynamic_check(runner)
@@ -23,7 +23,7 @@ function (runner::Runner{DependentJob})()
         end
         job.def = typeof(job.def)(job.def.callable, args, job.def.kwargs)  # Create a new `Think` instance
     end
-    return run_outer!(runner.job; n=runner.maxattempts, δt=runner.separation, t=runner.skip)
+    return run_outer!(runner.job; n=runner.maxattempts, dt=runner.separation, t=runner.skip)
 end
 
 """
@@ -32,11 +32,12 @@ end
 Run a `Job` with a maximum attempts, with each attempt separated by a few seconds.
 """
 run!(job::AbstractJob; kwargs...) = Runner(job; kwargs...)()
-function run_outer!(job; n=1, δt=1, t=0)
+
+function run_outer!(job; n=1, dt=1, t=0)
     _sleep(t)
-    return run_repeatedly!(job; n=n, δt=δt)
+    return run_repeatedly!(job; n=n, dt=dt)
 end
-function run_repeatedly!(job; n=1, δt=1)
+function run_repeatedly!(job; n=1, dt=1)
     if iszero(n)
         return job
     else
@@ -44,10 +45,10 @@ function run_repeatedly!(job; n=1, δt=1)
         if issucceeded(job)
             return job  # Stop immediately
         else
-            if !iszero(δt)
-                sleep(δt)  # `if-else` is faster than `sleep(0)`
+            if !iszero(dt)
+                sleep(dt)  # `if-else` is faster than `sleep(0)`
             end
-            return run_repeatedly!(job; n=n - 1, δt=δt)
+            return run_repeatedly!(job; n=n - 1, dt=dt)
         end
     end
 end
