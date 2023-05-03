@@ -29,17 +29,17 @@ function run!(runner::Runner{DependentJob})
         end
         job.def = typeof(job.def)(job.def.callable, args, job.def.kwargs)  # Create a new `Think` instance
     end
-    return run_outer!(runner)
+    return _run!(exe)
 end
-function run_outer!(runner::Runner)
-    _sleep(runner.waitfor)
-    for _ in runner.maxattempts
-        run_inner!(runner)
-        if issucceeded(runner.job)
-            return runner  # Stop immediately
+function _run!(exe::Executor)  # Do not export!
+    _sleep(exe.waitfor)
+    for _ in exe.maxattempts
+        __run!(exe)
+        if issucceeded(exe.job)
+            return exe  # Stop immediately
         else
-            if !iszero(runner.interval)
-                sleep(runner.interval)  # `if-else` is faster than `sleep(0)`
+            if !iszero(exe.interval)
+                sleep(exe.interval)  # `if-else` is faster than `sleep(0)`
             end
         end
     end
