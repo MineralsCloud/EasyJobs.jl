@@ -32,11 +32,8 @@ function (runner::Runner{DependentJob})()
     end
     return run_outer!(runner.job; n=runner.maxattempts, dt=runner.separation, t=runner.skip)
 end
-function run_outer!(job; n=1, dt=1, t=0)
-    _sleep(t)
-    return run_repeatedly!(job; n=n, dt=dt)
-end
-function run_repeatedly!(runner::Runner)
+function run_outer!(runner::Runner)
+    _sleep(runner.skip)
     for _ in runner.maxattempts
         run_inner!(runner)
         if issucceeded(runner.job)
