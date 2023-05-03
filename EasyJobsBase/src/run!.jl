@@ -49,7 +49,7 @@ function run_inner!(runner)  # Do not export!
         if !isexecuted(runner.job)
             push!(JOB_REGISTRY, runner => nothing)
         end
-        runner.ref = @async run_core!(runner.job)
+        schedule(runner.task)
     else
         runner.job.status = PENDING
         return run_inner!(runner)
