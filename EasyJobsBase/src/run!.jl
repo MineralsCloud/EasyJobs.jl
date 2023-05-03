@@ -10,12 +10,11 @@ export run!, interrupt!
 Run a `Job` with a maximum number of attempts, with each attempt separated by a few seconds.
 """
 run!(job::AbstractJob; kwargs...) = Runner(job; kwargs...)()
-
-function (runner::Runner)()
+function run!(runner::Runner)
     dynamic_check(runner)
-    return run_outer!(runner.job; n=runner.maxattempts, dt=runner.separation, t=runner.skip)
+    return run_outer!(runner)
 end
-function (runner::Runner{DependentJob})()
+function run!(runner::Runner{DependentJob})
     dynamic_check(runner)
     job = runner.job
     if !isempty(job.args_from)
@@ -30,7 +29,7 @@ function (runner::Runner{DependentJob})()
         end
         job.def = typeof(job.def)(job.def.callable, args, job.def.kwargs)  # Create a new `Think` instance
     end
-    return run_outer!(runner.job; n=runner.maxattempts, dt=runner.separation, t=runner.skip)
+    return run_outer!(runner)
 end
 function run_outer!(runner::Runner)
     _sleep(runner.skip)
