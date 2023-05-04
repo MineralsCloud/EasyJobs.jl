@@ -19,23 +19,6 @@ function start!(exe::Executor)
     @assert isready(exe)
     return _run!(exe)
 end
-function start!(exe::Executor{DependentJob})
-    @assert isready(exe)
-    job = exe.job
-    if !isempty(job.args_from)
-        # Use previous results as arguments
-        source = job.args_from
-        args = if length(source) == 0
-            ()
-        elseif length(source) == 1
-            (something(getresult(first(source))),)
-        else  # > 1
-            (collect(something(getresult(job)) for job in source),)
-        end
-        job.def = typeof(job.def)(job.def.callable, args, job.def.kwargs)  # Create a new `Think` instance
-    end
-    return _run!(exe)
-end
 function _run!(exe::Executor)  # Do not export!
     sleep(exe.waitfor)
     for _ in exe.maxattempts
