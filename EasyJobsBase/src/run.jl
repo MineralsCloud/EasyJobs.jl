@@ -19,6 +19,19 @@ function start!(exe::Executor)
     @assert isready(exe)
     return _run!(exe)
 end
+function start!(exe::Executor{StronglyDependentJob})
+    @assert isready(exe)
+    parents = exe.job.parents
+    if length(parents) == 1
+        (something(getresult(first(parents))),)
+    else  # > 1
+        # Use previous results as arguments
+        args = (Set(something(getresult(parent)) for parent in parents),)
+        exe.job.def.args = args
+    end
+    return _run!(exe)
+end
+
 function _run!(exe::Executor)  # Do not export!
     sleep(exe.waitfor)
     for _ in exe.maxattempts
@@ -30,6 +43,7 @@ function _run!(exe::Executor)  # Do not export!
         end
     end
 end
+
 function __run!(exe::Executor)  # Do not export!
     if ispending(exe.job)
         schedule(exe.task)
@@ -38,6 +52,7 @@ function __run!(exe::Executor)  # Do not export!
         return __run!(exe)
     end
 end
+
 function ___run!(job::AbstractJob)  # Do not export!
     job.status = RUNNING
     job.start_time = now()
