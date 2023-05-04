@@ -73,9 +73,14 @@ end
 @testset "Test running `WeaklyDependentJob`s" begin
     f₁(x) = write("file", string(x))
     f₂() = read("file", String)
+    h = Job(Thunk(sleep, 3); username="me", name="h")
     i = Job(Thunk(f₁, 1001); username="me", name="i")
     j = WeaklyDependentJob(Thunk(map, f₂); username="he", name="j")
-    i → j
+    [h, i] .→ Ref(j)
+    @test_throws AssertionError run!(j)
+    @test getresult(j) === nothing
+    exe = run!(h)
+    wait(exe)
     @test_throws AssertionError run!(j)
     @test getresult(j) === nothing
     exe = run!(i)
