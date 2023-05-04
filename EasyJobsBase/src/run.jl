@@ -21,14 +21,14 @@ function start!(exe::Executor)
 end
 function start!(exe::Executor{StronglyDependentJob})
     @assert isready(exe)
-    parents = exe.job.parents
-    if length(parents) == 1
+    parents, thunk = exe.job.parents, exe.job.def
+    # Use previous results as arguments
+    args = if length(parents) == 1
         (something(getresult(first(parents))),)
     else  # > 1
-        # Use previous results as arguments
-        args = (Set(something(getresult(parent)) for parent in parents),)
-        exe.job.def.args = args
+        (Set(something(getresult(parent)) for parent in parents),)
     end
+    exe.job.def = typeof(thunk)(thunk.callable, args, thunk.kwargs)
     return _run!(exe)
 end
 
