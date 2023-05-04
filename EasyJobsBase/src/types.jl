@@ -103,6 +103,40 @@ mutable struct WeaklyDependentJob <: AbstractJob
         )
     end
 end
+mutable struct StronglyDependentJob <: AbstractJob
+    id::UUID
+    def::Think
+    name::String
+    description::String
+    username::String
+    creation_time::DateTime
+    start_time::DateTime
+    end_time::DateTime
+    "Track the job status."
+    status::JobStatus
+    "Count hom many times the job has been run."
+    count::UInt64
+    "These jobs runs before the current job."
+    parents::Set{AbstractJob}
+    "These jobs runs after the current job."
+    children::Set{AbstractJob}
+    function StronglyDependentJob(def::Think; name="", description="", username="")
+        return new(
+            uuid1(),
+            def,
+            name,
+            description,
+            username,
+            now(),
+            DateTime(0),
+            DateTime(0),
+            PENDING,
+            0,
+            Set(),
+            Set(),
+        )
+    end
+end
 
 # See https://github.com/MineralsCloud/SimpleWorkflows.jl/issues/137
 struct Executor{T<:AbstractJob}
