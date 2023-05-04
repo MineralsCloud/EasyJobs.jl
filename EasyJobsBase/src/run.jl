@@ -54,7 +54,7 @@ function ___run!(job::AbstractJob)  # Do not export!
 end
 
 Base.isready(::Executor) = true
-Base.isready(exe::Executor{DependentJob}) =
+Base.isready(exe::Executor{<:DependentJob}) =
     all(issucceeded(parent) for parent in exe.job.parents)
 
 """
