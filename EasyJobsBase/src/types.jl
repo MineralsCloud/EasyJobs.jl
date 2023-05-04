@@ -69,7 +69,8 @@ mutable struct Job <: AbstractJob
         )
     end
 end
-mutable struct WeaklyDependentJob <: AbstractJob
+abstract type DependentJob <: AbstractJob end
+mutable struct WeaklyDependentJob <: DependentJob
     id::UUID
     def::Think
     name::String
@@ -103,7 +104,7 @@ mutable struct WeaklyDependentJob <: AbstractJob
         )
     end
 end
-mutable struct StronglyDependentJob <: AbstractJob
+mutable struct StronglyDependentJob <: DependentJob
     id::UUID
     def::Think
     name::String
