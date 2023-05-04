@@ -16,24 +16,7 @@ function run!(job::AbstractJob; kwargs...)
 end
 
 function start!(exe::Executor)
-    dynamic_check(exe)
-    return _run!(exe)
-end
-function start!(exe::Executor{DependentJob})
-    dynamic_check(exe)
-    job = exe.job
-    if !isempty(job.args_from)
-        # Use previous results as arguments
-        source = job.args_from
-        args = if length(source) == 0
-            ()
-        elseif length(source) == 1
-            (something(getresult(first(source))),)
-        else  # > 1
-            (collect(something(getresult(job)) for job in source),)
-        end
-        job.def = typeof(job.def)(job.def.callable, args, job.def.kwargs)  # Create a new `Think` instance
-    end
+    @assert isready(exe)
     return _run!(exe)
 end
 function _run!(exe::Executor)  # Do not export!
@@ -70,15 +53,9 @@ function ___run!(job::AbstractJob)  # Do not export!
     return job
 end
 
-dynamic_check(::Executor) = nothing
-function dynamic_check(runner::Executor{DependentJob})
-    if runner.job.strict
-        @assert all(issucceeded(parent) for parent in runner.job.parents)
-    else
-        @assert all(isexited(parent) for parent in runner.job.parents)
-    end
-    return nothing
-end
+Base.isready(::Executor) = true
+Base.isready(exe::Executor{DependentJob}) =
+    all(issucceeded(parent) for parent in exe.job.parents)
 
 """
     kill!(exe::Executor)

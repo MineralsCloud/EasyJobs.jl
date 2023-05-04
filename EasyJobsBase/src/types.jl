@@ -46,6 +46,7 @@ mutable struct Job <: AbstractJob
     end_time::DateTime
     "Track the job status."
     status::JobStatus
+    "Count hom many times the job has been run."
     count::UInt64
     "These jobs runs before the current job."
     parents::Set{AbstractJob}
@@ -79,13 +80,12 @@ mutable struct DependentJob <: AbstractJob
     end_time::DateTime
     "Track the job status."
     status::JobStatus
+    "Count hom many times the job has been run."
     count::UInt64
     "These jobs runs before the current job."
     parents::Set{AbstractJob}
     "These jobs runs after the current job."
     children::Set{AbstractJob}
-    strict::Bool
-    args_from::Vector{AbstractJob}
     function DependentJob(def::Think; name="", description="", username="")
         return new(
             uuid1(),
@@ -100,8 +100,6 @@ mutable struct DependentJob <: AbstractJob
             0,
             Set(),
             Set(),
-            false,
-            [],
         )
     end
 end
