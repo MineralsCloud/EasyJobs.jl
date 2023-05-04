@@ -69,7 +69,7 @@ Filter the pending jobs in a sequence of jobs.
 listpending(jobs) = Iterators.filter(ispending, jobs)
 
 """
-listrunning(jobs)
+    listrunning(jobs)
 
 Filter the running jobs in a sequence of jobs.
 """
