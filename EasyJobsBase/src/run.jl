@@ -19,6 +19,19 @@ function start!(exe::Executor)
     @assert isready(exe)
     return _run!(exe)
 end
+function start!(exe::Executor{StronglyDependentJob})
+    @assert isready(exe)
+    parents, thunk = exe.job.parents, exe.job.def
+    # Use previous results as arguments
+    args = if length(parents) == 1
+        (something(getresult(first(parents))),)
+    else  # > 1
+        (Set(something(getresult(parent)) for parent in parents),)
+    end
+    exe.job.def = typeof(thunk)(thunk.callable, args, thunk.kwargs)
+    return _run!(exe)
+end
+
 function _run!(exe::Executor)  # Do not export!
     sleep(exe.waitfor)
     for _ in exe.maxattempts
@@ -30,6 +43,7 @@ function _run!(exe::Executor)  # Do not export!
         end
     end
 end
+
 function __run!(exe::Executor)  # Do not export!
     if ispending(exe.job)
         schedule(exe.task)
@@ -38,6 +52,7 @@ function __run!(exe::Executor)  # Do not export!
         return __run!(exe)
     end
 end
+
 function ___run!(job::AbstractJob)  # Do not export!
     job.status = RUNNING
     job.start_time = now()
@@ -53,9 +68,9 @@ function ___run!(job::AbstractJob)  # Do not export!
     return job
 end
 
-Base.isready(::Executor) = true
-Base.isready(exe::Executor{DependentJob}) =
-    all(issucceeded(parent) for parent in exe.job.parents)
+isready(::Executor) = true
+isready(exe::Executor{<:DependentJob}) =
+    length(exe.job.parents) >= 1 && all(issucceeded(parent) for parent in exe.job.parents)
 
 """
     kill!(exe::Executor)
