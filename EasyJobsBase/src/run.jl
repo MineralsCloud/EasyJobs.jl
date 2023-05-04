@@ -55,7 +55,7 @@ end
 
 Base.isready(::Executor) = true
 Base.isready(exe::Executor{<:DependentJob}) =
-    all(issucceeded(parent) for parent in exe.job.parents)
+    length(exe.job.parents) >= 1 && all(issucceeded(parent) for parent in exe.job.parents)
 
 """
     kill!(exe::Executor)
