@@ -3,7 +3,7 @@ using UUIDs: UUID, uuid1
 
 using Thinkers: Think
 
-export Job, WeaklyDependentJob
+export Job, WeaklyDependentJob, StronglyDependentJob
 
 @enum JobStatus begin
     PENDING
