@@ -68,8 +68,8 @@ function ___run!(job::AbstractJob)  # Do not export!
     return job
 end
 
-Base.isready(::Executor) = true
-Base.isready(exe::Executor{<:DependentJob}) =
+isready(::Executor) = true
+isready(exe::Executor{<:DependentJob}) =
     length(exe.job.parents) >= 1 && all(issucceeded(parent) for parent in exe.job.parents)
 
 """
