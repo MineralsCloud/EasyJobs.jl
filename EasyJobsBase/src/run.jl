@@ -1,6 +1,6 @@
 using Dates: Period, now
 
-using Thinkers: TimeoutException, ErrorInfo, reify!, haserred, _kill
+using Thinkers: TimeoutException, ErrorInfo, reify!, setargs!, haserred, _kill
 
 export run!, start!, kill!
 
@@ -21,14 +21,14 @@ function start!(exe::Executor)
 end
 function start!(exe::Executor{StronglyDependentJob})
     @assert isready(exe)
-    parents, thunk = exe.job.parents, exe.job.def
+    parents = exe.job.parents
     # Use previous results as arguments
     args = if length(parents) == 1
         (something(getresult(first(parents))),)
     else  # > 1
         (Set(something(getresult(parent)) for parent in parents),)
     end
-    exe.job.def = typeof(thunk)(thunk.callable, args, thunk.kwargs)
+    setargs!(exe.job.def, args)
     return _run!(exe)
 end
 
