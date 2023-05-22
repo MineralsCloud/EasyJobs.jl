@@ -37,7 +37,7 @@ julia> b = Job(Thunk(run, `pwd` & `ls`); username="me", description="Run some co
 """
 mutable struct Job <: AbstractJob
     id::UUID
-    def::Think
+    core::Think
     name::String
     description::String
     username::String
@@ -52,10 +52,10 @@ mutable struct Job <: AbstractJob
     parents::Set{AbstractJob}
     "These jobs runs after the current job."
     children::Set{AbstractJob}
-    function Job(def::Think; name="", description="", username="")
+    function Job(core::Think; name="", description="", username="")
         return new(
             uuid1(),
-            def,
+            core,
             name,
             description,
             username,
@@ -72,7 +72,7 @@ end
 abstract type DependentJob <: AbstractJob end
 mutable struct WeaklyDependentJob <: DependentJob
     id::UUID
-    def::Think
+    core::Think
     name::String
     description::String
     username::String
@@ -87,10 +87,10 @@ mutable struct WeaklyDependentJob <: DependentJob
     parents::Set{AbstractJob}
     "These jobs runs after the current job."
     children::Set{AbstractJob}
-    function WeaklyDependentJob(def::Think; name="", description="", username="")
+    function WeaklyDependentJob(core::Think; name="", description="", username="")
         return new(
             uuid1(),
-            def,
+            core,
             name,
             description,
             username,
@@ -106,7 +106,7 @@ mutable struct WeaklyDependentJob <: DependentJob
 end
 mutable struct StronglyDependentJob <: DependentJob
     id::UUID
-    def::Think
+    core::Think
     name::String
     description::String
     username::String
@@ -121,10 +121,10 @@ mutable struct StronglyDependentJob <: DependentJob
     parents::Set{AbstractJob}
     "These jobs runs after the current job."
     children::Set{AbstractJob}
-    function StronglyDependentJob(def::Think; name="", description="", username="")
+    function StronglyDependentJob(core::Think; name="", description="", username="")
         return new(
             uuid1(),
-            def,
+            core,
             name,
             description,
             username,
