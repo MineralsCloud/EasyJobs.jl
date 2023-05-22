@@ -28,7 +28,7 @@ function start!(exe::Executor{StronglyDependentJob})
     else  # > 1
         (Set(something(getresult(parent)) for parent in parents),)
     end
-    setargs!(exe.job.def, args)
+    setargs!(exe.job.core, args)
     return _run!(exe)
 end
 
@@ -56,10 +56,10 @@ end
 function ___run!(job::AbstractJob)  # Do not export!
     job.status = RUNNING
     job.start_time = now()
-    reify!(job.def)
+    reify!(job.core)
     job.end_time = now()
-    job.status = if haserred(job.def)
-        e = something(getresult(job.def)).thrown
+    job.status = if haserred(job.core)
+        e = something(getresult(job.core)).thrown
         e isa Union{InterruptException,TimeoutException} ? INTERRUPTED : FAILED
     else
         SUCCEEDED
