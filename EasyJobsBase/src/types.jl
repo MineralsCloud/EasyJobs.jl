@@ -16,12 +16,12 @@ end
 abstract type AbstractJob end
 # Reference: https://github.com/cihga39871/JobSchedulers.jl/blob/aca52de/src/jobs.jl#L35-L69
 """
-    Job(def::Thunk; description="", username="")
+    Job(core::Thunk; description="", username="")
 
 Create a simple job.
 
 # Arguments
-- `def`: a `Thunk` that encloses the job definition.
+- `core`: a `Thunk` that encloses the job core definition.
 - `name`: give a short name to the job.
 - `description::String=""`: describe what the job does in more detail.
 - `username::String=""`: indicate who executes the job.
