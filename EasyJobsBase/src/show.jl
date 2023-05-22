@@ -5,7 +5,7 @@ function Base.show(io::IO, job::AbstractJob)
             IOContext(io, :limit => true, :compact => true), summary(job), '(', job.id, ')'
         )
     else
-        print(io, summary(job), '(', job.id, "), ", job.def)
+        print(io, summary(job), '(', job.id, "), ", job.core)
     end
 end
 function Base.show(io::IO, ::MIME"text/plain", job::AbstractJob)
@@ -16,8 +16,8 @@ function Base.show(io::IO, ::MIME"text/plain", job::AbstractJob)
         show(io, job.description)
         println(io)
     end
-    print(io, ' ', "def: ")
-    print(io, job.def)
+    print(io, ' ', "core: ")
+    print(io, job.core)
     print(io, '\n', ' ', "status: ")
     printstyled(io, getstatus(job); bold=true)
     if !ispending(job)

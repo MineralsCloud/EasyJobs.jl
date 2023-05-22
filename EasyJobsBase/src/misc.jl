@@ -64,4 +64,4 @@ Get the running result of the `job`.
 The result is wrapped by a `Some` type. Use `something` to retrieve its value.
 If it is `nothing`, the `job` is not finished.
 """
-getresult(job::AbstractJob) = isexited(job) ? getresult(job.def) : nothing
+getresult(job::AbstractJob) = isexited(job) ? getresult(job.core) : nothing
