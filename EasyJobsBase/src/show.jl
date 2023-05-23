@@ -17,7 +17,7 @@ function Base.show(io::IO, ::MIME"text/plain", job::AbstractJob)
         println(io)
     end
     print(io, ' ', "core: ")
-    print(io, job.core)
+    printf(io, job.core)
     print(io, '\n', ' ', "status: ")
     printstyled(io, getstatus(job); bold=true)
     if !ispending(job)
@@ -28,5 +28,27 @@ function Base.show(io::IO, ::MIME"text/plain", job::AbstractJob)
             println(io, ' ', "to: ", format(endtimeof(job), "HH:MM:SS.s, mm/dd/yyyy"))
             print(io, ' ', "used: ", timecostof(job))
         end
+    end
+end
+
+function printf(io::IO, think::Think)
+    print(io, think.callable, '(')
+    args = think.args
+    if length(args) > 0
+        for v in args[1:(end - 1)]
+            print(io, v, ", ")
+        end
+        print(io, args[end])
+    end
+    kwargs = think.kwargs
+    if isempty(kwargs)
+        print(io, ')')
+    else
+        print(io, ";")
+        for (k, v) in zip(keys(kwargs)[1:(end - 1)], Tuple(kwargs)[1:(end - 1)])
+            print(io, ' ', k, '=', v, ",")
+        end
+        print(io, ' ', last(keys(kwargs)), '=', last(values(kwargs)))
+        print(io, ')')
     end
 end
