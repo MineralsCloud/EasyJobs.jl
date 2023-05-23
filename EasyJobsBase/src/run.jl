@@ -16,11 +16,11 @@ function run!(job::AbstractJob; kwargs...)
 end
 
 function start!(exe::Executor)
-    @assert isready(exe)
+    @assert isreadytorun(exe)
     return _run!(exe)
 end
 function start!(exe::Executor{StronglyDependentJob})
-    @assert isready(exe)
+    @assert isreadytorun(exe)
     parents = exe.job.parents
     # Use previous results as arguments
     args = if length(parents) == 1
@@ -68,8 +68,8 @@ function ___run!(job::AbstractJob)  # Do not export!
     return job
 end
 
-isready(::Executor) = true
-isready(exe::Executor{<:DependentJob}) =
+isreadytorun(::Executor) = true
+isreadytorun(exe::Executor{<:DependentJob}) =
     length(exe.job.parents) >= 1 && all(issucceeded(parent) for parent in exe.job.parents)
 
 """
