@@ -26,7 +26,7 @@ function start!(exe::Executor{StronglyDependentJob})
     args = if length(parents) == 1
         something(getresult(first(parents)))
     else  # > 1
-        (Set(something(getresult(parent)) for parent in parents),)
+        Set(something(getresult(parent)) for parent in parents)
     end
     setargs!(exe.job.core, args)
     return _run!(exe)
