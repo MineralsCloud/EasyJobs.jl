@@ -17,7 +17,7 @@ function Base.show(io::IO, ::MIME"text/plain", job::AbstractJob)
         println(io)
     end
     print(io, ' ', "core: ")
-    print(io, job.core)
+    printf(io, job.core)
     print(io, '\n', ' ', "status: ")
     printstyled(io, getstatus(job); bold=true)
     if !ispending(job)
