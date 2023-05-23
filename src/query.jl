@@ -8,7 +8,7 @@ function maketable(registry)
     return @from job in registry begin
         @select {
             id = job.id,
-            def = string(job.core),
+            core = string(job.core),
             created_by = string(job.username),
             created_at = creationtimeof(job),
             started_at = starttimeof(job),
