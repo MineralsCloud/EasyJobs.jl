@@ -14,16 +14,3 @@ Pages = ["public.md"]
 queue
 query
 ```
-
-```@meta
-CurrentModule = EasyJobs.Thunks
-```
-
-## `Thunks` module
-
-```@docs
-Thunk
-ErredResult
-reify!
-getresult(::Thunk)
-```
