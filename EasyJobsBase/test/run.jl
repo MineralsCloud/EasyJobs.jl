@@ -125,8 +125,10 @@ end
         job → l
     end
     @test_throws AssertionError run!(l)
-    for job in (h, i, j, k)
-        exe = run!(job)
+    exes = map((h, i, j, k)) do job
+        run!(job)
+    end
+    for exe in exes
         wait(exe)
     end
     exe = run!(l)
