@@ -10,46 +10,46 @@ export run!, start!, kill!
 Run a `Job` with a maximum number of attempts, with each attempt separated by a few seconds.
 """
 function run!(job::AbstractJob; kwargs...)
-    exe = Executor(job; kwargs...)
-    start!(exe)
-    return exe
+    exec = Executor(job; kwargs...)
+    start!(exec)
+    return exec
 end
 
-function start!(exe::Executor)
-    @assert isreadytorun(exe)
-    return _run!(exe)
+function start!(exec::Executor)
+    @assert isreadytorun(exec)
+    return _run!(exec)
 end
-function start!(exe::Executor{StronglyDependentJob})
-    @assert isreadytorun(exe)
-    parents = exe.job.parents
+function start!(exec::Executor{StronglyDependentJob})
+    @assert isreadytorun(exec)
+    parents = exec.job.parents
     # Use previous results as arguments
     args = if length(parents) == 1
         something(getresult(first(parents)))
     else  # > 1
         Set(something(getresult(parent)) for parent in parents)
     end
-    setargs!(exe.job.core, args)
-    return _run!(exe)
+    setargs!(exec.job.core, args)
+    return _run!(exec)
 end
 
-function _run!(exe::Executor)  # Do not export!
-    sleep(exe.waitfor)
-    for _ in exe.maxattempts
-        __run!(exe)
-        if issucceeded(exe.job)
-            return exe  # Stop immediately
+function _run!(exec::Executor)  # Do not export!
+    sleep(exec.waitfor)
+    for _ in exec.maxattempts
+        __run!(exec)
+        if issucceeded(exec.job)
+            return exec  # Stop immediately
         else
-            sleep(exe.interval)
+            sleep(exec.interval)
         end
     end
 end
 
-function __run!(exe::Executor)  # Do not export!
-    if ispending(exe.job)
-        schedule(exe.task)
+function __run!(exec::Executor)  # Do not export!
+    if ispending(exec.job)
+        schedule(exec.task)
     else
-        exe.job.status = PENDING
-        return __run!(exe)
+        exec.job.status = PENDING
+        return __run!(exec)
     end
 end
 
@@ -69,23 +69,23 @@ function ___run!(job::AbstractJob)  # Do not export!
 end
 
 isreadytorun(::Executor) = true
-isreadytorun(exe::Executor{<:DependentJob}) =
-    length(exe.job.parents) >= 1 && all(issucceeded(parent) for parent in exe.job.parents)
+isreadytorun(exec::Executor{<:DependentJob}) =
+    length(exec.job.parents) >= 1 && all(issucceeded(parent) for parent in exec.job.parents)
 
 """
-    kill!(exe::Executor)
+    kill!(exec::Executor)
 
 Manually kill a `Job`, works only if it is running.
 """
-function kill!(exe::Executor)
-    if isexited(exe.job)
-        @info "the job $(exe.job.id) has already exited!"
-    elseif ispending(exe.job)
-        @info "the job $(exe.job.id) has not started!"
+function kill!(exec::Executor)
+    if isexited(exec.job)
+        @info "the job $(exec.job.id) has already exited!"
+    elseif ispending(exec.job)
+        @info "the job $(exec.job.id) has not started!"
     else
-        _kill(exe.task)
+        _kill(exec.task)
     end
-    return exe
+    return exec
 end
 
-Base.wait(exe::Executor) = wait(exe.task)
+Base.wait(exec::Executor) = wait(exec.task)
