@@ -37,8 +37,8 @@ using Thinkers
         m = Job(Thunk(f₅, 3, 1); name="m")
         n = Job(Thunk(f₆, 1; x=3); username="she", name="n")
         for job in (i, j, k, l, m, n)
-            exe = run!(job)
-            wait(exe)
+            exec = run!(job)
+            wait(exec)
             @test issucceeded(job)
         end
     end
@@ -63,8 +63,8 @@ using Thinkers
         @assert n.parents == Set([l, m])
         @assert isempty(n.children)
         for job in (i, j, k, l, m, n)
-            exe = run!(job)
-            wait(exe)
+            exec = run!(job)
+            wait(exec)
             @test issucceeded(job)
         end
     end
@@ -79,14 +79,14 @@ end
     [h, i] .→ Ref(j)
     @test_throws AssertionError run!(j)
     @test getresult(j) === nothing
-    exe = run!(h)
-    wait(exe)
+    exec = run!(h)
+    wait(exec)
     @test_throws AssertionError run!(j)
     @test getresult(j) === nothing
-    exe = run!(i)
-    wait(exe)
-    exe = run!(j)
-    wait(exe)
+    exec = run!(i)
+    wait(exec)
+    exec = run!(j)
+    wait(exec)
     @test getresult(j) == Some("1001")
 end
 
@@ -99,15 +99,15 @@ end
     k = StronglyDependentJob(Thunk(f₃, 6); username="she", name="k")
     i → j → k
     @test_throws AssertionError run!(j)
-    exe = run!(i)
-    wait(exe)
+    exec = run!(i)
+    wait(exec)
     @test getresult(i) == Some(25)
     @test_throws AssertionError run!(k)
-    exe = run!(j)
-    wait(exe)
+    exec = run!(j)
+    wait(exec)
     @test getresult(j) == Some(26)
-    exe = run!(k)
-    wait(exe)
+    exec = run!(k)
+    wait(exec)
     @test getresult(k) == Some(13.0)
 end
 
@@ -125,14 +125,14 @@ end
         job → l
     end
     @test_throws AssertionError run!(l)
-    exes = map((h, i, j, k)) do job
+    execs = map((h, i, j, k)) do job
         run!(job)
     end
-    for exe in exes
-        wait(exe)
+    for exec in execs
+        wait(exec)
     end
-    exe = run!(l)
-    wait(exe)
+    exec = run!(l)
+    wait(exec)
     @test getresult(i) == Some(25)
     @test getresult(j) == Some(4)
     @test getresult(k) == Some(3.0)
