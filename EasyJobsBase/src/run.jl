@@ -33,7 +33,7 @@ function start!(exec::Executor{StronglyDependentJob})
 end
 
 function _run!(exec::Executor)  # Do not export!
-    sleep(exec.waitfor)
+    sleep(exec.delay)
     for _ in exec.maxattempts
         __run!(exec)
         if issucceeded(exec.job)
