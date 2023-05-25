@@ -47,6 +47,10 @@ end
 function __run!(exec::Executor)  # Do not export!
     if ispending(exec.job)
         schedule(exec.task)
+        if exec.wait
+            wait(exec)
+        end
+        return exec
     else
         exec.job.status = PENDING
         return __run!(exec)
