@@ -51,7 +51,7 @@ function _run!(exec::Executor)  # Do not export!
     if exec.maxattempts == 1
         return issucceeded(exec.job) ? exec : _run!(exec)  # Wait or not depends on `exec.wait`
     elseif exec.maxattempts > 1
-        for _ in exec.maxattempts
+        for _ in Base.OneTo(exec.maxattempts)
             if issucceeded(exec.job)
                 return exec  # Stop immediately
             end
