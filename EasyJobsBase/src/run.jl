@@ -48,11 +48,15 @@ end
 
 function _run!(exec::Executor)  # Do not export!
     sleep(exec.delay)
-    for _ in exec.maxattempts
-        __run!(exec)
-        if issucceeded(exec.job)
-            return exec  # Stop immediately
-        else
+    if exec.maxattempts == 1
+        return issucceeded(exec.job) ? exec : _run!(exec)  # Wait or not depends on `exec.wait`
+    elseif exec.maxattempts > 1
+        for _ in exec.maxattempts
+            if issucceeded(exec.job)
+                return exec  # Stop immediately
+            end
+            __run!(exec)
+            wait(exec)  # Wait no matter whether `exec.wait` is `true` or `false`
             sleep(exec.interval)
         end
     end
