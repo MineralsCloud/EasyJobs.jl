@@ -1,4 +1,4 @@
-using Dates: DateTime, now, format
+using Dates: DateTime, now
 using UUIDs: UUID, uuid1
 
 using Thinkers: Think

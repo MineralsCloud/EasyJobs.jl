@@ -1,5 +1,3 @@
-using Dates: Period, now
-
 using Thinkers: TimeoutException, ErrorInfo, reify!, setargs!, haserred, _kill
 
 export run!, start!, kill!
