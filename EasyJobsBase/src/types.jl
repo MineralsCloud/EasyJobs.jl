@@ -145,12 +145,12 @@ struct Executor{T<:AbstractJob}
     wait::Bool
     maxattempts::UInt64
     interval::Real
-    waitfor::Real
+    delay::Real
     task::Task
-    function Executor(job::T; wait=false, maxattempts=1, interval=1, waitfor=0) where {T}
+    function Executor(job::T; wait=false, maxattempts=1, interval=1, delay=0) where {T}
         @assert maxattempts >= 1
         @assert interval >= zero(interval)
-        @assert waitfor >= zero(waitfor)
-        return new{T}(job, wait, maxattempts, interval, waitfor, Task(() -> ___run!(job)))
+        @assert delay >= zero(delay)
+        return new{T}(job, wait, maxattempts, interval, delay, Task(() -> ___run!(job)))
     end
 end
