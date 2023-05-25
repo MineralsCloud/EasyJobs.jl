@@ -1,6 +1,6 @@
 module EasyJobsBase
 
-include("types.jl")
+include("jobs.jl")
 include("operations.jl")
 include("run.jl")
 include("status.jl")
