@@ -49,16 +49,23 @@ end
 function _run!(exec::Executor)  # Do not export!
     sleep(exec.delay)
     if exec.maxattempts == 1
-        return issucceeded(exec.job) ? exec : _run!(exec)  # Wait or not depends on `exec.wait`
+        return runonce!(exec)
     elseif exec.maxattempts > 1
         for _ in Base.OneTo(exec.maxattempts)
-            if issucceeded(exec.job)
-                return exec  # Stop immediately
-            end
-            __run!(exec)
+            runonce!(exec)
             wait(exec)  # Wait no matter whether `exec.wait` is `true` or `false`
             sleep(exec.interval)
         end
+        return exec
+    end
+end
+
+function runonce!(exec)
+    if issucceeded(exec.job)
+        return exec  # Stop immediately
+    else
+        exec.task = @task ___run!(exec.job)  # Start a new task. This is necessary!
+        return __run!(exec)  # Wait or not depends on `exec.wait`
     end
 end
 
