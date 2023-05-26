@@ -14,7 +14,7 @@ mutable struct Executor{T<:AbstractJob}
         @assert maxattempts >= 1
         @assert interval >= zero(interval)
         @assert delay >= zero(delay)
-        return new{T}(job, wait, maxattempts, interval, delay, Task(() -> ___run!(job)))
+        return new{T}(job, wait, maxattempts, interval, delay, @task ___run!(job))
     end
 end
 
