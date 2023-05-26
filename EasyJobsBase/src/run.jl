@@ -14,12 +14,12 @@ mutable struct Executor{T<:AbstractJob}
         @assert maxattempts >= 1
         @assert interval >= zero(interval)
         @assert delay >= zero(delay)
-        return new{T}(job, wait, maxattempts, interval, delay, @task ___run!(job))
+        return new{T}(job, wait, maxattempts, interval, delay, @task _run!(job))
     end
 end
 
 function newtask!(exec::Executor)
-    exec.task = @task ___run!(exec.job)  # Start a new task. This is necessary for rerunning!
+    exec.task = @task _run!(exec.job)  # Start a new task. This is necessary for rerunning!
     return exec
 end
 
@@ -37,24 +37,24 @@ end
 function execute!(exec::Executor)
     @assert shouldrun(exec)
     prepare!(exec)
-    return _run!(exec)
+    return launch!(exec)
 end
 
-function _run!(exec::Executor)  # Do not export!
+function launch!(exec::Executor)  # Do not export!
     sleep(exec.delay)
-    runonce!(exec)
+    singlerun!(exec)
     if exec.maxattempts > 1
         wait(exec)
         for _ in Base.OneTo(exec.maxattempts - 1)
             sleep(exec.interval)
-            runonce!(exec)
+            singlerun!(exec)
             wait(exec)  # Wait no matter whether `exec.wait` is `true` or `false`
         end
     end
     return exec
 end
 
-function runonce!(exec::Executor)
+function singlerun!(exec::Executor)
     if ispending(exec.job)
         schedule(exec.task)
         if exec.wait
@@ -64,12 +64,12 @@ function runonce!(exec::Executor)
     if isfailed(exec.job) || isinterrupted(exec.job)
         newtask!(exec)
         exec.job.status = PENDING
-        return runonce!(exec)  # Wait or not depends on `exec.wait`
+        return singlerun!(exec)  # Wait or not depends on `exec.wait`
     end
     return exec  # Do nothing for running and succeeded jobs
 end
 
-function ___run!(job::AbstractJob)  # Do not export!
+function _run!(job::AbstractJob)  # Do not export!
     job.status = RUNNING
     job.start_time = now()
     reify!(job.core)
