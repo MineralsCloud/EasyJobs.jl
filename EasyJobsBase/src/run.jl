@@ -24,9 +24,10 @@ function newtask!(exec::Executor)
 end
 
 """
-    run!(job::Job; maxattempts=1, interval=1, waitfor=0)
+    run!(job::Job; wait=false, maxattempts=1, interval=1, delay=0)
 
-Run a `Job` with a maximum number of attempts, with each attempt separated by a few seconds.
+Run a `Job` with a maximum number of attempts, with each attempt separated by `interval` seconds
+and an initial `delay` in seconds.
 """
 function run!(job::AbstractJob; kwargs...)
     exec = Executor(job; kwargs...)
