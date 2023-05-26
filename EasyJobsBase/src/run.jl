@@ -1,6 +1,6 @@
 using Thinkers: TimeoutException, ErrorInfo, reify!, setargs!, haserred, _kill
 
-export run!, start!, kill!
+export run!, execute!, kill!
 
 # See https://github.com/MineralsCloud/SimpleWorkflows.jl/issues/137
 mutable struct Executor{T<:AbstractJob}
@@ -25,16 +25,16 @@ Run a `Job` with a maximum number of attempts, with each attempt separated by a 
 """
 function run!(job::AbstractJob; kwargs...)
     exec = Executor(job; kwargs...)
-    start!(exec)
+    execute!(exec)
     return exec
 end
 
-function start!(exec::Executor)
-    @assert isreadytorun(exec)
+function execute!(exec::Executor)
+    @assert shouldrun(exec)
     return _run!(exec)
 end
-function start!(exec::Executor{StronglyDependentJob})
-    @assert isreadytorun(exec)
+function execute!(exec::Executor{StronglyDependentJob})
+    @assert shouldrun(exec)
     parents = exec.job.parents
     # Use previous results as arguments
     args = if length(parents) == 1
@@ -97,8 +97,8 @@ function ___run!(job::AbstractJob)  # Do not export!
     return job
 end
 
-isreadytorun(::Executor) = true
-isreadytorun(exec::Executor{<:DependentJob}) =
+shouldrun(::Executor) = true
+shouldrun(exec::Executor{<:DependentJob}) =
     length(exec.job.parents) >= 1 && all(issucceeded(parent) for parent in exec.job.parents)
 
 """
