@@ -3,7 +3,7 @@ using Thinkers: TimeoutException, ErrorInfo, reify!, setargs!, haserred, _kill
 export run!, start!, kill!
 
 # See https://github.com/MineralsCloud/SimpleWorkflows.jl/issues/137
-struct Executor{T<:AbstractJob}
+mutable struct Executor{T<:AbstractJob}
     job::T
     wait::Bool
     maxattempts::UInt64
