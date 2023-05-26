@@ -54,26 +54,19 @@ function _run!(exec::Executor)  # Do not export!
     return exec
 end
 
-function runonce!(exec)
-    if issucceeded(exec.job)
-        return exec  # Stop immediately
-    else
-        exec.task = @task ___run!(exec.job)  # Start a new task. This is necessary!
-        return __run!(exec)  # Wait or not depends on `exec.wait`
-    end
-end
-
-function __run!(exec::Executor)  # Do not export!
+function runonce!(exec::Executor)
     if ispending(exec.job)
         schedule(exec.task)
         if exec.wait
             wait(exec)
         end
-        return exec
-    else
-        exec.job.status = PENDING
-        return __run!(exec)
     end
+    if isfailed(exec.job) || isinterrupted(exec.job)
+        newtask!(exec)
+        exec.job.status = PENDING
+        return runonce!(exec)  # Wait or not depends on `exec.wait`
+    end
+    return exec  # Do nothing for running and succeeded jobs
 end
 
 function ___run!(job::AbstractJob)  # Do not export!
