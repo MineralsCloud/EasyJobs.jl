@@ -31,18 +31,7 @@ end
 
 function execute!(exec::Executor)
     @assert shouldrun(exec)
-    return _run!(exec)
-end
-function execute!(exec::Executor{StronglyDependentJob})
-    @assert shouldrun(exec)
-    parents = exec.job.parents
-    # Use previous results as arguments
-    args = if length(parents) == 1
-        something(getresult(first(parents)))
-    else  # > 1
-        Set(something(getresult(parent)) for parent in parents)
-    end
-    setargs!(exec.job.core, args)
+    prepare!(exec)
     return _run!(exec)
 end
 
@@ -95,6 +84,19 @@ function ___run!(job::AbstractJob)  # Do not export!
     end
     job.count += 1
     return job
+end
+
+prepare!(::Executor) = nothing  # No op
+function prepare!(exec::Executor{StronglyDependentJob})
+    parents = exec.job.parents
+    # Use previous results as arguments
+    args = if length(parents) == 1
+        something(getresult(first(parents)))
+    else  # > 1
+        Set(something(getresult(parent)) for parent in parents)
+    end
+    setargs!(exec.job.core, args)
+    return nothing
 end
 
 shouldrun(::Executor) = true
