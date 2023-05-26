@@ -18,6 +18,11 @@ mutable struct Executor{T<:AbstractJob}
     end
 end
 
+function newtask!(exec::Executor)
+    exec.task = @task ___run!(exec.job)  # Start a new task. This is necessary for rerunning!
+    return exec
+end
+
 """
     run!(job::Job; maxattempts=1, interval=1, waitfor=0)
 
