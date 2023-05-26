@@ -1,8 +1,27 @@
-using Dates: Period, now
-
 using Thinkers: TimeoutException, ErrorInfo, reify!, setargs!, haserred, _kill
 
-export run!, start!, kill!
+export run!, execute!, kill!
+
+# See https://github.com/MineralsCloud/SimpleWorkflows.jl/issues/137
+mutable struct Executor{T<:AbstractJob}
+    job::T
+    wait::Bool
+    maxattempts::UInt64
+    interval::Real
+    delay::Real
+    task::Task
+    function Executor(job::T; wait=false, maxattempts=1, interval=1, delay=0) where {T}
+        @assert maxattempts >= 1
+        @assert interval >= zero(interval)
+        @assert delay >= zero(delay)
+        return new{T}(job, wait, maxattempts, interval, delay, @task _run!(job))
+    end
+end
+
+function newtask!(exec::Executor)
+    exec.task = @task _run!(exec.job)  # Start a new task. This is necessary for rerunning!
+    return exec
+end
 
 """
     run!(job::Job; maxattempts=1, interval=1, waitfor=0)
@@ -11,49 +30,48 @@ Run a `Job` with a maximum number of attempts, with each attempt separated by a 
 """
 function run!(job::AbstractJob; kwargs...)
     exec = Executor(job; kwargs...)
-    start!(exec)
+    execute!(exec)
     return exec
 end
 
-function start!(exec::Executor)
-    @assert isreadytorun(exec)
-    return _run!(exec)
-end
-function start!(exec::Executor{StronglyDependentJob})
-    @assert isreadytorun(exec)
-    parents = exec.job.parents
-    # Use previous results as arguments
-    args = if length(parents) == 1
-        something(getresult(first(parents)))
-    else  # > 1
-        Set(something(getresult(parent)) for parent in parents)
-    end
-    setargs!(exec.job.core, args)
-    return _run!(exec)
+function execute!(exec::Executor)
+    @assert shouldrun(exec)
+    prepare!(exec)
+    return launch!(exec)
 end
 
-function _run!(exec::Executor)  # Do not export!
-    sleep(exec.delay)
-    for _ in exec.maxattempts
-        __run!(exec)
-        if issucceeded(exec.job)
-            return exec  # Stop immediately
-        else
-            sleep(exec.interval)
+function launch!(exec::Executor)  # Do not export!
+    if !issucceeded(exec.job)
+        sleep(exec.delay)
+        singlerun!(exec)
+        if exec.maxattempts > 1
+            wait(exec)
+            for _ in Base.OneTo(exec.maxattempts - 1)
+                sleep(exec.interval)
+                singlerun!(exec)
+                wait(exec)  # Wait no matter whether `exec.wait` is `true` or `false`
+            end
         end
     end
+    return exec  # Stop immediately if the job has succeeded
 end
 
-function __run!(exec::Executor)  # Do not export!
+function singlerun!(exec::Executor)
     if ispending(exec.job)
         schedule(exec.task)
-    else
-        exec.job.status = PENDING
-        return __run!(exec)
+        if exec.wait
+            wait(exec)
+        end
     end
+    if isfailed(exec.job) || isinterrupted(exec.job)
+        newtask!(exec)
+        exec.job.status = PENDING
+        return singlerun!(exec)  # Wait or not depends on `exec.wait`
+    end
+    return exec  # Do nothing for running and succeeded jobs
 end
 
-function ___run!(job::AbstractJob)  # Do not export!
+function _run!(job::AbstractJob)  # Do not export!
     job.status = RUNNING
     job.start_time = now()
     reify!(job.core)
@@ -68,8 +86,21 @@ function ___run!(job::AbstractJob)  # Do not export!
     return job
 end
 
-isreadytorun(::Executor) = true
-isreadytorun(exec::Executor{<:DependentJob}) =
+prepare!(::Executor) = nothing  # No op
+function prepare!(exec::Executor{StronglyDependentJob})
+    parents = exec.job.parents
+    # Use previous results as arguments
+    args = if length(parents) == 1
+        something(getresult(first(parents)))
+    else  # > 1
+        Set(something(getresult(parent)) for parent in parents)
+    end
+    setargs!(exec.job.core, args)
+    return nothing
+end
+
+shouldrun(::Executor) = true
+shouldrun(exec::Executor{<:DependentJob}) =
     length(exec.job.parents) >= 1 && all(issucceeded(parent) for parent in exec.job.parents)
 
 """

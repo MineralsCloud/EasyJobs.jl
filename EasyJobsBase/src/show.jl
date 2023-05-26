@@ -1,3 +1,5 @@
+using Dates: format
+
 # See https://docs.julialang.org/en/v1/manual/types/#man-custom-pretty-printing
 function Base.show(io::IO, job::AbstractJob)
     if get(io, :compact, false)

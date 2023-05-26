@@ -1,5 +1,18 @@
 using Thinkers
 
+@testset "Test running a `Job` multiple times" begin
+    function f()
+        n = rand(1:5)
+        n < 5 ? error("not the number we want!") : return n
+    end
+    i = Job(Thunk(f); username="me", name="i")
+    run!(i; maxattempts=10, interval=3)
+    count = countexecution(i)
+    @test 1 <= count <= 10
+    run!(i; maxattempts=10, interval=3)
+    @test countexecution(i) == count
+end
+
 @testset "Test running `Job`s" begin
     function f₁()
         println("Start job `i`!")

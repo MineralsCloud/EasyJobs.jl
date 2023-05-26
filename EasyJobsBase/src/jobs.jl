@@ -1,4 +1,4 @@
-using Dates: DateTime, now, format
+using Dates: DateTime, now
 using UUIDs: UUID, uuid1
 
 using Thinkers: Think
@@ -136,21 +136,5 @@ mutable struct StronglyDependentJob <: DependentJob
             Set(),
             Set(),
         )
-    end
-end
-
-# See https://github.com/MineralsCloud/SimpleWorkflows.jl/issues/137
-struct Executor{T<:AbstractJob}
-    job::T
-    wait::Bool
-    maxattempts::UInt64
-    interval::Real
-    delay::Real
-    task::Task
-    function Executor(job::T; wait=false, maxattempts=1, interval=1, delay=0) where {T}
-        @assert maxattempts >= 1
-        @assert interval >= zero(interval)
-        @assert delay >= zero(delay)
-        return new{T}(job, wait, maxattempts, interval, delay, Task(() -> ___run!(job)))
     end
 end
