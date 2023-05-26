@@ -41,17 +41,19 @@ function execute!(exec::Executor)
 end
 
 function launch!(exec::Executor)  # Do not export!
-    sleep(exec.delay)
-    singlerun!(exec)
-    if exec.maxattempts > 1
-        wait(exec)
-        for _ in Base.OneTo(exec.maxattempts - 1)
-            sleep(exec.interval)
-            singlerun!(exec)
-            wait(exec)  # Wait no matter whether `exec.wait` is `true` or `false`
+    if !issucceeded(exec.job)
+        sleep(exec.delay)
+        singlerun!(exec)
+        if exec.maxattempts > 1
+            wait(exec)
+            for _ in Base.OneTo(exec.maxattempts - 1)
+                sleep(exec.interval)
+                singlerun!(exec)
+                wait(exec)  # Wait no matter whether `exec.wait` is `true` or `false`
+            end
         end
     end
-    return exec
+    return exec  # Stop immediately if the job has succeeded
 end
 
 function singlerun!(exec::Executor)
