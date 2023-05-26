@@ -79,7 +79,7 @@ version = "1.6.0"
 
 [[deps.EasyJobs]]
 deps = ["EasyJobsBase", "Query", "Reexport", "Thinkers", "UUIDs"]
-git-tree-sha1 = "4e52d0a7de5cb829bb26bc5cdc64eef157880db3"
+git-tree-sha1 = "232e1d45b2580df288a22b53debf36d1b0c77c50"
 repo-rev = "main"
 repo-url = "https://github.com/MineralsCloud/EasyJobs.jl"
 uuid = "66d786ec-6e9c-4d5d-a8f6-aa4f8d7350fb"
@@ -122,9 +122,9 @@ version = "0.21.4"
 
 [[deps.JuliaFormatter]]
 deps = ["CSTParser", "CommonMark", "DataStructures", "Glob", "Pkg", "PrecompileTools", "Tokenize"]
-git-tree-sha1 = "01ab91fcce19c965b3c68a82eb26260a3a7af271"
+git-tree-sha1 = "8c4e30ff45954b40d5deaaf967862c288dfd023c"
 uuid = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
-version = "1.0.29"
+version = "1.0.30"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
