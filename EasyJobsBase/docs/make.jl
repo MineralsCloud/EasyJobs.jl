@@ -19,7 +19,7 @@ makedocs(;
         "Manual" => [
             "Installation guide" => "installation.md",
         ],
-        "Public API" => "public.md",
+        "API Reference" => "api.md",
         "Developer Docs" => [
             "Contributing" => "developers/contributing.md",
             "Style Guide" => "developers/style-guide.md",

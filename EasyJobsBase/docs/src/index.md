@@ -66,11 +66,11 @@ Depth = 3
 ## Library outline
 
 ```@contents
-Pages = ["public.md"]
+Pages = ["api.md"]
 ```
 
 ### [Index](@id main-index)
 
 ```@index
-Pages = ["public.md"]
+Pages = ["api.md"]
 ```
