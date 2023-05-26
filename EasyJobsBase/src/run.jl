@@ -37,16 +37,16 @@ end
 
 function _run!(exec::Executor)  # Do not export!
     sleep(exec.delay)
-    if exec.maxattempts == 1
-        return runonce!(exec)
-    elseif exec.maxattempts > 1
-        for _ in Base.OneTo(exec.maxattempts)
+    runonce!(exec)
+    if exec.maxattempts > 1
+        wait(exec)
+        for _ in Base.OneTo(exec.maxattempts - 1)
+            sleep(exec.interval)
             runonce!(exec)
             wait(exec)  # Wait no matter whether `exec.wait` is `true` or `false`
-            sleep(exec.interval)
         end
-        return exec
     end
+    return exec
 end
 
 function runonce!(exec)
