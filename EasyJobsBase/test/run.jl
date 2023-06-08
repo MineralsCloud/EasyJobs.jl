@@ -129,7 +129,6 @@ end
     f₂(y) = y + 1
     f₃(z) = z / 2
     f₄(iter) = sum(iter)
-    h = Job(Thunk(sleep, 3); username="me", name="h")
     i = Job(Thunk(f₁, 5); username="me", name="i")
     j = Job(Thunk(f₂, 3); username="he", name="j")
     k = Job(Thunk(f₃, 6); username="she", name="k")
@@ -138,7 +137,7 @@ end
         job → l
     end
     @test_throws AssertionError run!(l)
-    execs = map((h, i, j, k)) do job
+    execs = map((i, j, k)) do job
         run!(job)
     end
     for exec in execs
