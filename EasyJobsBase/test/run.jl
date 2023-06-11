@@ -133,9 +133,7 @@ end
     j = Job(Thunk(f₂, 3); username="he", name="j")
     k = Job(Thunk(f₃, 6); username="she", name="k")
     l = StronglyDependentJob(Thunk(f₄, ()); username="she", name="me")
-    for job in (i, j, k)
-        job → l
-    end
+    (i, j, k) .→ l
     @test_throws AssertionError run!(l)
     execs = map((i, j, k)) do job
         run!(job)
