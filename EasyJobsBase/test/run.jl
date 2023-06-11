@@ -62,7 +62,7 @@ end
         l = Job(Thunk(f₄); name="l", username="me")
         m = Job(Thunk(f₅, 3, 1); name="m")
         n = Job(Thunk(f₆, 1; x=3); username="she", name="n")
-        Ref(i) .→ [j, k] .→ [l, m] .→ Ref(n)
+        i .→ [j, k] .→ [l, m] .→ n
         @assert isempty(i.parents)
         @assert i.children == Set([j, k])
         @assert j.parents == Set([i])
@@ -89,7 +89,7 @@ end
     h = Job(Thunk(sleep, 3); username="me", name="h")
     i = Job(Thunk(f₁, 1001); username="me", name="i")
     j = WeaklyDependentJob(Thunk(map, f₂); username="he", name="j")
-    [h, i] .→ Ref(j)
+    [h, i] .→ j
     @test_throws AssertionError run!(j)
     @test getresult(j) === nothing
     exec = run!(h)

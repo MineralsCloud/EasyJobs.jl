@@ -32,3 +32,23 @@ Chain two `AbstractJob`s.
 Chain two `AbstractJob`s reversely.
 """
 ←(y::AbstractJob, x::AbstractJob) = x → y
+
+# See https://github.com/JuliaLang/julia/blob/70c873e/base/number.jl#L279-L280
+Base.iterate(x::AbstractJob) = (x, nothing)
+Base.iterate(::AbstractJob, ::Any) = nothing
+
+# See https://github.com/JuliaLang/julia/blob/70c873e/base/number.jl#L92
+Base.IteratorSize(::Type{<:AbstractJob}) = Base.HasShape{0}()
+
+# See https://github.com/JuliaLang/julia/blob/70c873e/base/number.jl#L84
+Base.eltype(::Type{T}) where {T<:AbstractJob} = T
+
+# See https://github.com/JuliaLang/julia/blob/70c873e/base/number.jl#L87
+Base.length(::AbstractJob) = 1
+
+# See https://github.com/JuliaLang/julia/blob/70c873e/base/number.jl#L80-L81
+Base.size(::AbstractJob) = ()
+Base.size(::AbstractJob, dim::Integer) = dim < 1 ? throw(BoundsError()) : 1
+
+# See https://github.com/JuliaLang/julia/blob/70c873e/base/number.jl#L282
+Base.in(x::AbstractJob, y::AbstractJob) = x == y
