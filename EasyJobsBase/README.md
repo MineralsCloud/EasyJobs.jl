@@ -1,3 +1,5 @@
+# WARNING: `EasyJobsBase` now lives in https://github.com/MineralsCloud/EasyJobs.jl/tree/main/EasyJobsBase, please open issues [here](https://github.com/MineralsCloud/EasyJobs.jl/issues) and PRs [here](https://github.com/MineralsCloud/Express.jl/pulls). This repository will be archived.
+
 # EasyJobsBase
 
 |                                 **Documentation**                                  |                                                                                                 **Build Status**                                                                                                 |                                        **Others**                                         |
