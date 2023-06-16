@@ -131,9 +131,9 @@ function prepare!(job::ArgDependentJob)
     return nothing
 end
 
-shouldrun(::Executor) = true
-shouldrun(exec::Executor{ConditionalJob}) =
-    countparents(exec.job) >= 1 && all(issucceeded(parent) for parent in exec.job.parents)
+shouldrun(::AbstractJob) = true
+shouldrun(job::ConditionalJob) =
+    countparents(job) >= 1 && all(issucceeded(parent) for parent in eachparent(job))
 
 """
     kill!(exec::Executor)
