@@ -129,7 +129,7 @@ function _run!(job::AbstractJob)  # Do not export!
 end
 
 prepare!(::Executor) = nothing  # No op
-function prepare!(exec::Executor{StronglyDependentJob})
+function prepare!(exec::Executor{ArgDependentJob})
     parents = exec.job.parents
     # Use previous results as arguments
     args = if length(parents) == 1

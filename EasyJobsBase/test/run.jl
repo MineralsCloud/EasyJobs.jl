@@ -83,12 +83,12 @@ end
     end
 end
 
-@testset "Test running `WeaklyDependentJob`s" begin
+@testset "Test running `ConditionalJob`s" begin
     f₁(x) = write("file", string(x))
     f₂() = read("file", String)
     h = Job(Thunk(sleep, 3); username="me", name="h")
     i = Job(Thunk(f₁, 1001); username="me", name="i")
-    j = WeaklyDependentJob(Thunk(map, f₂); username="he", name="j")
+    j = ConditionalJob(Thunk(map, f₂); username="he", name="j")
     [h, i] .→ j
     @test_throws AssertionError run!(j)
     @test getresult(j) === nothing
@@ -103,13 +103,13 @@ end
     @test getresult(j) == Some("1001")
 end
 
-@testset "Test running `StronglyDependentJob`s" begin
+@testset "Test running `ArgDependentJob`s" begin
     f₁(x) = x^2
     f₂(y) = y + 1
     f₃(z) = z / 2
     i = Job(Thunk(f₁, 5); username="me", name="i")
-    j = StronglyDependentJob(Thunk(f₂, 3); username="he", name="j")
-    k = StronglyDependentJob(Thunk(f₃, 6); username="she", name="k")
+    j = ArgDependentJob(Thunk(f₂, 3); username="he", name="j")
+    k = ArgDependentJob(Thunk(f₃, 6); username="she", name="k")
     i → j → k
     @test_throws AssertionError run!(j)
     exec = run!(i)
@@ -124,7 +124,7 @@ end
     @test getresult(k) == Some(13.0)
 end
 
-@testset "Test running a `StronglyDependentJob` with more than one parent" begin
+@testset "Test running a `ArgDependentJob` with more than one parent" begin
     f₁(x) = x^2
     f₂(y) = y + 1
     f₃(z) = z / 2
@@ -132,7 +132,7 @@ end
     i = Job(Thunk(f₁, 5); username="me", name="i")
     j = Job(Thunk(f₂, 3); username="he", name="j")
     k = Job(Thunk(f₃, 6); username="she", name="k")
-    l = StronglyDependentJob(Thunk(f₄, ()); username="she", name="me")
+    l = ArgDependentJob(Thunk(f₄, ()); username="she", name="me")
     (i, j, k) .→ l
     @test_throws AssertionError run!(l)
     execs = map((i, j, k)) do job
