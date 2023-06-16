@@ -42,6 +42,8 @@ Run a `Job` with a maximum number of attempts, with each attempt separated by `i
 and an initial `delay` in seconds.
 """
 function run!(job::AbstractJob; kwargs...)
+    @assert shouldrun(job)
+    prepare!(job)
     exec = Executor(job; kwargs...)
     execute!(exec)
     return exec
@@ -56,8 +58,6 @@ Execute a given job associated with the `Executor` object.
 - `exec::Executor`: the `Executor` object containing the job to be executed.
 """
 function execute!(exec::Executor)
-    @assert shouldrun(exec)
-    prepare!(exec)
     return launch!(exec)
 end
 
