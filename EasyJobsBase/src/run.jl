@@ -134,6 +134,7 @@ end
 shouldrun(::AbstractJob) = true
 shouldrun(job::ConditionalJob) =
     countparents(job) >= 1 && all(issucceeded(parent) for parent in eachparent(job))
+shouldrun(job::ArgDependentJob) = countparents(job) >= 1
 
 """
     kill!(exec::Executor)
