@@ -1,7 +1,14 @@
 import Thinkers: getresult
 
 export countexecution,
-    descriptionof, creationtimeof, starttimeof, endtimeof, timecostof, getresult
+    descriptionof,
+    creationtimeof,
+    starttimeof,
+    endtimeof,
+    timecostof,
+    getresult,
+    countparents,
+    countchildren
 
 """
     countexecution(job::AbstractJob)
@@ -65,3 +72,17 @@ The result is wrapped by a `Some` type. Use `something` to retrieve its value.
 If it is `nothing`, the `job` is not finished.
 """
 getresult(job::AbstractJob) = isexited(job) ? getresult(job.core) : nothing
+
+"""
+    countparents(job::AbstractJob)
+
+Count the number of parent jobs for a given `job`.
+"""
+countparents(job::AbstractJob) = length(job.parents)
+
+"""
+    countchildren(job::AbstractJob)
+
+Count the number of child jobs for a given `job`.
+"""
+countchildren(job::AbstractJob) = length(job.children)

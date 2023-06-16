@@ -40,6 +40,8 @@ starttimeof
 endtimeof
 timecostof
 getresult
+countparents
+countchildren
 ```
 
 ## Private API
