@@ -3,7 +3,7 @@ using UUIDs: UUID, uuid1
 
 using Thinkers: Think
 
-export Job, WeaklyDependentJob, StronglyDependentJob
+export Job, WeaklyDependentJob, ArgDependentJob
 
 @enum JobStatus begin
     PENDING
@@ -104,7 +104,7 @@ mutable struct WeaklyDependentJob <: DependentJob
         )
     end
 end
-mutable struct StronglyDependentJob <: DependentJob
+mutable struct ArgDependentJob <: DependentJob
     id::UUID
     core::Think
     name::String
@@ -121,7 +121,7 @@ mutable struct StronglyDependentJob <: DependentJob
     parents::Set{AbstractJob}
     "These jobs runs after the current job."
     children::Set{AbstractJob}
-    function StronglyDependentJob(core::Think; name="", description="", username="")
+    function ArgDependentJob(core::Think; name="", description="", username="")
         return new(
             uuid1(),
             core,
