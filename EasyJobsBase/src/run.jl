@@ -130,20 +130,19 @@ end
 
 prepare!(::Executor) = nothing  # No op
 function prepare!(exec::Executor{ArgDependentJob})
-    parents = exec.job.parents
     # Use previous results as arguments
-    args = if length(parents) == 1
-        something(getresult(first(parents)))
+    args = if countparents(exec.job) == 1
+        something(getresult(only(eachparent(exec.job))))
     else  # > 1
-        Set(something(getresult(parent)) for parent in parents)
+        Set(something(getresult(parent)) for parent in eachparent(exec.job))
     end
     setargs!(exec.job.core, args)
     return nothing
 end
 
 shouldrun(::Executor) = true
-shouldrun(exec::Executor{<:DependentJob}) =
-    length(exec.job.parents) >= 1 && all(issucceeded(parent) for parent in exec.job.parents)
+shouldrun(exec::Executor{ConditionalJob}) =
+    countparents(exec.job) >= 1 && all(issucceeded(parent) for parent in exec.job.parents)
 
 """
     kill!(exec::Executor)
