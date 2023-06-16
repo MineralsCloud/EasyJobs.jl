@@ -147,4 +147,12 @@ end
     @test getresult(j) == Some(4)
     @test getresult(k) == Some(3.0)
     @test getresult(l) == Some(32.0)
+    @testset "Change `succeededonly` to `false`" begin
+        i = Job(Thunk(f₁, 5); username="me", name="i")
+        j = Job(Thunk(f₂, 3); username="he", name="j")
+        k = Job(Thunk(f₃, 6); username="she", name="k")
+        l = ArgDependentJob(Thunk(f₄, ()), false; username="she", name="me")
+        (i, j, k) .→ l
+    end
+    @test_throws AssertionError run!(l)
 end
