@@ -119,15 +119,15 @@ function _run!(job::AbstractJob)  # Do not export!
     return job
 end
 
-prepare!(::Executor) = nothing  # No op
-function prepare!(exec::Executor{ArgDependentJob})
+prepare!(::AbstractJob) = nothing  # No op
+function prepare!(job::ArgDependentJob)
     # Use previous results as arguments
-    args = if countparents(exec.job) == 1
-        something(getresult(only(eachparent(exec.job))))
+    args = if countparents(job) == 1
+        something(getresult(only(eachparent(job))))
     else  # > 1
-        Set(something(getresult(parent)) for parent in eachparent(exec.job))
+        Set(something(getresult(parent)) for parent in eachparent(job))
     end
-    setargs!(exec.job.core, args)
+    setargs!(job.core, args)
     return nothing
 end
 
