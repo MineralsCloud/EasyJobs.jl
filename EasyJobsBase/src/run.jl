@@ -123,9 +123,23 @@ prepare!(::AbstractJob) = nothing  # No op
 function prepare!(job::ArgDependentJob)
     # Use previous results as arguments
     args = if countparents(job) == 1
-        something(getresult(only(eachparent(job))))
+        result = getresult(only(eachparent(job)))
+        if isnothing(result)  # Parent job is pending or still running
+            if job.succeededonly  # Keep the arguments unchanged
+                @warn "the parent job is pending or still running! No arguments will be set!"
+            else
+                throw(error("the parent job is pending or still running!"))
+            end
+        else  # Parent job has succeeded or failed
+            something(getresult(only(eachparent(job))))
+        end
     else  # > 1
-        Set(something(getresult(parent)) for parent in eachparent(job))
+        parents = if job.succeededonly
+            Iterators.filter(issucceeded, eachparent(job))
+        else
+            eachparent(job)
+        end
+        Set(something(getresult(parent)) for parent in parents)  # Could be empty if all parents failed
     end
     setargs!(job.core, args)
     return nothing
