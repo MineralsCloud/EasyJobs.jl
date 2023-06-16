@@ -83,12 +83,12 @@ end
     end
 end
 
-@testset "Test running `WeaklyDependentJob`s" begin
+@testset "Test running `ConditionalJob`s" begin
     f₁(x) = write("file", string(x))
     f₂() = read("file", String)
     h = Job(Thunk(sleep, 3); username="me", name="h")
     i = Job(Thunk(f₁, 1001); username="me", name="i")
-    j = WeaklyDependentJob(Thunk(map, f₂); username="he", name="j")
+    j = ConditionalJob(Thunk(map, f₂); username="he", name="j")
     [h, i] .→ j
     @test_throws AssertionError run!(j)
     @test getresult(j) === nothing
