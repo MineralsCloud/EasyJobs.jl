@@ -125,13 +125,11 @@ function prepare!(job::ArgDependentJob)
     args = if countparents(job) == 1
         result = getresult(only(eachparent(job)))
         if isnothing(result)  # Parent job is pending or still running
-            if job.succeededonly  # Keep the arguments unchanged
-                @warn "the parent job is pending or still running! No arguments will be set!"
-            else
-                throw(error("the parent job is pending or still running!"))
-            end
+            # This means `job.succeededonly` must be `true` based on the logic
+            # Keep the arguments unchanged
+            @warn "the parent job is pending or still running! No arguments will be set!"
         else  # Parent job has succeeded or failed
-            something(getresult(only(eachparent(job))))
+            something(result)
         end
     else  # > 1
         parents = if job.succeededonly
