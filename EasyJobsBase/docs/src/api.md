@@ -53,6 +53,5 @@ unexpected errors or compatibility issues in your code.
 
 ```@docs
 Executor
-launch!
 singlerun!
 ```

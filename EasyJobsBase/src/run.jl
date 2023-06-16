@@ -42,6 +42,8 @@ Run a `Job` with a maximum number of attempts, with each attempt separated by `i
 and an initial `delay` in seconds.
 """
 function run!(job::AbstractJob; kwargs...)
+    @assert shouldrun(job)
+    prepare!(job)
     exec = Executor(job; kwargs...)
     execute!(exec)
     return exec
@@ -52,26 +54,15 @@ end
 
 Execute a given job associated with the `Executor` object.
 
-# Arguments
-- `exec::Executor`: the `Executor` object containing the job to be executed.
-"""
-function execute!(exec::Executor)
-    @assert shouldrun(exec)
-    prepare!(exec)
-    return launch!(exec)
-end
-
-"""
-    launch!(exec::Executor)
-
-Internal function to execute a given job associated with the `Executor` object.
-
 This function checks if the job has succeeded. If not, it sleeps for a delay,
 runs the job once using `singlerun!`. If `maxattempts` is more than ``1``, it loops over
 the remaining attempts, sleeping for an interval, running the job, and waiting in each loop.
 If the job has already succeeded, it stops immediately.
+
+# Arguments
+- `exec::Executor`: the `Executor` object containing the job to be executed.
 """
-function launch!(exec::Executor)  # Do not export!
+function execute!(exec::Executor)
     if !issucceeded(exec.job)
         sleep(exec.delay)
         singlerun!(exec)  # Wait or not depends on `exec.wait`
