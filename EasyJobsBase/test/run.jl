@@ -108,8 +108,8 @@ end
     f₂(y) = y + 1
     f₃(z) = z / 2
     i = Job(Thunk(f₁, 5); username="me", name="i")
-    j = ArgDependentJob(Thunk(f₂, 3); username="he", name="j")
-    k = ArgDependentJob(Thunk(f₃, 6); username="she", name="k")
+    j = ArgDependentJob(Thunk(f₂, 3), false; username="he", name="j")
+    k = ArgDependentJob(Thunk(f₃, 6), false; username="she", name="k")
     i → j → k
     @test_throws AssertionError run!(j)
     exec = run!(i)
