@@ -134,7 +134,8 @@ end
     k = Job(Thunk(f₃, 6); username="she", name="k")
     l = ArgDependentJob(Thunk(f₄, ()); username="she", name="me")
     (i, j, k) .→ l
-    run!(l)
+    exec = run!(l)
+    wait(exec)
     @test isfailed(l)
     execs = map((i, j, k)) do job
         run!(job)
