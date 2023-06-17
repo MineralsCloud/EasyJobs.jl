@@ -108,8 +108,8 @@ end
     f₂(y) = y + 1
     f₃(z) = z / 2
     i = Job(Thunk(f₁, 5); username="me", name="i")
-    j = ArgDependentJob(Thunk(f₂, 3); username="he", name="j")
-    k = ArgDependentJob(Thunk(f₃, 6); username="she", name="k")
+    j = ArgDependentJob(Thunk(f₂, 3), false; username="he", name="j")
+    k = ArgDependentJob(Thunk(f₃, 6), false; username="she", name="k")
     i → j → k
     @test_throws AssertionError run!(j)
     exec = run!(i)
@@ -134,17 +134,28 @@ end
     k = Job(Thunk(f₃, 6); username="she", name="k")
     l = ArgDependentJob(Thunk(f₄, ()); username="she", name="me")
     (i, j, k) .→ l
-    @test_throws AssertionError run!(l)
+    exec = run!(l)
+    wait(exec)
+    @test isfailed(l)
     execs = map((i, j, k)) do job
         run!(job)
     end
     for exec in execs
         wait(exec)
     end
+    l.core = Thunk(l.core)
     exec = run!(l)
     wait(exec)
     @test getresult(i) == Some(25)
     @test getresult(j) == Some(4)
     @test getresult(k) == Some(3.0)
     @test getresult(l) == Some(32.0)
+    @testset "Change `succeededonly` to `false`" begin
+        i = Job(Thunk(f₁, 5); username="me", name="i")
+        j = Job(Thunk(f₂, 3); username="he", name="j")
+        k = Job(Thunk(f₃, 6); username="she", name="k")
+        l = ArgDependentJob(Thunk(f₄, ()), false; username="she", name="me")
+        (i, j, k) .→ l
+    end
+    @test_throws AssertionError run!(l)
 end

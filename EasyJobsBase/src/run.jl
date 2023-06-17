@@ -123,9 +123,21 @@ prepare!(::AbstractJob) = nothing  # No op
 function prepare!(job::ArgDependentJob)
     # Use previous results as arguments
     args = if countparents(job) == 1
-        something(getresult(only(eachparent(job))))
+        result = getresult(only(eachparent(job)))
+        if isnothing(result)  # Parent job is pending or still running
+            # This means `job.succeededonly` must be `true` based on the logic
+            # Keep the arguments unchanged
+            @warn "the parent job is pending or still running! No arguments will be set!"
+        else  # Parent job has succeeded or failed
+            something(result)
+        end
     else  # > 1
-        Set(something(getresult(parent)) for parent in eachparent(job))
+        parents = if job.succeededonly
+            Iterators.filter(issucceeded, eachparent(job))
+        else
+            eachparent(job)
+        end
+        Set(something(getresult(parent)) for parent in parents)  # Could be empty if all parents failed
     end
     setargs!(job.core, args)
     return nothing
@@ -134,7 +146,14 @@ end
 shouldrun(::AbstractJob) = true
 shouldrun(job::ConditionalJob) =
     countparents(job) >= 1 && all(issucceeded(parent) for parent in eachparent(job))
-shouldrun(job::ArgDependentJob) = countparents(job) >= 1
+function shouldrun(job::ArgDependentJob)
+    if job.succeededonly
+        return countparents(job) >= 1
+    else
+        return countparents(job) >= 1 &&
+               all(issucceeded(parent) for parent in eachparent(job))
+    end
+end
 
 """
     kill!(exec::Executor)
