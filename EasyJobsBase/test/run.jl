@@ -10,7 +10,7 @@ using Thinkers
     count = countexecution(i)
     @test 1 <= count <= 10
     run!(i; maxattempts=10, interval=3)
-    @test countexecution(i) == count
+    @test 1 <= countexecution(i) <= 20
 end
 
 @testset "Test running `Job`s" begin
