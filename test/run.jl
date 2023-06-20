@@ -1,5 +1,18 @@
 using Thinkers
 
+@testset "Test running a `Job` multiple times" begin
+    function f()
+        n = rand(1:5)
+        n < 5 ? error("not the number we want!") : return n
+    end
+    i = Job(Thunk(f); username="me", name="i")
+    run!(i; maxattempts=10, interval=3)
+    count = countexecution(i)
+    @test 1 <= count <= 10
+    run!(i; maxattempts=10, interval=3)
+    @test 1 <= countexecution(i) <= 20
+end
+
 @testset "Test running `Job`s" begin
     function f₁()
         println("Start job `i`!")
@@ -37,8 +50,8 @@ using Thinkers
         m = Job(Thunk(f₅, 3, 1); name="m")
         n = Job(Thunk(f₆, 1; x=3); username="she", name="n")
         for job in (i, j, k, l, m, n)
-            exe = run!(job)
-            wait(exe)
+            exec = run!(job)
+            wait(exec)
             @test issucceeded(job)
         end
     end
@@ -49,7 +62,7 @@ using Thinkers
         l = Job(Thunk(f₄); name="l", username="me")
         m = Job(Thunk(f₅, 3, 1); name="m")
         n = Job(Thunk(f₆, 1; x=3); username="she", name="n")
-        Ref(i) .→ [j, k] .→ [l, m] .→ Ref(n)
+        i .→ [j, k] .→ [l, m] .→ n
         @assert isempty(i.parents)
         @assert i.children == Set([j, k])
         @assert j.parents == Set([i])
@@ -63,8 +76,8 @@ using Thinkers
         @assert n.parents == Set([l, m])
         @assert isempty(n.children)
         for job in (i, j, k, l, m, n)
-            exe = run!(job)
-            wait(exe)
+            exec = run!(job)
+            wait(exec)
             @test issucceeded(job)
         end
     end
@@ -76,65 +89,73 @@ end
     h = Job(Thunk(sleep, 3); username="me", name="h")
     i = Job(Thunk(f₁, 1001); username="me", name="i")
     j = ConditionalJob(Thunk(map, f₂); username="he", name="j")
-    [h, i] .→ Ref(j)
+    [h, i] .→ j
     @test_throws AssertionError run!(j)
     @test getresult(j) === nothing
-    exe = run!(h)
-    wait(exe)
+    exec = run!(h)
+    wait(exec)
     @test_throws AssertionError run!(j)
     @test getresult(j) === nothing
-    exe = run!(i)
-    wait(exe)
-    exe = run!(j)
-    wait(exe)
+    exec = run!(i)
+    wait(exec)
+    exec = run!(j)
+    wait(exec)
     @test getresult(j) == Some("1001")
 end
 
-@testset "Test running `ArgDependentJobs`s" begin
+@testset "Test running `ArgDependentJob`s" begin
     f₁(x) = x^2
     f₂(y) = y + 1
     f₃(z) = z / 2
     i = Job(Thunk(f₁, 5); username="me", name="i")
-    j = ArgDependentJobs(Thunk(f₂, 3); username="he", name="j")
-    k = ArgDependentJobs(Thunk(f₃, 6); username="she", name="k")
+    j = ArgDependentJob(Thunk(f₂, 3), false; username="he", name="j")
+    k = ArgDependentJob(Thunk(f₃, 6), false; username="she", name="k")
     i → j → k
     @test_throws AssertionError run!(j)
-    exe = run!(i)
-    wait(exe)
+    exec = run!(i)
+    wait(exec)
     @test getresult(i) == Some(25)
     @test_throws AssertionError run!(k)
-    exe = run!(j)
-    wait(exe)
+    exec = run!(j)
+    wait(exec)
     @test getresult(j) == Some(26)
-    exe = run!(k)
-    wait(exe)
+    exec = run!(k)
+    wait(exec)
     @test getresult(k) == Some(13.0)
 end
 
-@testset "Test running a `ArgDependentJobs` with more than one parent" begin
+@testset "Test running a `ArgDependentJob` with more than one parent" begin
     f₁(x) = x^2
     f₂(y) = y + 1
     f₃(z) = z / 2
     f₄(iter) = sum(iter)
-    h = Job(Thunk(sleep, 3); username="me", name="h")
     i = Job(Thunk(f₁, 5); username="me", name="i")
     j = Job(Thunk(f₂, 3); username="he", name="j")
     k = Job(Thunk(f₃, 6); username="she", name="k")
-    l = ArgDependentJobs(Thunk(f₄, ()); username="she", name="me")
-    for job in (i, j, k)
-        job → l
-    end
-    @test_throws AssertionError run!(l)
-    exes = map((h, i, j, k)) do job
+    l = ArgDependentJob(Thunk(f₄, ()); username="she", name="me")
+    (i, j, k) .→ l
+    exec = run!(l)
+    wait(exec)
+    @test isfailed(l)
+    execs = map((i, j, k)) do job
         run!(job)
     end
-    for exe in exes
-        wait(exe)
+    for exec in execs
+        wait(exec)
     end
-    exe = run!(l)
-    wait(exe)
+    l.core = Thunk(l.core)
+    exec = run!(l)
+    wait(exec)
     @test getresult(i) == Some(25)
     @test getresult(j) == Some(4)
     @test getresult(k) == Some(3.0)
     @test getresult(l) == Some(32.0)
+    @testset "Change `succeededonly` to `false`" begin
+        i = Job(Thunk(f₁, 5); username="me", name="i")
+        j = Job(Thunk(f₂, 3); username="he", name="j")
+        k = Job(Thunk(f₃, 6); username="she", name="k")
+        l = ArgDependentJob(Thunk(f₄, ()), false; username="she", name="me")
+        (i, j, k) .→ l
+    end
+    @test_throws AssertionError run!(l)
 end
