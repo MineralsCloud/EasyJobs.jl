@@ -79,11 +79,11 @@ version = "1.6.0"
 
 [[deps.EasyJobs]]
 deps = ["EasyJobsBase", "Query", "Reexport", "Thinkers", "UUIDs"]
-git-tree-sha1 = "08703c92ed930385fce1b8a11d5d88f15996a680"
+git-tree-sha1 = "8d8963d33b1cf9b0e648ea41aa70fd0d8ad77976"
 repo-rev = "main"
 repo-url = "https://github.com/MineralsCloud/EasyJobs.jl"
 uuid = "66d786ec-6e9c-4d5d-a8f6-aa4f8d7350fb"
-version = "0.5.0"
+version = "0.5.1"
 
 [[deps.EasyJobsBase]]
 deps = ["Dates", "Thinkers", "UUIDs"]
