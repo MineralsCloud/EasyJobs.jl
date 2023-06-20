@@ -1,4 +1,3 @@
-using EasyJobsBase: Job
 using Query: @from, @filter
 using UUIDs: UUID
 
