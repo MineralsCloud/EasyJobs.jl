@@ -144,14 +144,14 @@ function prepare!(job::ArgDependentJob)
 end
 
 shouldrun(::IndependentJob) = true
-shouldrun(job::ConditionalJob) =
-    countparents(job) >= 1 && all(issucceeded(parent) for parent in eachparent(job))
-function shouldrun(job::ArgDependentJob)
-    if job.succeededonly
-        return countparents(job) >= 1
+function shouldrun(job::Union{ConditionalJob,ArgDependentJob})
+    if countparents(job) < 1
+        return false
+    end
+    if job.strict
+        return all(issucceeded(parent) for parent in eachparent(job))
     else
-        return countparents(job) >= 1 &&
-               all(issucceeded(parent) for parent in eachparent(job))
+        return all(isexited(parent) for parent in eachparent(job))
     end
 end
 
