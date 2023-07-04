@@ -143,7 +143,7 @@ function prepare!(job::ArgDependentJob)
     return nothing
 end
 
-shouldrun(::AbstractJob) = true
+shouldrun(::IndependentJob) = true
 shouldrun(job::ConditionalJob) =
     countparents(job) >= 1 && all(issucceeded(parent) for parent in eachparent(job))
 function shouldrun(job::ArgDependentJob)
