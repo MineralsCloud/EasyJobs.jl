@@ -132,7 +132,7 @@ function prepare!(job::ArgDependentJob)
             something(result)
         end
     else  # > 1
-        parents = if job.filter_incomplete
+        parents = if job.skip_incomplete
             Iterators.filter(issucceeded, eachparent(job))
         else
             eachparent(job)
@@ -148,7 +148,7 @@ function shouldrun(job::Union{ConditionalJob,ArgDependentJob})
     if countparents(job) < 1
         return false
     end
-    if job.strict
+    if job.skip_incomplete
         return all(issucceeded(parent) for parent in eachparent(job))
     else
         return all(isexited(parent) for parent in eachparent(job))
