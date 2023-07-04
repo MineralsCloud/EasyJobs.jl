@@ -122,10 +122,8 @@ mutable struct ArgDependentJob <: DependentJob
     parents::Set{AbstractJob}
     "These jobs runs after the current job."
     children::Set{AbstractJob}
-    succeededonly::Bool
-    function ArgDependentJob(
-        core::Think, succeededonly=true; name="", description="", username=""
-    )
+    strict::Bool
+    function ArgDependentJob(core::Think, strict=true; name="", description="", username="")
         return new(
             uuid1(),
             core,
@@ -139,7 +137,7 @@ mutable struct ArgDependentJob <: DependentJob
             0,
             Set(),
             Set(),
-            succeededonly,
+            strict,
         )
     end
 end

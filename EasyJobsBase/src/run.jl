@@ -132,7 +132,7 @@ function prepare!(job::ArgDependentJob)
             something(result)
         end
     else  # > 1
-        parents = if job.succeededonly
+        parents = if job.strict
             Iterators.filter(issucceeded, eachparent(job))
         else
             eachparent(job)
