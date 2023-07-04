@@ -88,7 +88,8 @@ mutable struct ConditionalJob <: DependentJob
     parents::Set{AbstractJob}
     "These jobs runs after the current job."
     children::Set{AbstractJob}
-    function ConditionalJob(core::Think; name="", description="", username="")
+    strict::Bool
+    function ConditionalJob(core::Think, strict=true; name="", description="", username="")
         return new(
             uuid1(),
             core,
@@ -102,6 +103,7 @@ mutable struct ConditionalJob <: DependentJob
             0,
             Set(),
             Set(),
+            strict,
         )
     end
 end
