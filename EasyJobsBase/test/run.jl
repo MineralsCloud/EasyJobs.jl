@@ -90,10 +90,12 @@ end
     i = Job(Thunk(f₁, 1001); username="me", name="i")
     j = ConditionalJob(Thunk(map, f₂); username="he", name="j")
     [h, i] .→ j
+    @test !shouldrun(j)
     @test_throws AssertionError run!(j)
     @test getresult(j) === nothing
     exec = run!(h)
     wait(exec)
+    @test !shouldrun(j)
     @test_throws AssertionError run!(j)
     @test getresult(j) === nothing
     exec = run!(i)
@@ -156,7 +158,7 @@ end
         i = Job(Thunk(f₁, 5); username="me", name="i")
         j = Job(Thunk(f₂, 3); username="he", name="j")
         k = Job(Thunk(f₃, 6); username="she", name="k")
-        l = ArgDependentJob(Thunk(f₄, ()), false; username="she", name="me")
+        l = ArgDependentJob(Thunk(f₄, ()), false; username="she", name="l")
         (i, j, k) .→ l
         @test !shouldrun(l)
         @test_throws AssertionError run!(l)
