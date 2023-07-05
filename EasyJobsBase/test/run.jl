@@ -147,7 +147,6 @@ end
         wait(exec)
     end
     @test shouldrun(l)
-    l.core = Thunk(l.core)
     exec = run!(l)
     wait(exec)
     @test getresult(i) == Some(25)
