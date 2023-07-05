@@ -123,13 +123,11 @@ prepare!(::AbstractJob) = nothing  # No op
 function prepare!(job::ArgDependentJob)
     # Use previous results as arguments
     args = if countparents(job) == 1
-        result = getresult(only(eachparent(job)))
-        if isnothing(result)  # Parent job is pending or still running
-            # This means `job.filter_incomplete` must be `true` based on the logic
-            # Keep the arguments unchanged
-            @warn "the parent job is pending or still running! No arguments will be set!"
-        else  # Parent job has succeeded or failed
-            something(result)
+        parent = only(eachparent(job))
+        if issucceeded(parent)
+            something(getresult(parent))
+        else
+            error("the parent job has failed!")
         end
     else  # > 1
         parents = if job.skip_incomplete
