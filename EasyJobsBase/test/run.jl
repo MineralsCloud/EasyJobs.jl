@@ -111,14 +111,17 @@ end
     j = ArgDependentJob(Thunk(f₂, 3), false; username="he", name="j")
     k = ArgDependentJob(Thunk(f₃, 6), false; username="she", name="k")
     i → j → k
-    @test_throws AssertionError run!(j)
+    @test !shouldrun(j)
+    @test !shouldrun(k)
     exec = run!(i)
     wait(exec)
     @test getresult(i) == Some(25)
-    @test_throws AssertionError run!(k)
+    @test shouldrun(j)
+    @test !shouldrun(k)
     exec = run!(j)
     wait(exec)
     @test getresult(j) == Some(26)
+    @test shouldrun(k)
     exec = run!(k)
     wait(exec)
     @test getresult(k) == Some(13.0)
@@ -134,15 +137,14 @@ end
     k = Job(Thunk(f₃, 6); username="she", name="k")
     l = ArgDependentJob(Thunk(f₄, ()); username="she", name="me")
     (i, j, k) .→ l
-    exec = run!(l)
-    wait(exec)
-    @test isfailed(l)
+    @test !shouldrun(l)
     execs = map((i, j, k)) do job
         run!(job)
     end
     for exec in execs
         wait(exec)
     end
+    @test shouldrun(l)
     l.core = Thunk(l.core)
     exec = run!(l)
     wait(exec)
@@ -150,12 +152,13 @@ end
     @test getresult(j) == Some(4)
     @test getresult(k) == Some(3.0)
     @test getresult(l) == Some(32.0)
-    @testset "Change `succeededonly` to `false`" begin
+    @testset "Change `skip_incomplete` to `false`" begin
         i = Job(Thunk(f₁, 5); username="me", name="i")
         j = Job(Thunk(f₂, 3); username="he", name="j")
         k = Job(Thunk(f₃, 6); username="she", name="k")
         l = ArgDependentJob(Thunk(f₄, ()), false; username="she", name="me")
         (i, j, k) .→ l
+        @test !shouldrun(l)
+        @test_throws AssertionError run!(l)
     end
-    @test_throws AssertionError run!(l)
 end
