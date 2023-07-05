@@ -147,9 +147,9 @@ function shouldrun(job::Union{ConditionalJob,ArgDependentJob})
         return false
     end
     if job.skip_incomplete
-        return all(issucceeded(parent) for parent in eachparent(job))
-    else
         return all(isexited(parent) for parent in eachparent(job))
+    else
+        return all(issucceeded(parent) for parent in eachparent(job))
     end
 end
 
