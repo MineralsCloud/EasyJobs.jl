@@ -9,10 +9,9 @@
         @test !shouldrun(l)
         exec = run!(i)
         wait(exec)
-        @test shouldrun(l)
-        exec = run!(l)
-        wait(exec)
-        @test isfailed(l)
+        @test !shouldrun(l)
+        @test_throws AssertionError run!(l)
+        @test getresult(l) === nothing
     end
     @testset "With multiple parents" begin
         f(x) = x^2
