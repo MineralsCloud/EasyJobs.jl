@@ -88,7 +88,10 @@ mutable struct ConditionalJob <: DependentJob
     parents::Set{AbstractJob}
     "These jobs runs after the current job."
     children::Set{AbstractJob}
-    function ConditionalJob(core::Think; name="", description="", username="")
+    skip_incomplete::Bool
+    function ConditionalJob(
+        core::Think, skip_incomplete=true; name="", description="", username=""
+    )
         return new(
             uuid1(),
             core,
@@ -102,6 +105,7 @@ mutable struct ConditionalJob <: DependentJob
             0,
             Set(),
             Set(),
+            skip_incomplete,
         )
     end
 end
@@ -122,9 +126,9 @@ mutable struct ArgDependentJob <: DependentJob
     parents::Set{AbstractJob}
     "These jobs runs after the current job."
     children::Set{AbstractJob}
-    succeededonly::Bool
+    skip_incomplete::Bool
     function ArgDependentJob(
-        core::Think, succeededonly=true; name="", description="", username=""
+        core::Think, skip_incomplete=true; name="", description="", username=""
     )
         return new(
             uuid1(),
@@ -139,7 +143,7 @@ mutable struct ArgDependentJob <: DependentJob
             0,
             Set(),
             Set(),
-            succeededonly,
+            skip_incomplete,
         )
     end
 end

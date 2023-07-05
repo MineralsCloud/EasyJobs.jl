@@ -1,6 +1,6 @@
 using Thinkers: TimeoutException, ErrorInfo, reify!, setargs!, haserred, _kill
 
-export run!, execute!, kill!
+export shouldrun, run!, execute!, kill!
 
 # See https://github.com/MineralsCloud/SimpleWorkflows.jl/issues/137
 """
@@ -123,16 +123,14 @@ prepare!(::AbstractJob) = nothing  # No op
 function prepare!(job::ArgDependentJob)
     # Use previous results as arguments
     args = if countparents(job) == 1
-        result = getresult(only(eachparent(job)))
-        if isnothing(result)  # Parent job is pending or still running
-            # This means `job.succeededonly` must be `true` based on the logic
-            # Keep the arguments unchanged
-            @warn "the parent job is pending or still running! No arguments will be set!"
-        else  # Parent job has succeeded or failed
-            something(result)
+        parent = only(eachparent(job))
+        if issucceeded(parent)
+            something(getresult(parent))
+        else
+            error("the parent job has failed!")
         end
     else  # > 1
-        parents = if job.succeededonly
+        parents = if job.skip_incomplete
             Iterators.filter(issucceeded, eachparent(job))
         else
             eachparent(job)
@@ -143,15 +141,15 @@ function prepare!(job::ArgDependentJob)
     return nothing
 end
 
-shouldrun(::AbstractJob) = true
-shouldrun(job::ConditionalJob) =
-    countparents(job) >= 1 && all(issucceeded(parent) for parent in eachparent(job))
-function shouldrun(job::ArgDependentJob)
-    if job.succeededonly
-        return countparents(job) >= 1
+shouldrun(::IndependentJob) = true
+function shouldrun(job::Union{ConditionalJob,ArgDependentJob})
+    if countparents(job) < 1
+        return false
+    end
+    if job.skip_incomplete
+        return all(issucceeded(parent) for parent in eachparent(job))
     else
-        return countparents(job) >= 1 &&
-               all(issucceeded(parent) for parent in eachparent(job))
+        return all(isexited(parent) for parent in eachparent(job))
     end
 end
 
