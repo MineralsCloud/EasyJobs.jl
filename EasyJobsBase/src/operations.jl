@@ -1,4 +1,4 @@
-export chain!, →, ←
+export chain!, chain_succeeded!, →, ←, ↣, ↢
 
 """
     chain!(x::AbstractJob, y::AbstractJob, z::AbstractJob...)
@@ -32,6 +32,26 @@ Chain two `AbstractJob`s.
 Chain two `AbstractJob`s reversely.
 """
 ←(y::AbstractJob, x::AbstractJob) = x → y
+
+function chain_succeeded!(x::AbstractJob, y::Union{ConditionalJob,ArgDependentJob})
+    if x == y
+        throw(ArgumentError("a job cannot be followed by itself!"))
+    end
+    if y in x.children && x in y.parents
+        @info "You cannot chain the same jobs twice! No operations will be done!"
+    elseif y in x.children || x in y.parents  # This should never happen
+        error("Only one job is linked to the other, something is wrong!")
+    else
+        push!(x.children, y)
+        push!(y.parents, x)
+        y.skip_incomplete = true
+    end
+    return x
+end
+chain_succeeded!(x::AbstractJob, y::AbstractJob, z::AbstractJob...) =
+    foldr(chain_succeeded!, (x, y, z...))
+↣(x::AbstractJob, y::AbstractJob) = chain_succeeded!(x, y)
+↢(y::AbstractJob, x::AbstractJob) = x ↣ y
 
 # See https://github.com/JuliaLang/julia/blob/70c873e/base/number.jl#L279-L280
 Base.iterate(x::AbstractJob) = (x, nothing)
