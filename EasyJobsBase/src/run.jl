@@ -3,6 +3,7 @@ using Thinkers: TimeoutException, ErrorInfo, reify!, setargs!, haserred, _kill
 export shouldrun, run!, execute!
 
 # See https://github.com/MineralsCloud/SimpleWorkflows.jl/issues/137
+abstract type Executor end
 """
     Executor(job::AbstractJob; wait=false, maxattempts=1, interval=1, delay=0)
 
@@ -15,13 +16,13 @@ Handle the execution of jobs.
 - `interval::Real=1`: the time interval between each attempt to execute the job, in seconds.
 - `delay::Real=0`: the delay before the first attempt to execute the job, in seconds.
 """
-mutable struct Executor
+mutable struct AsyncExecutor <: Executor
     wait::Bool
     maxattempts::UInt64
     interval::Real
     delay::Real
     task::Task
-    function Executor(wait=false, maxattempts=1, interval=1, delay=0)
+    function AsyncExecutor(wait=false, maxattempts=1, interval=1, delay=0)
         @assert maxattempts >= 1
         @assert interval >= zero(interval)
         @assert delay >= zero(delay)
@@ -29,7 +30,7 @@ mutable struct Executor
     end
 end
 
-function dispatch!(exec::Executor, job::AbstractJob)
+function dispatch!(exec::AsyncExecutor, job::AbstractJob)
     exec.task = @task _run!(job)  # Start a new task. This is necessary for rerunning!
     return exec
 end
@@ -40,7 +41,7 @@ end
 Run a `Job` with a maximum number of attempts, with each attempt separated by `interval` seconds
 and an initial `delay` in seconds.
 """
-run!(job::AbstractJob; kwargs...) = execute!(job, Executor(; kwargs...))
+run!(job::AbstractJob; kwargs...) = execute!(job, AsyncExecutor(; kwargs...))
 
 """
     execute!(exec::Executor)
@@ -55,7 +56,7 @@ If the job has already succeeded, it stops immediately.
 # Arguments
 - `exec::Executor`: the `Executor` object containing the job to be executed.
 """
-function execute!(job::AbstractJob, exec::Executor)
+function execute!(job::AbstractJob, exec::AsyncExecutor)
     @assert shouldrun(job)
     prepare!(job)
     if !issucceeded(job)
@@ -83,7 +84,7 @@ if `wait` is `true`. If the job has failed or been interrupted, it creates a new
 resets the job status to `PENDING`, and then calls `singlerun!` again. If the job is running
 or has succeeded, it does nothing and returns the `Executor` object.
 """
-function singlerun!(exec::Executor, job::AbstractJob)
+function singlerun!(exec::AsyncExecutor, job::AbstractJob)
     dispatch!(exec, job)  # In case `exec.task` is not initialized
     if ispending(job)
         schedule(exec.task)
@@ -166,7 +167,7 @@ end
 
 Manually kill a `Job`, works only if it is running.
 """
-function Base.kill(exec::Executor)
+function Base.kill(exec::AsyncExecutor)
     _kill(exec.task)
     return nothing
 end
@@ -177,4 +178,4 @@ end
 Overloads the Base `wait` function to wait for the `Task` associated with an `Executor`
 object to complete.
 """
-Base.wait(exec::Executor) = wait(exec.task)
+Base.wait(exec::AsyncExecutor) = wait(exec.task)
