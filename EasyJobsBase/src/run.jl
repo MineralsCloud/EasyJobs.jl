@@ -84,6 +84,7 @@ resets the job status to `PENDING`, and then calls `singlerun!` again. If the jo
 or has succeeded, it does nothing and returns the `Executor` object.
 """
 function singlerun!(exec::Executor, job::AbstractJob)
+    dispatch!(exec, job)  # In case `exec.task` is not initialized
     if ispending(job)
         schedule(exec.task)
         if exec.wait
@@ -91,7 +92,6 @@ function singlerun!(exec::Executor, job::AbstractJob)
         end
     end
     if isfailed(job) || isinterrupted(job)
-        dispatch!(exec, job)
         job.status = PENDING
         return singlerun!(exec, job)  # Wait or not depends on `exec.wait`
     end
