@@ -15,18 +15,17 @@ Handle the execution of jobs.
 - `interval::Real=1`: the time interval between each attempt to execute the job, in seconds.
 - `delay::Real=0`: the delay before the first attempt to execute the job, in seconds.
 """
-mutable struct Executor{T<:AbstractJob}
-    job::T
+mutable struct Executor
     wait::Bool
     maxattempts::UInt64
     interval::Real
     delay::Real
     task::Task
-    function Executor(job::T; wait=false, maxattempts=1, interval=1, delay=0) where {T}
+    function Executor(wait=false, maxattempts=1, interval=1, delay=0)
         @assert maxattempts >= 1
         @assert interval >= zero(interval)
         @assert delay >= zero(delay)
-        return new{T}(job, wait, maxattempts, interval, delay, @task _run!(job))
+        return new(wait, maxattempts, interval, delay)
     end
 end
 
