@@ -40,7 +40,7 @@ end
 Run a `Job` with a maximum number of attempts, with each attempt separated by `interval` seconds
 and an initial `delay` in seconds.
 """
-run!(job::AbstractJob; kwargs...) = execute!(Executor(job; kwargs...))
+run!(job::AbstractJob; kwargs...) = execute!(job, Executor(; kwargs...))
 
 """
     execute!(exec::Executor)
@@ -55,17 +55,17 @@ If the job has already succeeded, it stops immediately.
 # Arguments
 - `exec::Executor`: the `Executor` object containing the job to be executed.
 """
-function execute!(exec::Executor)
-    @assert shouldrun(exec.job)
-    prepare!(exec.job)
-    if !issucceeded(exec.job)
+function execute!(job::AbstractJob, exec::Executor)
+    @assert shouldrun(job)
+    prepare!(job)
+    if !issucceeded(job)
         sleep(exec.delay)
-        singlerun!(exec)  # Wait or not depends on `exec.wait`
+        singlerun!(exec, job)  # Wait or not depends on `exec.wait`
         if exec.maxattempts > 1
             wait(exec)
             for _ in Base.OneTo(exec.maxattempts - 1)
                 sleep(exec.interval)
-                singlerun!(exec)
+                singlerun!(exec, job)
                 wait(exec)  # Wait no matter whether `exec.wait` is `true` or `false`
             end
         end
