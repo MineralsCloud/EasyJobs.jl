@@ -1,6 +1,6 @@
 using Thinkers: TimeoutException, ErrorInfo, reify!, setargs!, haserred, _kill
 
-export shouldrun, run!, execute!, kill!
+export shouldrun, run!, execute!
 
 # See https://github.com/MineralsCloud/SimpleWorkflows.jl/issues/137
 """
