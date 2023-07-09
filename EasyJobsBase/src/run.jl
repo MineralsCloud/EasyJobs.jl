@@ -83,17 +83,17 @@ if `wait` is `true`. If the job has failed or been interrupted, it creates a new
 resets the job status to `PENDING`, and then calls `singlerun!` again. If the job is running
 or has succeeded, it does nothing and returns the `Executor` object.
 """
-function singlerun!(exec::Executor)
-    if ispending(exec.job)
+function singlerun!(exec::Executor, job::AbstractJob)
+    if ispending(job)
         schedule(exec.task)
         if exec.wait
             wait(exec)
         end
     end
-    if isfailed(exec.job) || isinterrupted(exec.job)
-        newtask!(exec)
-        exec.job.status = PENDING
-        return singlerun!(exec)  # Wait or not depends on `exec.wait`
+    if isfailed(job) || isinterrupted(job)
+        dispatch!(exec, job)
+        job.status = PENDING
+        return singlerun!(exec, job)  # Wait or not depends on `exec.wait`
     end
     return exec  # Do nothing for running and succeeded jobs
 end
