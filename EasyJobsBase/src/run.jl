@@ -29,6 +29,8 @@ mutable struct AsyncExecutor <: Executor
         return new(wait, maxattempts, interval, delay)
     end
 end
+AsyncExecutor(; wait=false, maxattempts=1, interval=1, delay=0) =
+    AsyncExecutor(wait, maxattempts, interval, delay)
 
 function dispatch!(exec::AsyncExecutor, job::AbstractJob)
     exec.task = @task _run!(job)  # Start a new task. This is necessary for rerunning!
