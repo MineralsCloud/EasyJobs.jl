@@ -29,8 +29,8 @@ mutable struct Executor
     end
 end
 
-function newtask!(exec::Executor)
-    exec.task = @task _run!(exec.job)  # Start a new task. This is necessary for rerunning!
+function dispatch!(exec::Executor, job::AbstractJob)
+    exec.task = @task _run!(job)  # Start a new task. This is necessary for rerunning!
     return exec
 end
 
