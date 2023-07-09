@@ -166,11 +166,11 @@ end
 
 Manually kill a `Job`, works only if it is running.
 """
-function kill!(exec::Executor)
-    if isexited(exec.job)
-        @info "the job $(exec.job.id) has already exited!"
-    elseif ispending(exec.job)
-        @info "the job $(exec.job.id) has not started!"
+function Base.kill(exec::Executor, job::AbstractJob)
+    if isexited(job)
+        @info "the job $(job.id) has already exited!"
+    elseif ispending(job)
+        @info "the job $(job.id) has not started!"
     else
         _kill(exec.task)
     end
