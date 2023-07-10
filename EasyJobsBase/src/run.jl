@@ -76,12 +76,7 @@ function execute!(job::AbstractJob, exec::AsyncExecutor)
         @task job  # Just return the job if it has succeeded
     else
         sleep(exec.delay)
-        @task for _ in Base.OneTo(exec.maxattempts)
-            runonce!(job, exec)  # Update job with the modified one for `ParallelExecutor`
-            if issucceeded(job)
-                break  # Stop immediately if the job has succeeded
-            end
-        end
+        @task dispatch!(job, exec)
     end
     schedule(task)
     if exec.wait
@@ -105,6 +100,15 @@ function execute!(job::AbstractJob, exec::ParallelExecutor)
     return task
 end
 
+function dispatch!(job::AbstractJob, exec::AsyncExecutor)
+    for _ in Base.OneTo(exec.maxattempts)
+        runonce!(job, exec)  # Update job with the modified one for `ParallelExecutor`
+        if issucceeded(job)
+            break  # Stop immediately if the job has succeeded
+        end
+    end
+    return job
+end
 function dispatch!(job::AbstractJob, exec::ParallelExecutor)
     copiedjob = job  # Initialize `copiedjob` outside the loop with the original job
     for _ in Base.OneTo(exec.maxattempts)
