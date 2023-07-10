@@ -58,17 +58,16 @@ function execute!(job::AbstractJob, exec::AsyncExecutor)
     prepare!(job)
     if !issucceeded(job)
         sleep(exec.delay)
-        singlerun!(exec, job)  # Wait or not depends on `exec.wait`
-        if exec.maxattempts > 1
-            wait(exec)
-            for _ in Base.OneTo(exec.maxattempts - 1)
-                sleep(exec.interval)
-                singlerun!(exec, job)
-                wait(exec)  # Wait no matter whether `exec.wait` is `true` or `false`
+        task = @task for _ in Base.OneTo(exec.maxattempts)
+            subtask = singlerun!(exec, job)
+            wait(subtask)
+            if issucceeded(job)
+                break  # Stop immediately if the job has succeeded
             end
         end
+        schedule(task)
     end
-    return exec  # Stop immediately if the job has succeeded
+    return task  # Stop immediately if the job has succeeded
 end
 
 """
