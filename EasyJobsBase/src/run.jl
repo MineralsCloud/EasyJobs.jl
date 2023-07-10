@@ -59,7 +59,7 @@ function execute!(job::AbstractJob, exec::AsyncExecutor)
     if !issucceeded(job)
         sleep(exec.delay)
         task = @task for _ in Base.OneTo(exec.maxattempts)
-            subtask = singlerun!(exec, job)
+            subtask = singlerun!(job)
             wait(subtask)
             if issucceeded(job)
                 break  # Stop immediately if the job has succeeded
@@ -70,10 +70,10 @@ function execute!(job::AbstractJob, exec::AsyncExecutor)
     return task  # Stop immediately if the job has succeeded
 end
 
-function singlerun!(exec::AsyncExecutor, job::AbstractJob)
+function singlerun!(job::AbstractJob)
     if isfailed(job) || isinterrupted(job)
         job.status = PENDING
-        return singlerun!(exec, job)
+        return singlerun!(job)
     end
     if ispending(job)
         task = dispatch!(job)
