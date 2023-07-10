@@ -18,8 +18,6 @@ chain!
 ←
 run!
 execute!
-kill!
-wait
 getstatus
 ispending
 isrunning
@@ -52,6 +50,5 @@ are primarily meant for internal use within the package. Using them directly may
 unexpected errors or compatibility issues in your code.
 
 ```@docs
-Executor
-singlerun!
+AsyncExecutor
 ```
