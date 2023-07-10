@@ -94,8 +94,9 @@ function runonce!(job::AbstractJob, exec::AsyncExecutor)
     if ispending(job)
         task = @task _run!(job)
         schedule(task)
+        wait(task)
     end
-    return task  # Do nothing for running and succeeded jobs
+    return job  # Do nothing for running and succeeded jobs
 end
 function runonce!(job::AbstractJob, exec::ParallelExecutor)
     if isfailed(job) || isinterrupted(job)
