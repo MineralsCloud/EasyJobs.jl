@@ -72,8 +72,7 @@ function execute!(job::AbstractJob, exec::AsyncExecutor)
     else
         sleep(exec.delay)
         @task for _ in Base.OneTo(exec.maxattempts)
-            subtask_or_future = runonce!(job, exec)
-            wait(subtask_or_future)
+            runonce!(job, exec)  # Update job with the modified one for `ParallelExecutor`
             if issucceeded(job)
                 break  # Stop immediately if the job has succeeded
             end
