@@ -30,8 +30,6 @@ end
 AsyncExecutor(; maxattempts=1, interval=1, delay=0, wait=false) =
     AsyncExecutor(maxattempts, interval, delay, wait)
 
-dispatch!(job::AbstractJob) = @task _run!(job)
-
 """
     run!(job::Job; maxattempts=1, interval=1, delay=0, wait=false)
 
@@ -78,7 +76,7 @@ function singlerun!(job::AbstractJob)
         return singlerun!(job)
     end
     if ispending(job)
-        task = dispatch!(job)
+        task = @task _run!(job)
         schedule(task)
     end
     return task  # Do nothing for running and succeeded jobs
