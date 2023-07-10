@@ -1,7 +1,11 @@
 using Distributed: @spawnat
 using Thinkers: TimeoutException, ErrorInfo, reify!, setargs!, haserred, _kill
 
-export shouldrun, run!, execute!
+export Async, Parallel, shouldrun, run!, execute!
+
+abstract type ExecutionStyle end
+struct Async <: ExecutionStyle end
+struct Parallel <: ExecutionStyle end
 
 # See https://github.com/MineralsCloud/SimpleWorkflows.jl/issues/137
 abstract type Executor end
