@@ -69,22 +69,7 @@ sleeps for a `exec.delay`, then runs the `job`. If `exec.maxattempts` is more th
 loops over the remaining attempts, sleeping for an `exec.interval`, running the `job`, and
 waiting in each loop.
 """
-function execute!(job::AbstractJob, exec::AsyncExecutor)
-    @assert shouldrun(job)
-    prepare!(job)
-    task = if issucceeded(job)
-        @task job  # Just return the job if it has succeeded
-    else
-        sleep(exec.delay)
-        @task dispatch!(job, exec)
-    end
-    schedule(task)
-    if exec.wait
-        wait(task)
-    end
-    return task
-end
-function execute!(job::AbstractJob, exec::ParallelExecutor)
+function execute!(job::AbstractJob, exec::Executor)
     @assert shouldrun(job)
     prepare!(job)
     task = if issucceeded(job)
