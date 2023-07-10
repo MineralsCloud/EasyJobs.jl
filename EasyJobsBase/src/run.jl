@@ -1,6 +1,11 @@
+using Distributed: @spawnat
 using Thinkers: TimeoutException, ErrorInfo, reify!, setargs!, haserred, _kill
 
-export shouldrun, run!, execute!
+export Async, Parallel, shouldrun, run!, execute!
+
+abstract type ExecutionStyle end
+struct Async <: ExecutionStyle end
+struct Parallel <: ExecutionStyle end
 
 # See https://github.com/MineralsCloud/SimpleWorkflows.jl/issues/137
 abstract type Executor end
@@ -29,39 +34,57 @@ mutable struct AsyncExecutor <: Executor
 end
 AsyncExecutor(; maxattempts=1, interval=1, delay=0, wait=false) =
     AsyncExecutor(maxattempts, interval, delay, wait)
+mutable struct ParallelExecutor <: Executor
+    spawnat::Union{Symbol,UInt64}
+    maxattempts::UInt64
+    interval::Real
+    delay::Real
+    wait::Bool
+    function ParallelExecutor(spawnat=:any, maxattempts=1, interval=1, delay=0, wait=false)
+        if isinteger(spawnat)
+            spawnat = UInt64(spawnat)
+        else
+            @assert spawnat == :any
+        end
+        @assert maxattempts >= 1
+        @assert interval >= zero(interval)
+        @assert delay >= zero(delay)
+        return new(spawnat, maxattempts, interval, delay, wait)
+    end
+end
+ParallelExecutor(spawnat=:any; maxattempts=1, interval=1, delay=0, wait=false) =
+    ParallelExecutor(spawnat, maxattempts, interval, delay, wait)
 
 """
     run!(job::Job; maxattempts=1, interval=1, delay=0, wait=false)
+    run!(job::Job, style::Async; maxattempts=1, interval=1, delay=0, wait=false)
+    run!(job::Job, style::Parallel; maxattempts=1, interval=1, delay=0, wait=false)
 
 Run a `Job` with a maximum number of attempts, with each attempt separated by `interval` seconds
 and an initial `delay` in seconds.
 """
-run!(job::AbstractJob; kwargs...) = execute!(job, AsyncExecutor(; kwargs...))
+run!(job::AbstractJob, ::Async; kwargs...) = execute!(job, AsyncExecutor(; kwargs...))
+run!(job::AbstractJob, ::Parallel; kwargs...) = execute!(job, ParallelExecutor(; kwargs...))
+run!(job::AbstractJob; kwargs...) = execute!(job, Async(); kwargs...)
 
 """
-    execute!(job::AbstractJob, exec::AsyncExecutor)
+    execute!(job::AbstractJob, exec::Executor)
 
-Execute a given `AbstractJob` associated with the `AsyncExecutor`.
+Execute a given `AbstractJob` associated with the `Executor`.
 
 This function checks if the `job` has succeeded. If so, it stops immediately. If not, it
 sleeps for a `exec.delay`, then runs the `job`. If `exec.maxattempts` is more than ``1``, it
 loops over the remaining attempts, sleeping for an `exec.interval`, running the `job`, and
 waiting in each loop.
 """
-function execute!(job::AbstractJob, exec::AsyncExecutor)
+function execute!(job::AbstractJob, exec::Executor)
     @assert shouldrun(job)
     prepare!(job)
     task = if issucceeded(job)
         @task job  # Just return the job if it has succeeded
     else
         sleep(exec.delay)
-        @task for _ in Base.OneTo(exec.maxattempts)
-            subtask = singlerun!(job)
-            wait(subtask)
-            if issucceeded(job)
-                break  # Stop immediately if the job has succeeded
-            end
-        end
+        @task dispatch!(job, exec)
     end
     schedule(task)
     if exec.wait
@@ -70,16 +93,48 @@ function execute!(job::AbstractJob, exec::AsyncExecutor)
     return task
 end
 
-function singlerun!(job::AbstractJob)
+function dispatch!(job::AbstractJob, exec::AsyncExecutor)
+    for _ in Base.OneTo(exec.maxattempts)
+        runonce!(job, exec)  # Update job with the modified one for `ParallelExecutor`
+        if issucceeded(job)
+            break  # Stop immediately if the job has succeeded
+        end
+    end
+    return job
+end
+function dispatch!(job::AbstractJob, exec::ParallelExecutor)
+    copiedjob = job  # Initialize `copiedjob` outside the loop with the original job
+    for _ in Base.OneTo(exec.maxattempts)
+        copiedjob = runonce!(copiedjob, exec)  # Update `job` with the modified one for `ParallelExecutor`
+        if issucceeded(copiedjob)
+            break  # Stop immediately if the job has succeeded
+        end
+    end
+    return copiedjob  # Now it's valid to return `copiedjob`
+end
+
+function runonce!(job::AbstractJob, exec::AsyncExecutor)
     if isfailed(job) || isinterrupted(job)
         setpending!(job)
-        return singlerun!(job)
+        return runonce!(job, exec)
     end
     if ispending(job)
         task = @task _run!(job)
         schedule(task)
+        wait(task)
     end
-    return task  # Do nothing for running and succeeded jobs
+    return job  # Do nothing for running and succeeded jobs
+end
+function runonce!(job::AbstractJob, exec::ParallelExecutor)
+    if isfailed(job) || isinterrupted(job)
+        setpending!(job)
+        return runonce!(job, exec)
+    end
+    if ispending(job)
+        future = @spawnat exec.spawnat _run!(job)  # It is likely that `job` will not be modified
+        job = fetch(future)
+    end
+    return job  # Do nothing for running and succeeded jobs
 end
 
 # Internal function to execute a specific `AbstractJob`.
