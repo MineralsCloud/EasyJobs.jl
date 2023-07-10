@@ -41,17 +41,14 @@ and an initial `delay` in seconds.
 run!(job::AbstractJob; kwargs...) = execute!(job, AsyncExecutor(; kwargs...))
 
 """
-    execute!(exec::Executor)
+    execute!(job::AbstractJob, exec::AsyncExecutor)
 
-Execute a given job associated with the `Executor` object.
+Execute a given `AbstractJob` associated with the `AsyncExecutor`.
 
-This function checks if the job has succeeded. If not, it sleeps for a delay,
-runs the job once using `singlerun!`. If `maxattempts` is more than ``1``, it loops over
-the remaining attempts, sleeping for an interval, running the job, and waiting in each loop.
-If the job has already succeeded, it stops immediately.
-
-# Arguments
-- `exec::Executor`: the `Executor` object containing the job to be executed.
+This function checks if the `job` has succeeded. If so, it stops immediately. If not, it
+sleeps for a `exec.delay`, then runs the `job`. If `exec.maxattempts` is more than ``1``, it
+loops over the remaining attempts, sleeping for an `exec.interval`, running the `job`, and
+waiting in each loop.
 """
 function execute!(job::AbstractJob, exec::AsyncExecutor)
     @assert shouldrun(job)
