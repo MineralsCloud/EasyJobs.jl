@@ -105,8 +105,9 @@ function runonce!(job::AbstractJob, exec::ParallelExecutor)
     end
     if ispending(job)
         future = @spawnat exec.spawnat _run!(job)
+        job = fetch(future)
     end
-    return future  # Do nothing for running and succeeded jobs
+    return job  # Do nothing for running and succeeded jobs
 end
 
 # Internal function to execute a specific `AbstractJob`.
