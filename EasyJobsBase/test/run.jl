@@ -13,6 +13,20 @@ using Thinkers
     @test 1 <= countexecution(i) <= 20
 end
 
+# See https://github.com/MineralsCloud/EasyJobsBase.jl/pull/44
+@testset "Test `singlerun!` only runs once per attempt" begin
+    arr = []
+    function f(A)
+        push!(A, 1)
+        return error("an error occurred!")
+    end
+    i = Job(Thunk(f, arr); username="me", name="i")
+    task = run!(i; maxattempts=5, interval=1, wait=false)
+    wait(task)
+    @test countexecution(i) == 5
+    @test length(arr) == 5  # It proves `singlerun!` only runs once per attempt
+end
+
 @testset "Test running `Job`s" begin
     function f₁()
         println("Start job `i`!")
