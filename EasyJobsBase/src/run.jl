@@ -20,15 +20,16 @@ mutable struct AsyncExecutor <: Executor
     maxattempts::UInt64
     interval::Real
     delay::Real
-    function AsyncExecutor(maxattempts=1, interval=1, delay=0)
+    wait::Bool
+    function AsyncExecutor(maxattempts=1, interval=1, delay=0, wait=false)
         @assert maxattempts >= 1
         @assert interval >= zero(interval)
         @assert delay >= zero(delay)
-        return new(maxattempts, interval, delay)
+        return new(maxattempts, interval, delay, wait)
     end
 end
-AsyncExecutor(; maxattempts=1, interval=1, delay=0) =
-    AsyncExecutor(maxattempts, interval, delay)
+AsyncExecutor(; maxattempts=1, interval=1, delay=0, wait=false) =
+    AsyncExecutor(maxattempts, interval, delay, wait)
 
 dispatch!(job::AbstractJob) = @task _run!(job)
 
@@ -66,6 +67,9 @@ function execute!(job::AbstractJob, exec::AsyncExecutor)
         end
     end
     schedule(task)
+    if exec.wait
+        wait(task)
+    end
     return task
 end
 

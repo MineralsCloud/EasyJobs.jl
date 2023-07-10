@@ -6,13 +6,25 @@ using Thinkers
         n < 5 ? error("not the number we want!") : return n
     end
     i = Job(Thunk(f); username="me", name="i")
-    task = run!(i; maxattempts=10, interval=3)
-    wait(task)
+    run!(i; maxattempts=10, interval=3, wait=true)
     count = countexecution(i)
     @test 1 <= count <= 10
-    task = run!(i; maxattempts=10, interval=3)
-    wait(task)
+    run!(i; maxattempts=10, interval=3, wait=true)
     @test 1 <= countexecution(i) <= 20
+end
+
+# See https://github.com/MineralsCloud/EasyJobsBase.jl/pull/44
+@testset "Test `singlerun!` only runs once per attempt" begin
+    arr = []
+    function f(A)
+        push!(A, 1)
+        return error("an error occurred!")
+    end
+    i = Job(Thunk(f, arr); username="me", name="i")
+    task = run!(i; maxattempts=5, interval=1, wait=false)
+    wait(task)
+    @test countexecution(i) == 5
+    @test length(arr) == 5  # It proves `singlerun!` only runs once per attempt
 end
 
 @testset "Test running `Job`s" begin
@@ -52,8 +64,7 @@ end
         m = Job(Thunk(f₅, 3, 1); name="m")
         n = Job(Thunk(f₆, 1; x=3); username="she", name="n")
         for job in (i, j, k, l, m, n)
-            exec = run!(job)
-            wait(exec)
+            run!(job; wait=true)
             @test issucceeded(job)
         end
     end
@@ -78,8 +89,7 @@ end
         @assert n.parents == Set([l, m])
         @assert isempty(n.children)
         for job in (i, j, k, l, m, n)
-            task = run!(job)
-            wait(task)
+            run!(job; wait=true)
             @test issucceeded(job)
         end
     end
@@ -95,15 +105,12 @@ end
     @test !shouldrun(j)
     @test_throws AssertionError run!(j)
     @test getresult(j) === nothing
-    task = run!(h)
-    wait(task)
+    run!(h; wait=true)
     @test !shouldrun(j)
     @test_throws AssertionError run!(j)
     @test getresult(j) === nothing
-    task = run!(i)
-    wait(task)
-    task = run!(j)
-    wait(task)
+    run!(i; wait=true)
+    run!(j; wait=true)
     @test getresult(j) == Some("1001")
 end
 
@@ -117,17 +124,14 @@ end
     i → j → k
     @test !shouldrun(j)
     @test !shouldrun(k)
-    task = run!(i)
-    wait(task)
+    run!(i; wait=true)
     @test getresult(i) == Some(25)
     @test shouldrun(j)
     @test !shouldrun(k)
-    task = run!(j)
-    wait(task)
+    run!(j; wait=true)
     @test getresult(j) == Some(26)
     @test shouldrun(k)
-    task = run!(k)
-    wait(task)
+    run!(k; wait=true)
     @test getresult(k) == Some(13.0)
 end
 
@@ -142,15 +146,11 @@ end
     l = ArgDependentJob(Thunk(f₄, ()); username="she", name="me")
     (i, j, k) .→ l
     @test !shouldrun(l)
-    tasks = map((i, j, k)) do job
-        run!(job)
-    end
-    for task in tasks
-        wait(task)
+    map((i, j, k)) do job
+        run!(job; wait=true)
     end
     @test shouldrun(l)
-    task = run!(l)
-    wait(task)
+    run!(l; wait=true)
     @test getresult(i) == Some(25)
     @test getresult(j) == Some(4)
     @test getresult(k) == Some(3.0)
