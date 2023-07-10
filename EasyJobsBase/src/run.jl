@@ -81,18 +81,15 @@ resets the job status to `PENDING`, and then calls `singlerun!` again. If the jo
 or has succeeded, it does nothing and returns the `Executor` object.
 """
 function singlerun!(exec::AsyncExecutor, job::AbstractJob)
-    dispatch!(exec, job)  # In case `exec.task` is not initialized
-    if ispending(job)
-        schedule(exec.task)
-        if exec.wait
-            wait(exec)
-        end
-    end
     if isfailed(job) || isinterrupted(job)
         job.status = PENDING
-        return singlerun!(exec, job)  # Wait or not depends on `exec.wait`
+        return singlerun!(exec, job)
     end
-    return exec  # Do nothing for running and succeeded jobs
+    if ispending(job)
+        task = dispatch!(job)
+        schedule(task)
+    end
+    return task  # Do nothing for running and succeeded jobs
 end
 
 # Internal function to execute a specific `AbstractJob`.
