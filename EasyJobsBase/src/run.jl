@@ -72,8 +72,8 @@ function execute!(job::AbstractJob, exec::AsyncExecutor)
     else
         sleep(exec.delay)
         @task for _ in Base.OneTo(exec.maxattempts)
-            subtask = async_runonce!(job)
-            wait(subtask)
+            subtask_or_future = runonce!(job, exec)
+            wait(subtask_or_future)
             if issucceeded(job)
                 break  # Stop immediately if the job has succeeded
             end
@@ -86,10 +86,10 @@ function execute!(job::AbstractJob, exec::AsyncExecutor)
     return task
 end
 
-function async_runonce!(job::AbstractJob)
+function runonce!(job::AbstractJob, exec::AsyncExecutor)
     if isfailed(job) || isinterrupted(job)
         setpending!(job)
-        return async_runonce!(job)
+        return runonce!(job, exec)
     end
     if ispending(job)
         task = @task _run!(job)
