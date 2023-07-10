@@ -1,3 +1,4 @@
+using Distributed: @spawnat
 using Thinkers: TimeoutException, ErrorInfo, reify!, setargs!, haserred, _kill
 
 export shouldrun, run!, execute!
@@ -80,6 +81,16 @@ function async_runonce!(job::AbstractJob)
         schedule(task)
     end
     return task  # Do nothing for running and succeeded jobs
+end
+function runonce!(job::AbstractJob, exec::ParallelExecutor)
+    if isfailed(job) || isinterrupted(job)
+        setpending!(job)
+        return runonce!(job, exec)
+    end
+    if ispending(job)
+        future = @spawnat exec.spawnat _run!(job)
+    end
+    return future  # Do nothing for running and succeeded jobs
 end
 
 # Internal function to execute a specific `AbstractJob`.
