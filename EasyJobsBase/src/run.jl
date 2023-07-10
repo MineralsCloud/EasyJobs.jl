@@ -5,16 +5,15 @@ export shouldrun, run!, execute!
 # See https://github.com/MineralsCloud/SimpleWorkflows.jl/issues/137
 abstract type Executor end
 """
-    Executor(job::AbstractJob; wait=false, maxattempts=1, interval=1, delay=0)
+    AsyncExecutor(; maxattempts=1, interval=1, delay=0, wait=false)
 
-Handle the execution of jobs.
+Handle the asynchronous execution of jobs.
 
 # Arguments
-- `job::AbstractJob`: an `AbstractJob` instance.
-- `wait::Bool=false`: determines whether to wait for the job to complete before executing the next task.
 - `maxattempts::UInt64=1`: the maximum number of attempts to execute the job.
 - `interval::Real=1`: the time interval between each attempt to execute the job, in seconds.
 - `delay::Real=0`: the delay before the first attempt to execute the job, in seconds.
+- `wait::Bool=false`: determines whether to wait for the job to complete before executing the next task.
 """
 mutable struct AsyncExecutor <: Executor
     maxattempts::UInt64
@@ -34,7 +33,7 @@ AsyncExecutor(; maxattempts=1, interval=1, delay=0, wait=false) =
 dispatch!(job::AbstractJob) = @task _run!(job)
 
 """
-    run!(job::Job; wait=false, maxattempts=1, interval=1, delay=0)
+    run!(job::Job; maxattempts=1, interval=1, delay=0, wait=false)
 
 Run a `Job` with a maximum number of attempts, with each attempt separated by `interval` seconds
 and an initial `delay` in seconds.
