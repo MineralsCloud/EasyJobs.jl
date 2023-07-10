@@ -30,10 +30,7 @@ end
 AsyncExecutor(; maxattempts=1, interval=1, delay=0) =
     AsyncExecutor(maxattempts, interval, delay)
 
-function dispatch!(exec::AsyncExecutor, job::AbstractJob)
-    exec.task = @task _run!(job)  # Start a new task. This is necessary for rerunning!
-    return exec
-end
+dispatch!(job::AbstractJob) = @task _run!(job)
 
 """
     run!(job::Job; wait=false, maxattempts=1, interval=1, delay=0)
