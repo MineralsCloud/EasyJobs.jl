@@ -53,18 +53,20 @@ waiting in each loop.
 function execute!(job::AbstractJob, exec::AsyncExecutor)
     @assert shouldrun(job)
     prepare!(job)
-    if !issucceeded(job)
+    task = if issucceeded(job)
+        @task job  # Just return the job if it has succeeded
+    else
         sleep(exec.delay)
-        task = @task for _ in Base.OneTo(exec.maxattempts)
+        @task for _ in Base.OneTo(exec.maxattempts)
             subtask = singlerun!(job)
             wait(subtask)
             if issucceeded(job)
                 break  # Stop immediately if the job has succeeded
             end
         end
-        schedule(task)
     end
-    return task  # Stop immediately if the job has succeeded
+    schedule(task)
+    return task
 end
 
 function singlerun!(job::AbstractJob)
