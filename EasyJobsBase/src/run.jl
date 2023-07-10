@@ -71,7 +71,7 @@ end
 
 function singlerun!(job::AbstractJob)
     if isfailed(job) || isinterrupted(job)
-        job.status = PENDING
+        setpending!(job)
         return singlerun!(job)
     end
     if ispending(job)

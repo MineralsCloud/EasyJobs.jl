@@ -10,7 +10,10 @@ export getstatus,
     listexited,
     listsucceeded,
     listfailed,
-    listinterrupted
+    listinterrupted,
+    setsucceeded!,
+    setpending!,
+    setfailed!
 
 """
     getstatus(job::AbstractJob)
@@ -102,3 +105,9 @@ listfailed(jobs) = Iterators.filter(isfailed, jobs)
 Filter the interrupted jobs in a sequence of jobs.
 """
 listinterrupted(jobs) = Iterators.filter(isinterrupted, jobs)
+
+setsucceeded!(job::AbstractJob) = job.status = SUCCEEDED
+
+setpending!(job::AbstractJob) = job.status = PENDING
+
+setfailed!(job::AbstractJob) = job.status = FAILED
