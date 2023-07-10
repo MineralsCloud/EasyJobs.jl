@@ -37,6 +37,11 @@ mutable struct ParallelExecutor <: Executor
     delay::Real
     wait::Bool
     function ParallelExecutor(spawnat=:any, maxattempts=1, interval=1, delay=0, wait=false)
+        if isinteger(spawnat)
+            spawnat = UInt64(spawnat)
+        else
+            @assert spawnat == :any
+        end
         @assert maxattempts >= 1
         @assert interval >= zero(interval)
         @assert delay >= zero(delay)
