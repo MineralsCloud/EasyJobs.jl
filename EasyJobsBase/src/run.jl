@@ -163,21 +163,3 @@ function shouldrun(job::ArgDependentJob)
         end
     end
 end
-
-"""
-    kill!(exec::Executor)
-
-Manually kill a `Job`, works only if it is running.
-"""
-function Base.kill(exec::AsyncExecutor)
-    _kill(exec.task)
-    return nothing
-end
-
-"""
-    Base.wait(exec::Executor)
-
-Overloads the Base `wait` function to wait for the `Task` associated with an `Executor`
-object to complete.
-"""
-Base.wait(exec::AsyncExecutor) = wait(exec.task)
