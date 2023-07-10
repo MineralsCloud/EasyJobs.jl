@@ -1,8 +1,9 @@
 using Thinkers: TimeoutException, ErrorInfo, reify!, setargs!, haserred, _kill
 
-export shouldrun, run!, execute!, kill!
+export shouldrun, run!, execute!
 
 # See https://github.com/MineralsCloud/SimpleWorkflows.jl/issues/137
+abstract type Executor end
 """
     Executor(job::AbstractJob; wait=false, maxattempts=1, interval=1, delay=0)
 
@@ -15,25 +16,21 @@ Handle the execution of jobs.
 - `interval::Real=1`: the time interval between each attempt to execute the job, in seconds.
 - `delay::Real=0`: the delay before the first attempt to execute the job, in seconds.
 """
-mutable struct Executor{T<:AbstractJob}
-    job::T
-    wait::Bool
+mutable struct AsyncExecutor <: Executor
     maxattempts::UInt64
     interval::Real
     delay::Real
-    task::Task
-    function Executor(job::T; wait=false, maxattempts=1, interval=1, delay=0) where {T}
+    function AsyncExecutor(maxattempts=1, interval=1, delay=0)
         @assert maxattempts >= 1
         @assert interval >= zero(interval)
         @assert delay >= zero(delay)
-        return new{T}(job, wait, maxattempts, interval, delay, @task _run!(job))
+        return new(maxattempts, interval, delay)
     end
 end
+AsyncExecutor(; maxattempts=1, interval=1, delay=0) =
+    AsyncExecutor(maxattempts, interval, delay)
 
-function newtask!(exec::Executor)
-    exec.task = @task _run!(exec.job)  # Start a new task. This is necessary for rerunning!
-    return exec
-end
+dispatch!(job::AbstractJob) = @task _run!(job)
 
 """
     run!(job::Job; wait=false, maxattempts=1, interval=1, delay=0)
@@ -41,62 +38,47 @@ end
 Run a `Job` with a maximum number of attempts, with each attempt separated by `interval` seconds
 and an initial `delay` in seconds.
 """
-run!(job::AbstractJob; kwargs...) = execute!(Executor(job; kwargs...))
+run!(job::AbstractJob; kwargs...) = execute!(job, AsyncExecutor(; kwargs...))
 
 """
-    execute!(exec::Executor)
+    execute!(job::AbstractJob, exec::AsyncExecutor)
 
-Execute a given job associated with the `Executor` object.
+Execute a given `AbstractJob` associated with the `AsyncExecutor`.
 
-This function checks if the job has succeeded. If not, it sleeps for a delay,
-runs the job once using `singlerun!`. If `maxattempts` is more than ``1``, it loops over
-the remaining attempts, sleeping for an interval, running the job, and waiting in each loop.
-If the job has already succeeded, it stops immediately.
-
-# Arguments
-- `exec::Executor`: the `Executor` object containing the job to be executed.
+This function checks if the `job` has succeeded. If so, it stops immediately. If not, it
+sleeps for a `exec.delay`, then runs the `job`. If `exec.maxattempts` is more than ``1``, it
+loops over the remaining attempts, sleeping for an `exec.interval`, running the `job`, and
+waiting in each loop.
 """
-function execute!(exec::Executor)
-    @assert shouldrun(exec.job)
-    prepare!(exec.job)
-    if !issucceeded(exec.job)
+function execute!(job::AbstractJob, exec::AsyncExecutor)
+    @assert shouldrun(job)
+    prepare!(job)
+    task = if issucceeded(job)
+        @task job  # Just return the job if it has succeeded
+    else
         sleep(exec.delay)
-        singlerun!(exec)  # Wait or not depends on `exec.wait`
-        if exec.maxattempts > 1
-            wait(exec)
-            for _ in Base.OneTo(exec.maxattempts - 1)
-                sleep(exec.interval)
-                singlerun!(exec)
-                wait(exec)  # Wait no matter whether `exec.wait` is `true` or `false`
+        @task for _ in Base.OneTo(exec.maxattempts)
+            subtask = singlerun!(job)
+            wait(subtask)
+            if issucceeded(job)
+                break  # Stop immediately if the job has succeeded
             end
         end
     end
-    return exec  # Stop immediately if the job has succeeded
+    schedule(task)
+    return task
 end
 
-"""
-    singlerun!(exec::Executor)
-
-Executes a single run of the job associated with the `Executor` object.
-
-This function checks the job status. If the job is pending, it schedules the task and waits
-if `wait` is `true`. If the job has failed or been interrupted, it creates a new task,
-resets the job status to `PENDING`, and then calls `singlerun!` again. If the job is running
-or has succeeded, it does nothing and returns the `Executor` object.
-"""
-function singlerun!(exec::Executor)
-    if ispending(exec.job)
-        schedule(exec.task)
-        if exec.wait
-            wait(exec)
-        end
+function singlerun!(job::AbstractJob)
+    if isfailed(job) || isinterrupted(job)
+        job.status = PENDING
+        return singlerun!(job)
     end
-    if isfailed(exec.job) || isinterrupted(exec.job)
-        newtask!(exec)
-        exec.job.status = PENDING
-        return singlerun!(exec)  # Wait or not depends on `exec.wait`
+    if ispending(job)
+        task = dispatch!(job)
+        schedule(task)
     end
-    return exec  # Do nothing for running and succeeded jobs
+    return task  # Do nothing for running and succeeded jobs
 end
 
 # Internal function to execute a specific `AbstractJob`.
@@ -161,27 +143,3 @@ function shouldrun(job::ArgDependentJob)
         end
     end
 end
-
-"""
-    kill!(exec::Executor)
-
-Manually kill a `Job`, works only if it is running.
-"""
-function kill!(exec::Executor)
-    if isexited(exec.job)
-        @info "the job $(exec.job.id) has already exited!"
-    elseif ispending(exec.job)
-        @info "the job $(exec.job.id) has not started!"
-    else
-        _kill(exec.task)
-    end
-    return exec
-end
-
-"""
-    Base.wait(exec::Executor)
-
-Overloads the Base `wait` function to wait for the `Task` associated with an `Executor`
-object to complete.
-"""
-Base.wait(exec::Executor) = wait(exec.task)
