@@ -30,6 +30,21 @@ mutable struct AsyncExecutor <: Executor
 end
 AsyncExecutor(; maxattempts=1, interval=1, delay=0, wait=false) =
     AsyncExecutor(maxattempts, interval, delay, wait)
+mutable struct ParallelExecutor <: Executor
+    spawnat::Union{Symbol,UInt64}
+    maxattempts::UInt64
+    interval::Real
+    delay::Real
+    wait::Bool
+    function ParallelExecutor(spawnat=:any, maxattempts=1, interval=1, delay=0, wait=false)
+        @assert maxattempts >= 1
+        @assert interval >= zero(interval)
+        @assert delay >= zero(delay)
+        return new(spawnat, maxattempts, interval, delay, wait)
+    end
+end
+ParallelExecutor(spawnat=:any; maxattempts=1, interval=1, delay=0, wait=false) =
+    ParallelExecutor(spawnat, maxattempts, interval, delay, wait)
 
 """
     run!(job::Job; maxattempts=1, interval=1, delay=0, wait=false)
