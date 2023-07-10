@@ -70,16 +70,6 @@ function execute!(job::AbstractJob, exec::AsyncExecutor)
     return task  # Stop immediately if the job has succeeded
 end
 
-"""
-    singlerun!(exec::Executor)
-
-Executes a single run of the job associated with the `Executor` object.
-
-This function checks the job status. If the job is pending, it schedules the task and waits
-if `wait` is `true`. If the job has failed or been interrupted, it creates a new task,
-resets the job status to `PENDING`, and then calls `singlerun!` again. If the job is running
-or has succeeded, it does nothing and returns the `Executor` object.
-"""
 function singlerun!(exec::AsyncExecutor, job::AbstractJob)
     if isfailed(job) || isinterrupted(job)
         job.status = PENDING
