@@ -6,10 +6,12 @@ using Thinkers
         n < 5 ? error("not the number we want!") : return n
     end
     i = Job(Thunk(f); username="me", name="i")
-    run!(i; maxattempts=10, interval=3)
+    task = run!(i; maxattempts=10, interval=3)
+    wait(task)
     count = countexecution(i)
     @test 1 <= count <= 10
-    run!(i; maxattempts=10, interval=3)
+    task = run!(i; maxattempts=10, interval=3)
+    wait(task)
     @test 1 <= countexecution(i) <= 20
 end
 
