@@ -89,6 +89,32 @@ function execute!(job::AbstractJob, exec::AsyncExecutor)
     end
     return task
 end
+function execute!(job::AbstractJob, exec::ParallelExecutor)
+    @assert shouldrun(job)
+    prepare!(job)
+    task = if issucceeded(job)
+        @task job  # Just return the job if it has succeeded
+    else
+        sleep(exec.delay)
+        @task dispatch!(job, exec)
+    end
+    schedule(task)
+    if exec.wait
+        wait(task)
+    end
+    return task
+end
+
+function dispatch!(job::AbstractJob, exec::ParallelExecutor)
+    copiedjob = job  # Initialize `copiedjob` outside the loop with the original job
+    for _ in Base.OneTo(exec.maxattempts)
+        copiedjob = runonce!(copiedjob, exec)  # Update `job` with the modified one for `ParallelExecutor`
+        if issucceeded(copiedjob)
+            break  # Stop immediately if the job has succeeded
+        end
+    end
+    return copiedjob  # Now it's valid to return `copiedjob`
+end
 
 function runonce!(job::AbstractJob, exec::AsyncExecutor)
     if isfailed(job) || isinterrupted(job)
@@ -108,7 +134,7 @@ function runonce!(job::AbstractJob, exec::ParallelExecutor)
         return runonce!(job, exec)
     end
     if ispending(job)
-        future = @spawnat exec.spawnat _run!(job)
+        future = @spawnat exec.spawnat _run!(job)  # It is likely that `job` will not be modified
         job = fetch(future)
     end
     return job  # Do nothing for running and succeeded jobs
