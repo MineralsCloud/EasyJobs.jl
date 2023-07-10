@@ -78,8 +78,8 @@ end
         @assert n.parents == Set([l, m])
         @assert isempty(n.children)
         for job in (i, j, k, l, m, n)
-            exec = run!(job)
-            wait(exec)
+            task = run!(job)
+            wait(task)
             @test issucceeded(job)
         end
     end
@@ -95,15 +95,15 @@ end
     @test !shouldrun(j)
     @test_throws AssertionError run!(j)
     @test getresult(j) === nothing
-    exec = run!(h)
-    wait(exec)
+    task = run!(h)
+    wait(task)
     @test !shouldrun(j)
     @test_throws AssertionError run!(j)
     @test getresult(j) === nothing
-    exec = run!(i)
-    wait(exec)
-    exec = run!(j)
-    wait(exec)
+    task = run!(i)
+    wait(task)
+    task = run!(j)
+    wait(task)
     @test getresult(j) == Some("1001")
 end
 
@@ -117,17 +117,17 @@ end
     i → j → k
     @test !shouldrun(j)
     @test !shouldrun(k)
-    exec = run!(i)
-    wait(exec)
+    task = run!(i)
+    wait(task)
     @test getresult(i) == Some(25)
     @test shouldrun(j)
     @test !shouldrun(k)
-    exec = run!(j)
-    wait(exec)
+    task = run!(j)
+    wait(task)
     @test getresult(j) == Some(26)
     @test shouldrun(k)
-    exec = run!(k)
-    wait(exec)
+    task = run!(k)
+    wait(task)
     @test getresult(k) == Some(13.0)
 end
 
@@ -142,15 +142,15 @@ end
     l = ArgDependentJob(Thunk(f₄, ()); username="she", name="me")
     (i, j, k) .→ l
     @test !shouldrun(l)
-    execs = map((i, j, k)) do job
+    tasks = map((i, j, k)) do job
         run!(job)
     end
-    for exec in execs
-        wait(exec)
+    for task in tasks
+        wait(task)
     end
     @test shouldrun(l)
-    exec = run!(l)
-    wait(exec)
+    task = run!(l)
+    wait(task)
     @test getresult(i) == Some(25)
     @test getresult(j) == Some(4)
     @test getresult(k) == Some(3.0)
