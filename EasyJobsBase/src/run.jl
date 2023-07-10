@@ -17,20 +17,18 @@ Handle the execution of jobs.
 - `delay::Real=0`: the delay before the first attempt to execute the job, in seconds.
 """
 mutable struct AsyncExecutor <: Executor
-    wait::Bool
     maxattempts::UInt64
     interval::Real
     delay::Real
-    task::Task
-    function AsyncExecutor(wait=false, maxattempts=1, interval=1, delay=0)
+    function AsyncExecutor(maxattempts=1, interval=1, delay=0)
         @assert maxattempts >= 1
         @assert interval >= zero(interval)
         @assert delay >= zero(delay)
-        return new(wait, maxattempts, interval, delay)
+        return new(maxattempts, interval, delay)
     end
 end
-AsyncExecutor(; wait=false, maxattempts=1, interval=1, delay=0) =
-    AsyncExecutor(wait, maxattempts, interval, delay)
+AsyncExecutor(; maxattempts=1, interval=1, delay=0) =
+    AsyncExecutor(maxattempts, interval, delay)
 
 function dispatch!(exec::AsyncExecutor, job::AbstractJob)
     exec.task = @task _run!(job)  # Start a new task. This is necessary for rerunning!
