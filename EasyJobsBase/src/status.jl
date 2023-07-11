@@ -4,7 +4,6 @@ export getstatus,
     isexited,
     issucceeded,
     isfailed,
-    isinterrupted,
     listpending,
     listrunning,
     listexited,
@@ -55,14 +54,7 @@ issucceeded(job::AbstractJob) = getstatus(job) === SUCCEEDED
 
 Test if the `job` failed during running.
 """
-isfailed(job::AbstractJob) = getstatus(job) === FAILED
-
-"""
-    isinterrupted(job::AbstractJob)
-
-Test if the `job` was interrupted during running.
-"""
-isinterrupted(job::AbstractJob) = getstatus(job) === INTERRUPTED
+isfailed(job::AbstractJob) = getstatus(job) in (FAILED, INTERRUPTED)
 
 """
     listpending(jobs)
