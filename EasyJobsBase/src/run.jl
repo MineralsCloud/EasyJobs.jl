@@ -25,35 +25,31 @@ struct AsyncExecutor <: Executor
     interval::Real
     delay::Real
     wait::Bool
-    function AsyncExecutor(maxattempts=1, interval=1, delay=0, wait=false)
-        @assert maxattempts >= 1
-        @assert interval >= zero(interval)
-        @assert delay >= zero(delay)
-        return new(maxattempts, interval, delay, wait)
-    end
 end
-AsyncExecutor(; maxattempts=1, interval=1, delay=0, wait=false) =
-    AsyncExecutor(maxattempts, interval, delay, wait)
+function AsyncExecutor(; maxattempts=1, interval=1, delay=0, wait=false)
+    @assert maxattempts >= 1
+    @assert interval >= zero(interval)
+    @assert delay >= zero(delay)
+    return AsyncExecutor(maxattempts, interval, delay, wait)
+end
 struct ParallelExecutor <: Executor
     spawnat::Union{Symbol,UInt64}
     maxattempts::UInt64
     interval::Real
     delay::Real
     wait::Bool
-    function ParallelExecutor(spawnat=:any, maxattempts=1, interval=1, delay=0, wait=false)
-        if isinteger(spawnat)
-            spawnat = UInt64(spawnat)
-        else
-            @assert spawnat == :any
-        end
-        @assert maxattempts >= 1
-        @assert interval >= zero(interval)
-        @assert delay >= zero(delay)
-        return new(spawnat, maxattempts, interval, delay, wait)
-    end
 end
-ParallelExecutor(spawnat=:any; maxattempts=1, interval=1, delay=0, wait=false) =
-    ParallelExecutor(spawnat, maxattempts, interval, delay, wait)
+function ParallelExecutor(spawnat=:any; maxattempts=1, interval=1, delay=0, wait=false)
+    if isinteger(spawnat)
+        spawnat = UInt64(spawnat)
+    else
+        @assert spawnat == :any
+    end
+    @assert maxattempts >= 1
+    @assert interval >= zero(interval)
+    @assert delay >= zero(delay)
+    return ParallelExecutor(spawnat, maxattempts, interval, delay, wait)
+end
 
 """
     run!(job::Job; maxattempts=1, interval=1, delay=0, wait=false)
