@@ -14,7 +14,7 @@ using Thinkers
 end
 
 # See https://github.com/MineralsCloud/EasyJobsBase.jl/pull/44
-@testset "Test `singlerun!` only runs once per attempt" begin
+@testset "Test `runonce!` only runs once per attempt" begin
     arr = []
     function f(A)
         push!(A, 1)
@@ -24,7 +24,7 @@ end
     task = run!(i; maxattempts=5, interval=1, wait=false)
     wait(task)
     @test countexecution(i) == 5
-    @test length(arr) == 5  # It proves `singlerun!` only runs once per attempt
+    @test length(arr) == 5  # It proves `runonce!` only runs once per attempt
 end
 
 @testset "Test running `Job`s" begin
