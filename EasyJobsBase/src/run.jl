@@ -108,7 +108,7 @@ function dispatch!(job::AbstractJob, exec::ParallelExecutor)
 end
 
 function runonce!(job::AbstractJob, exec::AsyncExecutor)
-    if isfailed(job) || isinterrupted(job)
+    if isfailed(job)
         setpending!(job)
         return runonce!(job, exec)
     end
@@ -120,7 +120,7 @@ function runonce!(job::AbstractJob, exec::AsyncExecutor)
     return job  # Do nothing for running and succeeded jobs
 end
 function runonce!(job::AbstractJob, exec::ParallelExecutor)
-    if isfailed(job) || isinterrupted(job)
+    if isfailed(job)
         setpending!(job)
         return runonce!(job, exec)
     end

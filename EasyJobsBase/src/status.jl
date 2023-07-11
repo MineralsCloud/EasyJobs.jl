@@ -4,13 +4,11 @@ export getstatus,
     isexited,
     issucceeded,
     isfailed,
-    isinterrupted,
     listpending,
     listrunning,
     listexited,
     listsucceeded,
     listfailed,
-    listinterrupted,
     setsucceeded!,
     setpending!,
     setfailed!
@@ -55,14 +53,7 @@ issucceeded(job::AbstractJob) = getstatus(job) === SUCCEEDED
 
 Test if the `job` failed during running.
 """
-isfailed(job::AbstractJob) = getstatus(job) === FAILED
-
-"""
-    isinterrupted(job::AbstractJob)
-
-Test if the `job` was interrupted during running.
-"""
-isinterrupted(job::AbstractJob) = getstatus(job) === INTERRUPTED
+isfailed(job::AbstractJob) = getstatus(job) in (FAILED, INTERRUPTED)
 
 """
     listpending(jobs)
@@ -98,13 +89,6 @@ listsucceeded(jobs) = Iterators.filter(issucceeded, jobs)
 Filter the failed jobs in a sequence of jobs.
 """
 listfailed(jobs) = Iterators.filter(isfailed, jobs)
-
-"""
-    listinterrupted(jobs)
-
-Filter the interrupted jobs in a sequence of jobs.
-"""
-listinterrupted(jobs) = Iterators.filter(isinterrupted, jobs)
 
 setsucceeded!(job::AbstractJob) = job.status = SUCCEEDED
 
