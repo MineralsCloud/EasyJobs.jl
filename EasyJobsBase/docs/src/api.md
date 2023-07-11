@@ -24,13 +24,11 @@ isrunning
 isexited
 issucceeded
 isfailed
-isinterrupted
 listpending
 listrunning
 listexited
 listsucceeded
 listfailed
-listinterrupted
 countexecution
 descriptionof
 creationtimeof
