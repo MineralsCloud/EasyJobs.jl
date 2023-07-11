@@ -4,6 +4,16 @@ addprocs(3)
 @everywhere using EasyJobsBase
 @everywhere using EasyJobsBase: ParallelExecutor, runonce!
 
+@testset "Test `runonce!` for `ParallelExecutor`" begin
+    i = Job(Thunk(myid); username="me", name="i")
+    exec = ParallelExecutor(2; wait=true)
+    i′ = runonce!(i, exec)
+    @test i != i′
+    i″ = runonce!(i, exec)
+    @test i′ != i″
+    @test i != i″
+end
+
 @testset "Test `execute!` for `ParallelExecutor`" begin
     i = Job(Thunk(myid); username="me", name="i")
     exec = ParallelExecutor(2; wait=true)
