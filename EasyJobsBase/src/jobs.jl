@@ -10,7 +10,6 @@ export Job, IndependentJob, ConditionalJob, ArgDependentJob
     RUNNING
     SUCCEEDED
     FAILED
-    INTERRUPTED
 end
 
 abstract type AbstractJob end
