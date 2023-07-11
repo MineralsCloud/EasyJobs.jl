@@ -61,7 +61,7 @@ and an initial `delay` in seconds.
 """
 run!(job::AbstractJob, ::Async; kwargs...) = execute!(job, AsyncExecutor(; kwargs...))
 run!(job::AbstractJob, ::Parallel; kwargs...) = execute!(job, ParallelExecutor(; kwargs...))
-run!(job::AbstractJob; kwargs...) = execute!(job, Async(; kwargs...))
+run!(job::AbstractJob; kwargs...) = run!(job, Async(); kwargs...)
 
 """
     execute!(job::AbstractJob, exec::Executor)
