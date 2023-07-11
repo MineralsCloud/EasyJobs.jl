@@ -137,12 +137,7 @@ function _run!(job::AbstractJob)  # Do not export!
     job.start_time = now()
     reify!(job.core)
     job.end_time = now()
-    job.status = if haserred(job.core)
-        e = something(getresult(job.core)).thrown
-        e isa Union{InterruptException,TimeoutException} ? INTERRUPTED : FAILED
-    else
-        SUCCEEDED
-    end
+    job.status = haserred(job.core) ? FAILED : SUCCEEDED
     job.count += 1
     return job
 end
