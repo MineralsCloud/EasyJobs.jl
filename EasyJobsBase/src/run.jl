@@ -128,7 +128,7 @@ function runonce!(job::AbstractJob, exec::ParallelExecutor)
     end
     if ispending(job)
         future = @spawnat exec.spawnat _run!(job)  # It is likely that `job` will not be modified
-        job = fetch(future)
+        job = fetch(future)  # The `future` will be different everytime, so is the `job` fetched
     end
     return job  # Do nothing for running and succeeded jobs
 end
