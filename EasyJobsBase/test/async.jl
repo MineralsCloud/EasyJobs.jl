@@ -27,7 +27,7 @@ end
     @test length(arr) == 5  # It proves `runonce!` only runs once per attempt
 end
 
-@testset "Test `execute!` returns the same `Job` with differernt statuses of the `Job` for `AsyncExecutor`" begin
+@testset "Test `execute!` returns the same `Job` when succeeded for `AsyncExecutor`" begin
     f₁(x) = x^2
     i = Job(Thunk(f₁, 5); username="me", name="i")
     task1 = run!(i; wait=true)

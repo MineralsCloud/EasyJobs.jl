@@ -11,7 +11,7 @@ addprocs(3)
     newjob = fetch(task1)
     @test newjob != i
     @test getresult(newjob) == Some(2)
-    @testset "Test `execute!` returns different `Job`s with differernt statuses of the `Job` for `ParallelExecutor`" begin
+    @testset "Test `execute!` returns a different `Job` when succeeded for `ParallelExecutor`" begin
         task2 = execute!(i, exec)
         @test task1 != task2
         @test fetch(task1) != fetch(task2)
@@ -26,7 +26,7 @@ end
     newjob = fetch(task1)
     @test newjob == i
     @test getresult(newjob) == Some(25)
-    @testset "Test `execute!` returns the same `Job` with differernt statuses of the `Job` for `ParallelExecutor`" begin
+    @testset "Test `execute!` returns the same `Job` when succeeded for `ParallelExecutor`" begin
         task2 = execute!(i, exec)
         @test task1 != task2
         @test i == fetch(task2)
