@@ -1,4 +1,4 @@
-using Distributed: @spawnat
+using Distributed: nprocs, @spawnat
 using Thinkers: TimeoutException, ErrorInfo, reify!, setargs!, haserred, _kill
 
 export Async, Parallel, shouldrun, run!, execute!
@@ -33,18 +33,14 @@ function AsyncExecutor(; maxattempts=1, interval=1, delay=0, wait=false)
     return AsyncExecutor(maxattempts, interval, delay, wait)
 end
 struct ParallelExecutor <: Executor
-    worker::Union{Symbol,UInt64}
+    worker::UInt64
     maxattempts::UInt64
     interval::Real
     delay::Real
     wait::Bool
 end
-function ParallelExecutor(worker=:any; maxattempts=1, interval=1, delay=0, wait=false)
-    if isinteger(worker)
-        worker = UInt64(worker)
-    else
-        @assert worker == :any
-    end
+function ParallelExecutor(worker=1; maxattempts=1, interval=1, delay=0, wait=false)
+    @assert 1 <= worker <= nprocs()
     @assert maxattempts >= 1
     @assert interval >= zero(interval)
     @assert delay >= zero(delay)
