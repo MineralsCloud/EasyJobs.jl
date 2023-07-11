@@ -39,7 +39,7 @@ isrunning(job::AbstractJob) = getstatus(job) === RUNNING
 
 Test if the `job` has exited.
 """
-isexited(job::AbstractJob) = getstatus(job) in (SUCCEEDED, FAILED, INTERRUPTED)
+isexited(job::AbstractJob) = getstatus(job) in (SUCCEEDED, FAILED)
 
 """
     issucceeded(job::AbstractJob)
@@ -53,7 +53,7 @@ issucceeded(job::AbstractJob) = getstatus(job) === SUCCEEDED
 
 Test if the `job` failed during running.
 """
-isfailed(job::AbstractJob) = getstatus(job) in (FAILED, INTERRUPTED)
+isfailed(job::AbstractJob) = getstatus(job) === FAILED
 
 """
     listpending(jobs)
