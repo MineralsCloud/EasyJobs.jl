@@ -20,7 +20,7 @@ Handle the asynchronous execution of jobs.
 - `delay::Real=0`: the delay before the first attempt to execute the job, in seconds.
 - `wait::Bool=false`: determines whether to wait for the job to complete before executing the next task.
 """
-mutable struct AsyncExecutor <: Executor
+struct AsyncExecutor <: Executor
     maxattempts::UInt64
     interval::Real
     delay::Real
@@ -34,7 +34,7 @@ mutable struct AsyncExecutor <: Executor
 end
 AsyncExecutor(; maxattempts=1, interval=1, delay=0, wait=false) =
     AsyncExecutor(maxattempts, interval, delay, wait)
-mutable struct ParallelExecutor <: Executor
+struct ParallelExecutor <: Executor
     spawnat::Union{Symbol,UInt64}
     maxattempts::UInt64
     interval::Real
