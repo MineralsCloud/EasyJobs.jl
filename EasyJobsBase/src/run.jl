@@ -33,22 +33,22 @@ function AsyncExecutor(; maxattempts=1, interval=1, delay=0, wait=false)
     return AsyncExecutor(maxattempts, interval, delay, wait)
 end
 struct ParallelExecutor <: Executor
-    spawnat::Union{Symbol,UInt64}
+    worker::Union{Symbol,UInt64}
     maxattempts::UInt64
     interval::Real
     delay::Real
     wait::Bool
 end
-function ParallelExecutor(spawnat=:any; maxattempts=1, interval=1, delay=0, wait=false)
-    if isinteger(spawnat)
-        spawnat = UInt64(spawnat)
+function ParallelExecutor(worker=:any; maxattempts=1, interval=1, delay=0, wait=false)
+    if isinteger(worker)
+        worker = UInt64(worker)
     else
-        @assert spawnat == :any
+        @assert worker == :any
     end
     @assert maxattempts >= 1
     @assert interval >= zero(interval)
     @assert delay >= zero(delay)
-    return ParallelExecutor(spawnat, maxattempts, interval, delay, wait)
+    return ParallelExecutor(worker, maxattempts, interval, delay, wait)
 end
 
 """
@@ -101,6 +101,8 @@ end
 function dispatch!(job::AbstractJob, exec::ParallelExecutor)
     copiedjob = job  # Initialize `copiedjob` outside the loop with the original job
     for _ in Base.OneTo(exec.maxattempts)
+        # `copiedjob` will be a new alias everytime using `runonce!`, but it is still run on the
+        # same worker specified by `exec.worker`
         copiedjob = runonce!(copiedjob, exec)  # Update `job` with the modified one for `ParallelExecutor`
         if issucceeded(copiedjob)
             break  # Stop immediately if the job has succeeded
@@ -127,7 +129,7 @@ function runonce!(job::AbstractJob, exec::ParallelExecutor)
         return runonce!(job, exec)
     end
     if ispending(job)
-        future = @spawnat exec.spawnat _run!(job)  # It is likely that `job` will not be modified
+        future = @spawnat exec.worker _run!(job)  # It is likely that `job` will not be modified
         job = fetch(future)  # The `future` will be different everytime, so is the `job` fetched
     end
     return job  # Do nothing for running and succeeded jobs
