@@ -1,11 +1,7 @@
 using Distributed: nprocs, @spawnat
 using Thinkers: TimeoutException, ErrorInfo, reify!, setargs!, haserred, _kill
 
-export Async, Parallel, shouldrun, run!, execute!
-
-abstract type ExecutionStyle end
-struct Async <: ExecutionStyle end
-struct Parallel <: ExecutionStyle end
+export shouldrun, run!, execute!
 
 # See https://github.com/MineralsCloud/SimpleWorkflows.jl/issues/137
 abstract type Executor end
@@ -49,15 +45,14 @@ end
 
 """
     run!(job::Job; maxattempts=1, interval=1, delay=0, wait=false)
-    run!(job::Job, style::Async; maxattempts=1, interval=1, delay=0, wait=false)
-    run!(job::Job, style::Parallel; maxattempts=1, interval=1, delay=0, wait=false)
+    run!(job::Job, worker::Integer; maxattempts=1, interval=1, delay=0, wait=false)
 
 Run a `Job` with a maximum number of attempts, with each attempt separated by `interval` seconds
 and an initial `delay` in seconds.
 """
-run!(job::AbstractJob, ::Async; kwargs...) = execute!(job, AsyncExecutor(; kwargs...))
-run!(job::AbstractJob, ::Parallel; kwargs...) = execute!(job, ParallelExecutor(; kwargs...))
-run!(job::AbstractJob; kwargs...) = run!(job, Async(); kwargs...)
+run!(job::AbstractJob; kwargs...) = execute!(job, AsyncExecutor(; kwargs...))
+run!(job::AbstractJob, worker::Integer; kwargs...) =
+    execute!(job, ParallelExecutor(worker; kwargs...))
 
 """
     execute!(job::AbstractJob, exec::Executor)
