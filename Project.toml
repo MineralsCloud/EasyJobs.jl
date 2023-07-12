@@ -1,7 +1,7 @@
 name = "EasyJobs"
 uuid = "66d786ec-6e9c-4d5d-a8f6-aa4f8d7350fb"
 authors = ["singularitti <singularitti@outlook.com> and contributors"]
-version = "0.7.0"
+version = "0.8.0"
 
 [deps]
 EasyJobsBase = "db8ca866-b61f-4bd1-a9b9-75c107d645d4"
