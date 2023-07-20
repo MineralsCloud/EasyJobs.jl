@@ -83,17 +83,17 @@ version = "1.6.0"
 
 [[deps.EasyJobs]]
 deps = ["EasyJobsBase", "Query", "Reexport", "Thinkers", "UUIDs"]
-git-tree-sha1 = "5e4303ee4375ba5c6c9bff52f4f11a65fca305af"
+git-tree-sha1 = "e2a505a98f98bda2b10dcbbd78144df3d8113202"
 repo-rev = "main"
 repo-url = "https://github.com/MineralsCloud/EasyJobs.jl"
 uuid = "66d786ec-6e9c-4d5d-a8f6-aa4f8d7350fb"
-version = "0.7.0"
+version = "0.9.0"
 
 [[deps.EasyJobsBase]]
 deps = ["Dates", "Distributed", "Thinkers", "UUIDs"]
-git-tree-sha1 = "3f03891113b3355b28768cce97fab06e9a52690c"
+git-tree-sha1 = "a6a51d40a947b14ce458c2737dfbb651cc2e5b8d"
 uuid = "db8ca866-b61f-4bd1-a9b9-75c107d645d4"
-version = "0.12.0"
+version = "0.13.0"
 
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
@@ -289,10 +289,10 @@ uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 version = "1.0.3"
 
 [[deps.TableShowUtils]]
-deps = ["DataValues", "Dates", "JSON", "Markdown", "Test"]
-git-tree-sha1 = "14c54e1e96431fb87f0d2f5983f090f1b9d06457"
+deps = ["DataValues", "Dates", "JSON", "Markdown", "Unicode"]
+git-tree-sha1 = "2a41a3dedda21ed1184a47caab56ed9304e9a038"
 uuid = "5e66a065-1f0a-5976-b372-e0b8c017ca10"
-version = "0.2.5"
+version = "0.2.6"
 
 [[deps.TableTraits]]
 deps = ["IteratorInterfaceExtensions"]
@@ -310,10 +310,6 @@ version = "1.0.2"
 deps = ["ArgTools", "SHA"]
 uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
 version = "1.10.0"
-
-[[deps.Test]]
-deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
-uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[deps.Thinkers]]
 deps = ["Dates"]
