@@ -83,11 +83,11 @@ version = "1.6.0"
 
 [[deps.EasyJobs]]
 deps = ["EasyJobsBase", "Query", "Reexport", "Thinkers", "UUIDs"]
-git-tree-sha1 = "e2a505a98f98bda2b10dcbbd78144df3d8113202"
+git-tree-sha1 = "3e217c29905bbf24f4c01b529cd8aff338b394ba"
 repo-rev = "main"
 repo-url = "https://github.com/MineralsCloud/EasyJobs.jl"
 uuid = "66d786ec-6e9c-4d5d-a8f6-aa4f8d7350fb"
-version = "0.9.0"
+version = "0.9.1"
 
 [[deps.EasyJobsBase]]
 deps = ["Dates", "Distributed", "Thinkers", "UUIDs"]
@@ -197,9 +197,9 @@ uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
 version = "0.3.21+4"
 
 [[deps.OrderedCollections]]
-git-tree-sha1 = "d321bf2de576bf25ec4d3e4360faca399afca282"
+git-tree-sha1 = "1791b503101162477bf11e951caf6983e57cd8c2"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
-version = "1.6.0"
+version = "1.6.1"
 
 [[deps.Parsers]]
 deps = ["Dates", "PrecompileTools", "UUIDs"]
