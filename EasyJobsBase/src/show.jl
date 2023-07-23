@@ -13,9 +13,19 @@ end
 function Base.show(io::IO, ::MIME"text/plain", job::AbstractJob)
     println(io, summary(job))
     println(io, ' ', "id: ", job.id)
+    if !isempty(job.name)
+        print(io, ' ', "name: ")
+        print(io, job.name)
+        println(io)
+    end
     if !isempty(job.description)
         print(io, ' ', "description: ")
-        show(io, job.description)
+        print(io, job.description)
+        println(io)
+    end
+    if !isempty(job.username)
+        print(io, ' ', "by: ")
+        print(io, job.username)
         println(io)
     end
     print(io, ' ', "core: ")
