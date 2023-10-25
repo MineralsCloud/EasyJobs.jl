@@ -4,11 +4,11 @@ export getstatus,
     isexited,
     issucceeded,
     isfailed,
-    listpending,
-    listrunning,
-    listexited,
-    listsucceeded,
-    listfailed,
+    filterpending,
+    filterrunning,
+    filterexited,
+    filtersucceeded,
+    filterfailed,
     setsucceeded!,
     setpending!,
     setfailed!
@@ -56,39 +56,39 @@ Test if the `job` failed during running.
 isfailed(job::AbstractJob) = getstatus(job) === FAILED
 
 """
-    listpending(jobs)
+    filterpending(jobs)
 
 Filter the pending jobs in a sequence of jobs.
 """
-listpending(jobs) = Iterators.filter(ispending, jobs)
+filterpending(jobs) = Iterators.filter(ispending, jobs)
 
 """
-    listrunning(jobs)
+    filterrunning(jobs)
 
 Filter the running jobs in a sequence of jobs.
 """
-listrunning(jobs) = Iterators.filter(isrunning, jobs)
+filterrunning(jobs) = Iterators.filter(isrunning, jobs)
 
 """
-    listexited(jobs)
+    filterexited(jobs)
 
 Filter the exited jobs in a sequence of jobs.
 """
-listexited(jobs) = Iterators.filter(isexited, jobs)
+filterexited(jobs) = Iterators.filter(isexited, jobs)
 
 """
-    listsucceeded(jobs)
+    filtersucceeded(jobs)
 
 Filter the succeeded jobs in a sequence of jobs.
 """
-listsucceeded(jobs) = Iterators.filter(issucceeded, jobs)
+filtersucceeded(jobs) = Iterators.filter(issucceeded, jobs)
 
 """
-    listfailed(jobs)
+    filterfailed(jobs)
 
 Filter the failed jobs in a sequence of jobs.
 """
-listfailed(jobs) = Iterators.filter(isfailed, jobs)
+filterfailed(jobs) = Iterators.filter(isfailed, jobs)
 
 setsucceeded!(job::AbstractJob) = job.status = SUCCEEDED
 
