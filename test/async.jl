@@ -109,7 +109,8 @@ end
     f₂() = read("file", String)
     h = Job(Thunk(sleep, 3); username="me", name="h")
     i = Job(Thunk(f₁, 1001); username="me", name="i")
-    j = ConditionalJob(Thunk(map, f₂); username="he", name="j")
+    caller = f -> f()
+    j = ConditionalJob(Thunk(caller, f₂); username="he", name="j")
     [h, i] .→ j
     @test !shouldrun(j)
     @test_throws AssertionError run!(j)
