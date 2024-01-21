@@ -1,11 +1,12 @@
 using Dates: DateTime, now
 using UUIDs: UUID, uuid1
 
+using SumTypes: @sum_type
 using Thinkers: Think
 
 export Job, IndependentJob, ConditionalJob, ArgDependentJob
 
-@enum JobStatus begin
+@sum_type JobStatus begin
     PENDING
     RUNNING
     SUCCEEDED
