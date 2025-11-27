@@ -16,9 +16,7 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "Manual" => [
-            "Installation guide" => "installation.md",
-        ],
+        "Manual" => ["Installation guide" => "installation.md"],
         "Public API" => "public.md",
         "Developer Docs" => [
             "Contributing" => "developers/contributing.md",
@@ -29,7 +27,4 @@ makedocs(;
     ],
 )
 
-deploydocs(;
-    repo="github.com/MineralsCloud/EasyJobs.jl",
-    devbranch="main",
-)
+deploydocs(; repo="github.com/MineralsCloud/EasyJobs.jl", devbranch="main")
