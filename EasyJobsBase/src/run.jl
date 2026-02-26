@@ -51,8 +51,9 @@ Run a `Job` with a maximum number of attempts, with each attempt separated by `i
 and an initial `delay` in seconds.
 """
 run!(job::AbstractJob; kwargs...) = execute!(job, AsyncExecutor(; kwargs...))
-run!(job::AbstractJob, worker::Integer; kwargs...) =
-    execute!(job, ParallelExecutor(worker; kwargs...))
+run!(job::AbstractJob, worker::Integer; kwargs...) = execute!(
+    job, ParallelExecutor(worker; kwargs...)
+)
 
 """
     execute!(job::AbstractJob, exec::Executor)

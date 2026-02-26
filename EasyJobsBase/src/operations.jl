@@ -48,8 +48,9 @@ function chain_succeeded!(x::AbstractJob, y::Union{ConditionalJob,ArgDependentJo
     end
     return x
 end
-chain_succeeded!(x::AbstractJob, y::AbstractJob, z::AbstractJob...) =
-    foldr(chain_succeeded!, (x, y, z...))
+chain_succeeded!(x::AbstractJob, y::AbstractJob, z::AbstractJob...) = foldr(
+    chain_succeeded!, (x, y, z...)
+)
 ↣(x::AbstractJob, y::AbstractJob) = chain_succeeded!(x, y)
 ↢(y::AbstractJob, x::AbstractJob) = x ↣ y
 
